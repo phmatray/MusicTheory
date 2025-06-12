@@ -36,6 +36,11 @@ public class Chord
     private List<(int Number, IntervalQuality Quality)> Extensions { get; } = new();
 
     /// <summary>
+    /// Gets the inversion of the chord.
+    /// </summary>
+    public ChordInversion Inversion { get; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="Chord"/> class.
     /// </summary>
     /// <param name="root">The root note of the chord.</param>
@@ -44,16 +49,18 @@ public class Chord
     {
         Root = root;
         Quality = quality;
+        Inversion = ChordInversion.Root;
     }
 
     /// <summary>
-    /// Private constructor for creating a transposed chord with extensions.
+    /// Private constructor for creating a chord with all properties.
     /// </summary>
-    private Chord(Note root, ChordQuality quality, List<(int Number, IntervalQuality Quality)> extensions)
+    private Chord(Note root, ChordQuality quality, List<(int Number, IntervalQuality Quality)> extensions, ChordInversion inversion)
     {
         Root = root;
         Quality = quality;
         Extensions = new List<(int Number, IntervalQuality Quality)>(extensions);
+        Inversion = inversion;
     }
 
     /// <summary>
@@ -161,6 +168,88 @@ public class Chord
     public Chord Transpose(Interval interval, Direction direction = Direction.Up)
     {
         var newRoot = Root.Transpose(interval, direction);
-        return new Chord(newRoot, Quality, Extensions);
+        return new Chord(newRoot, Quality, Extensions, Inversion);
+    }
+
+    /// <summary>
+    /// Creates a new chord with the specified inversion.
+    /// </summary>
+    /// <param name="inversion">The inversion to apply.</param>
+    /// <returns>A new chord with the specified inversion.</returns>
+    public Chord WithInversion(ChordInversion inversion)
+    {
+        return new Chord(Root, Quality, Extensions, inversion);
+    }
+
+    /// <summary>
+    /// Gets the bass note of the chord based on its inversion.
+    /// </summary>
+    /// <returns>The bass note.</returns>
+    public Note GetBassNote()
+    {
+        var notes = GetNotes().ToList();
+        
+        return Inversion switch
+        {
+            ChordInversion.Root => notes[0],   // Root
+            ChordInversion.First => notes[1],  // Third
+            ChordInversion.Second => notes[2], // Fifth
+            ChordInversion.Third => notes.Count > 3 ? notes[3] : throw new InvalidOperationException("Third inversion requires a seventh chord"),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
+    /// <summary>
+    /// Gets the notes of the chord arranged according to the inversion.
+    /// </summary>
+    /// <returns>An enumerable of notes in inversion order.</returns>
+    public IEnumerable<Note> GetNotesInInversion()
+    {
+        var notes = GetNotes().ToList();
+        
+        switch (Inversion)
+        {
+            case ChordInversion.Root:
+                return notes;
+                
+            case ChordInversion.First:
+                // Move root up an octave
+                var rootUpOctave = new Note(notes[0].Name, notes[0].Alteration, notes[0].Octave + 1);
+                return new[] { notes[1], notes[2] }.Concat(notes.Skip(3)).Append(rootUpOctave);
+                
+            case ChordInversion.Second:
+                // Move root and third up an octave
+                var rootUp = new Note(notes[0].Name, notes[0].Alteration, notes[0].Octave + 1);
+                var thirdUp = new Note(notes[1].Name, notes[1].Alteration, notes[1].Octave + 1);
+                return new[] { notes[2] }.Concat(notes.Skip(3)).Append(rootUp).Append(thirdUp);
+                
+            case ChordInversion.Third:
+                if (notes.Count < 4)
+                    throw new InvalidOperationException("Third inversion requires a seventh chord");
+                // Move root, third, and fifth up an octave
+                var rootUp3 = new Note(notes[0].Name, notes[0].Alteration, notes[0].Octave + 1);
+                var thirdUp3 = new Note(notes[1].Name, notes[1].Alteration, notes[1].Octave + 1);
+                var fifthUp3 = new Note(notes[2].Name, notes[2].Alteration, notes[2].Octave + 1);
+                return new[] { notes[3] }.Concat(notes.Skip(4)).Append(rootUp3).Append(thirdUp3).Append(fifthUp3);
+                
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    /// <summary>
+    /// Gets the slash chord notation for the chord.
+    /// </summary>
+    /// <returns>The slash chord notation (e.g., "C/E" for C major first inversion).</returns>
+    public string GetSlashChordNotation()
+    {
+        var rootName = Root.Name.ToString();
+        var bassNote = GetBassNote();
+        var bassName = bassNote.Name.ToString();
+        
+        if (Inversion == ChordInversion.Root)
+            return $"{rootName}/{rootName}";
+        
+        return $"{rootName}/{bassName}";
     }
 }
