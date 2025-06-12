@@ -64,6 +64,28 @@ public class Note
     public double Frequency => CalculateFrequency();
 
     /// <summary>
+    /// Gets the MIDI note number (0-127).
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when the note is outside the valid MIDI range.</exception>
+    public int MidiNumber
+    {
+        get
+        {
+            // MIDI note 60 is Middle C (C4)
+            // Calculate semitones from C-1 (MIDI 0)
+            int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 };
+            int midiNumber = (Octave + 1) * 12 + semitonesFromC[(int)Name] + (int)Alteration;
+            
+            if (midiNumber < 0 || midiNumber > 127)
+            {
+                throw new InvalidOperationException($"Note {this} is outside the valid MIDI range (0-127).");
+            }
+            
+            return midiNumber;
+        }
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="Note"/> class with natural alteration and octave 4.
     /// </summary>
     /// <param name="name">The name of the note.</param>
@@ -245,5 +267,86 @@ public class Note
     {
         int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 };
         return Octave * 12 + semitonesFromC[(int)Name] + (int)Alteration;
+    }
+
+    /// <summary>
+    /// Creates a note from a MIDI note number.
+    /// </summary>
+    /// <param name="midiNumber">The MIDI note number (0-127).</param>
+    /// <param name="preferFlats">Whether to prefer flats over sharps for accidentals.</param>
+    /// <returns>A new Note instance.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the MIDI number is outside the valid range.</exception>
+    public static Note FromMidiNumber(int midiNumber, bool preferFlats = false)
+    {
+        if (midiNumber < 0 || midiNumber > 127)
+        {
+            throw new ArgumentOutOfRangeException(nameof(midiNumber), 
+                "MIDI note number must be between 0 and 127.");
+        }
+
+        // Calculate octave (C-1 = 0, C0 = 12, C1 = 24, etc.)
+        int octave = (midiNumber / 12) - 1;
+        int noteInOctave = midiNumber % 12;
+
+        // Map semitones to note names and alterations
+        if (preferFlats)
+        {
+            // Prefer flats for black keys
+            return noteInOctave switch
+            {
+                0 => new Note(NoteName.C, Alteration.Natural, octave),
+                1 => new Note(NoteName.D, Alteration.Flat, octave),
+                2 => new Note(NoteName.D, Alteration.Natural, octave),
+                3 => new Note(NoteName.E, Alteration.Flat, octave),
+                4 => new Note(NoteName.E, Alteration.Natural, octave),
+                5 => new Note(NoteName.F, Alteration.Natural, octave),
+                6 => new Note(NoteName.G, Alteration.Flat, octave),
+                7 => new Note(NoteName.G, Alteration.Natural, octave),
+                8 => new Note(NoteName.A, Alteration.Flat, octave),
+                9 => new Note(NoteName.A, Alteration.Natural, octave),
+                10 => new Note(NoteName.B, Alteration.Flat, octave),
+                11 => new Note(NoteName.B, Alteration.Natural, octave),
+                _ => throw new InvalidOperationException($"Invalid note in octave: {noteInOctave}")
+            };
+        }
+        else
+        {
+            // Prefer sharps for black keys (default)
+            return noteInOctave switch
+            {
+                0 => new Note(NoteName.C, Alteration.Natural, octave),
+                1 => new Note(NoteName.C, Alteration.Sharp, octave),
+                2 => new Note(NoteName.D, Alteration.Natural, octave),
+                3 => new Note(NoteName.E, Alteration.Flat, octave),  // Eb is more common than D#
+                4 => new Note(NoteName.E, Alteration.Natural, octave),
+                5 => new Note(NoteName.F, Alteration.Natural, octave),
+                6 => new Note(NoteName.F, Alteration.Sharp, octave),
+                7 => new Note(NoteName.G, Alteration.Natural, octave),
+                8 => new Note(NoteName.A, Alteration.Flat, octave),  // Ab is more common than G#
+                9 => new Note(NoteName.A, Alteration.Natural, octave),
+                10 => new Note(NoteName.B, Alteration.Flat, octave), // Bb is more common than A#
+                11 => new Note(NoteName.B, Alteration.Natural, octave),
+                _ => throw new InvalidOperationException($"Invalid note in octave: {noteInOctave}")
+            };
+        }
+    }
+
+    /// <summary>
+    /// Returns a string representation of the note.
+    /// </summary>
+    /// <returns>A string in the format "NoteName[Alteration]Octave".</returns>
+    public override string ToString()
+    {
+        var alterationSymbol = Alteration switch
+        {
+            Alteration.DoubleFlat => "bb",
+            Alteration.Flat => "b",
+            Alteration.Natural => "",
+            Alteration.Sharp => "#",
+            Alteration.DoubleSharp => "##",
+            _ => ""
+        };
+        
+        return $"{Name}{alterationSymbol}{Octave}";
     }
 }
