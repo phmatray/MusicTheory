@@ -147,4 +147,16 @@ public class Interval
             _ => throw new ArgumentOutOfRangeException()
         };
     }
+
+    /// <summary>
+    /// Determines if this interval is enharmonically equivalent to another interval.
+    /// Two intervals are enharmonic if they have the same number of semitones.
+    /// </summary>
+    /// <param name="other">The other interval to compare.</param>
+    /// <returns>True if the intervals are enharmonic; otherwise, false.</returns>
+    public bool IsEnharmonicWith(Interval other)
+    {
+        if (other == null) return false;
+        return Semitones == other.Semitones;
+    }
 }

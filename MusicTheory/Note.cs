@@ -270,6 +270,14 @@ public class Note
     }
 
     /// <summary>
+    /// Gets the semitones from C in the current octave.
+    /// </summary>
+    private int GetSemitonesFromC()
+    {
+        return GetTotalSemitones();
+    }
+
+    /// <summary>
     /// Creates a note from a MIDI note number.
     /// </summary>
     /// <param name="midiNumber">The MIDI note number (0-127).</param>
@@ -348,5 +356,194 @@ public class Note
         };
         
         return $"{Name}{alterationSymbol}{Octave}";
+    }
+
+    /// <summary>
+    /// Determines if this note is enharmonically equivalent to another note.
+    /// Two notes are enharmonic if they represent the same pitch with different names.
+    /// </summary>
+    /// <param name="other">The other note to compare.</param>
+    /// <returns>True if the notes are enharmonic; otherwise, false.</returns>
+    public bool IsEnharmonicWith(Note other)
+    {
+        if (other == null) return false;
+        
+        // Two notes are enharmonic if they have the same semitone value
+        // but different note names or alterations
+        var thisSemitones = GetSemitonesFromC();
+        var otherSemitones = other.GetSemitonesFromC();
+        
+        // Normalize to same octave for comparison
+        var thisNormalized = thisSemitones % 12;
+        var otherNormalized = otherSemitones % 12;
+        
+        return thisNormalized == otherNormalized;
+    }
+
+    /// <summary>
+    /// Gets the most common enharmonic equivalent of this note.
+    /// </summary>
+    /// <returns>The enharmonic equivalent note, or null if no simple equivalent exists.</returns>
+    public Note GetEnharmonicEquivalent()
+    {
+        // Common enharmonic equivalents
+        return (Name, Alteration) switch
+        {
+            // Sharp to flat conversions
+            (NoteName.C, Alteration.Sharp) => new Note(NoteName.D, Alteration.Flat, Octave),
+            (NoteName.D, Alteration.Sharp) => new Note(NoteName.E, Alteration.Flat, Octave),
+            (NoteName.F, Alteration.Sharp) => new Note(NoteName.G, Alteration.Flat, Octave),
+            (NoteName.G, Alteration.Sharp) => new Note(NoteName.A, Alteration.Flat, Octave),
+            (NoteName.A, Alteration.Sharp) => new Note(NoteName.B, Alteration.Flat, Octave),
+            
+            // Flat to sharp conversions
+            (NoteName.D, Alteration.Flat) => new Note(NoteName.C, Alteration.Sharp, Octave),
+            (NoteName.E, Alteration.Flat) => new Note(NoteName.D, Alteration.Sharp, Octave),
+            (NoteName.G, Alteration.Flat) => new Note(NoteName.F, Alteration.Sharp, Octave),
+            (NoteName.A, Alteration.Flat) => new Note(NoteName.G, Alteration.Sharp, Octave),
+            (NoteName.B, Alteration.Flat) => new Note(NoteName.A, Alteration.Sharp, Octave),
+            
+            // Natural to sharp/flat conversions
+            (NoteName.E, Alteration.Natural) => new Note(NoteName.F, Alteration.Flat, Octave),
+            (NoteName.F, Alteration.Natural) => new Note(NoteName.E, Alteration.Sharp, Octave),
+            (NoteName.B, Alteration.Natural) => new Note(NoteName.C, Alteration.Flat, Octave + 1),
+            (NoteName.C, Alteration.Natural) => new Note(NoteName.B, Alteration.Sharp, Octave - 1),
+            
+            // Sharp/flat to natural conversions
+            (NoteName.E, Alteration.Sharp) => new Note(NoteName.F, Alteration.Natural, Octave),
+            (NoteName.F, Alteration.Flat) => new Note(NoteName.E, Alteration.Natural, Octave),
+            (NoteName.B, Alteration.Sharp) => new Note(NoteName.C, Alteration.Natural, Octave + 1),
+            (NoteName.C, Alteration.Flat) => new Note(NoteName.B, Alteration.Natural, Octave - 1),
+            
+            // Double alterations to natural
+            (NoteName.C, Alteration.DoubleSharp) => new Note(NoteName.D, Alteration.Natural, Octave),
+            (NoteName.D, Alteration.DoubleFlat) => new Note(NoteName.C, Alteration.Natural, Octave),
+            (NoteName.D, Alteration.DoubleSharp) => new Note(NoteName.E, Alteration.Natural, Octave),
+            (NoteName.E, Alteration.DoubleFlat) => new Note(NoteName.D, Alteration.Natural, Octave),
+            (NoteName.F, Alteration.DoubleSharp) => new Note(NoteName.G, Alteration.Natural, Octave),
+            (NoteName.G, Alteration.DoubleFlat) => new Note(NoteName.F, Alteration.Natural, Octave),
+            (NoteName.G, Alteration.DoubleSharp) => new Note(NoteName.A, Alteration.Natural, Octave),
+            (NoteName.A, Alteration.DoubleFlat) => new Note(NoteName.G, Alteration.Natural, Octave),
+            (NoteName.A, Alteration.DoubleSharp) => new Note(NoteName.B, Alteration.Natural, Octave),
+            (NoteName.B, Alteration.DoubleFlat) => new Note(NoteName.A, Alteration.Natural, Octave),
+            
+            // No simple equivalent for natural D, G, A
+            _ => null
+        };
+    }
+
+    /// <summary>
+    /// Gets all possible enharmonic equivalents of this note.
+    /// </summary>
+    /// <returns>A collection of all enharmonically equivalent notes.</returns>
+    public IEnumerable<Note> GetAllEnharmonicEquivalents()
+    {
+        var equivalents = new List<Note>();
+        var targetSemitones = GetSemitonesFromC() % 12;
+        
+        // Check all possible note name and alteration combinations
+        foreach (NoteName noteName in Enum.GetValues<NoteName>())
+        {
+            foreach (Alteration alteration in Enum.GetValues<Alteration>())
+            {
+                // Skip the current note itself
+                if (noteName == Name && alteration == Alteration)
+                    continue;
+                
+                var candidate = new Note(noteName, alteration, Octave);
+                if (candidate.GetSemitonesFromC() % 12 == targetSemitones)
+                {
+                    equivalents.Add(candidate);
+                }
+            }
+        }
+        
+        return equivalents;
+    }
+
+    /// <summary>
+    /// Returns a simplified version of this note, preferring natural notes and single alterations.
+    /// </summary>
+    /// <returns>A simplified enharmonic equivalent.</returns>
+    public Note SimplifyEnharmonic()
+    {
+        // For sharp/flat notes, always try to get the enharmonic equivalent
+        if (Alteration == Alteration.Sharp || Alteration == Alteration.Flat)
+        {
+            var equivalent = GetEnharmonicEquivalent();
+            if (equivalent != null)
+                return equivalent;
+        }
+        
+        // For double alterations, definitely simplify
+        if (Alteration == Alteration.DoubleSharp || Alteration == Alteration.DoubleFlat)
+        {
+            var equivalent = GetEnharmonicEquivalent();
+            if (equivalent != null)
+                return equivalent;
+        }
+        
+        // If no simplification possible, return self
+        return this;
+    }
+
+    /// <summary>
+    /// Parses a string representation of a note.
+    /// </summary>
+    /// <param name="noteString">The string to parse (e.g., "C#4", "Bb3", "F##5").</param>
+    /// <returns>A new Note instance.</returns>
+    /// <exception cref="ArgumentException">Thrown when the string cannot be parsed.</exception>
+    public static Note Parse(string noteString)
+    {
+        if (string.IsNullOrWhiteSpace(noteString))
+            throw new ArgumentException("Note string cannot be empty.", nameof(noteString));
+        
+        // Extract note name (first character)
+        if (!Enum.TryParse<NoteName>(noteString[0].ToString(), out var noteName))
+            throw new ArgumentException($"Invalid note name: {noteString[0]}", nameof(noteString));
+        
+        var index = 1;
+        var alteration = Alteration.Natural;
+        
+        // Parse alterations
+        if (index < noteString.Length)
+        {
+            if (noteString[index] == '#')
+            {
+                alteration = Alteration.Sharp;
+                index++;
+                if (index < noteString.Length && noteString[index] == '#')
+                {
+                    alteration = Alteration.DoubleSharp;
+                    index++;
+                }
+            }
+            else if (noteString[index] == 'b')
+            {
+                alteration = Alteration.Flat;
+                index++;
+                if (index < noteString.Length && noteString[index] == 'b')
+                {
+                    alteration = Alteration.DoubleFlat;
+                    index++;
+                }
+            }
+        }
+        
+        // Parse octave (remaining part)
+        var octave = 4; // Default octave
+        if (index < noteString.Length)
+        {
+            if (int.TryParse(noteString.Substring(index), out var parsedOctave))
+            {
+                octave = parsedOctave;
+            }
+            else if (noteString.Length > index)
+            {
+                throw new ArgumentException($"Invalid octave: {noteString.Substring(index)}", nameof(noteString));
+            }
+        }
+        
+        return new Note(noteName, alteration, octave);
     }
 }
