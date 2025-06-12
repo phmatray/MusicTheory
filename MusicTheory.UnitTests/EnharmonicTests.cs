@@ -20,8 +20,8 @@ public class EnharmonicTests
         var note2 = new Note(name2, alteration2, 4);
         
         // Act & Assert
-        note1.IsEnharmonicWith(note2).Should().BeTrue();
-        note2.IsEnharmonicWith(note1).Should().BeTrue(); // Should be symmetric
+        note1.IsEnharmonicWith(note2).ShouldBeTrue();
+        note2.IsEnharmonicWith(note1).ShouldBeTrue(); // Should be symmetric
     }
 
     [Theory]
@@ -36,7 +36,7 @@ public class EnharmonicTests
         var note2 = new Note(name2, alteration2, 4);
         
         // Act & Assert
-        note1.IsEnharmonicWith(note2).Should().BeFalse();
+        note1.IsEnharmonicWith(note2).ShouldBeFalse();
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class EnharmonicTests
         var dFlat5 = new Note(NoteName.D, Alteration.Flat, 5);
         
         // Act & Assert
-        cSharp3.IsEnharmonicWith(dFlat5).Should().BeTrue();
+        cSharp3.IsEnharmonicWith(dFlat5).ShouldBeTrue();
     }
 
     [Theory]
@@ -67,9 +67,9 @@ public class EnharmonicTests
         var equivalent = note.GetEnharmonicEquivalent();
         
         // Assert
-        equivalent.Should().NotBeNull();
-        note.IsEnharmonicWith(equivalent).Should().BeTrue();
-        equivalent.Name.Should().NotBe(note.Name); // Should have different name
+        equivalent.ShouldNotBeNull();
+        note.IsEnharmonicWith(equivalent).ShouldBeTrue();
+        equivalent.Name.ShouldNotBe(note.Name); // Should have different name
     }
 
     [Theory]
@@ -91,13 +91,13 @@ public class EnharmonicTests
         // Assert for notes that have equivalents
         if (name == NoteName.C || name == NoteName.E || name == NoteName.F || name == NoteName.B)
         {
-            equivalent.Should().NotBeNull();
-            note.IsEnharmonicWith(equivalent).Should().BeTrue();
+            equivalent.ShouldNotBeNull();
+            note.IsEnharmonicWith(equivalent).ShouldBeTrue();
         }
         else
         {
             // D, G, A don't have simple enharmonic equivalents (would need double sharps/flats)
-            equivalent.Should().BeNull();
+            equivalent.ShouldBeNull();
         }
     }
 
@@ -111,9 +111,9 @@ public class EnharmonicTests
         var equivalents = cSharp.GetAllEnharmonicEquivalents().ToList();
         
         // Assert
-        equivalents.Should().Contain(n => n.Name == NoteName.D && n.Alteration == Alteration.Flat);
-        equivalents.Should().Contain(n => n.Name == NoteName.B && n.Alteration == Alteration.DoubleSharp);
-        equivalents.All(e => cSharp.IsEnharmonicWith(e)).Should().BeTrue();
+        equivalents.ShouldContain(n => n.Name == NoteName.D && n.Alteration == Alteration.Flat);
+        equivalents.ShouldContain(n => n.Name == NoteName.B && n.Alteration == Alteration.DoubleSharp);
+        equivalents.ShouldAllBe(e => cSharp.IsEnharmonicWith(e));
     }
 
     [Theory]
@@ -129,8 +129,8 @@ public class EnharmonicTests
         var note2 = new Note(name2, alteration2, 4);
         
         // Act & Assert
-        note1.IsEnharmonicWith(note2).Should().BeTrue();
-        note2.IsEnharmonicWith(note1).Should().BeTrue();
+        note1.IsEnharmonicWith(note2).ShouldBeTrue();
+        note2.IsEnharmonicWith(note1).ShouldBeTrue();
     }
 
     [Fact]
@@ -141,8 +141,8 @@ public class EnharmonicTests
         var diminishedFifth = new Interval(IntervalQuality.Diminished, 5);
         
         // Act & Assert
-        augmentedFourth.IsEnharmonicWith(diminishedFifth).Should().BeTrue();
-        diminishedFifth.IsEnharmonicWith(augmentedFourth).Should().BeTrue();
+        augmentedFourth.IsEnharmonicWith(diminishedFifth).ShouldBeTrue();
+        diminishedFifth.IsEnharmonicWith(augmentedFourth).ShouldBeTrue();
     }
 
     [Fact]
@@ -155,15 +155,15 @@ public class EnharmonicTests
         var equivalent = cSharpMajor.GetEnharmonicEquivalent();
         
         // Assert
-        equivalent.Should().NotBeNull();
-        equivalent.Root.Name.Should().Be(NoteName.D);
-        equivalent.Root.Alteration.Should().Be(Alteration.Flat);
-        equivalent.Quality.Should().Be(ChordQuality.Major);
+        equivalent.ShouldNotBeNull();
+        equivalent.Root.Name.ShouldBe(NoteName.D);
+        equivalent.Root.Alteration.ShouldBe(Alteration.Flat);
+        equivalent.Quality.ShouldBe(ChordQuality.Major);
     }
 
     [Theory]
-    [InlineData("C#4", "Db4")]
-    [InlineData("Db4", "C#4")]
+    [InlineData("C#4", "C#4")] // Already simplified
+    [InlineData("Db4", "Db4")] // Already simplified  
     [InlineData("E#4", "F4")]
     [InlineData("Fb4", "E4")]
     [InlineData("B#4", "C5")]
@@ -177,6 +177,6 @@ public class EnharmonicTests
         var simplified = note.SimplifyEnharmonic();
         
         // Assert
-        simplified.ToString().Should().Be(expected);
+        simplified.ToString().ShouldBe(expected);
     }
 }

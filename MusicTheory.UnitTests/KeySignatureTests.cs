@@ -9,8 +9,8 @@ public class KeySignatureTests
         var keySignature = new KeySignature(new Note(NoteName.C), KeyMode.Major);
         
         // Assert
-        keySignature.Tonic.Name.Should().Be(NoteName.C);
-        keySignature.Mode.Should().Be(KeyMode.Major);
+        keySignature.Tonic.Name.ShouldBe(NoteName.C);
+        keySignature.Mode.ShouldBe(KeyMode.Major);
     }
 
     [Theory]
@@ -28,8 +28,8 @@ public class KeySignatureTests
         var keySignature = new KeySignature(new Note(tonic), mode);
         
         // Act & Assert
-        keySignature.AccidentalCount.Should().Be(expectedAccidentals);
-        keySignature.AlteredNotes.Should().BeEquivalentTo(expectedAlteredNotes);
+        keySignature.AccidentalCount.ShouldBe(expectedAccidentals);
+        keySignature.AlteredNotes.ShouldBe(expectedAlteredNotes);
     }
 
     [Theory]
@@ -45,8 +45,8 @@ public class KeySignatureTests
         var keySignature = new KeySignature(new Note(tonic), mode);
         
         // Act & Assert
-        keySignature.AccidentalCount.Should().Be(expectedAccidentals);
-        keySignature.AlteredNotes.Should().BeEquivalentTo(expectedAlteredNotes);
+        keySignature.AccidentalCount.ShouldBe(expectedAccidentals);
+        keySignature.AlteredNotes.ShouldBe(expectedAlteredNotes);
     }
 
     [Fact]
@@ -56,8 +56,8 @@ public class KeySignatureTests
         var gMajor = new KeySignature(new Note(NoteName.G), KeyMode.Major);
         
         // Act & Assert
-        gMajor.GetAlteration(NoteName.F).Should().Be(Alteration.Sharp);
-        gMajor.GetAlteration(NoteName.C).Should().Be(Alteration.Natural);
-        gMajor.GetAlteration(NoteName.G).Should().Be(Alteration.Natural);
+        gMajor.GetAlteration(NoteName.F).ShouldBe(Alteration.Sharp);
+        gMajor.GetAlteration(NoteName.C).ShouldBe(Alteration.Natural);
+        gMajor.GetAlteration(NoteName.G).ShouldBe(Alteration.Natural);
     }
 }

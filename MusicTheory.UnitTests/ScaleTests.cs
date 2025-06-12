@@ -9,8 +9,8 @@ public class ScaleTests
         var scale = new Scale(new Note(NoteName.C), ScaleType.Major);
         
         // Assert
-        scale.Root.Name.Should().Be(NoteName.C);
-        scale.Type.Should().Be(ScaleType.Major);
+        scale.Root.Name.ShouldBe(NoteName.C);
+        scale.Type.ShouldBe(ScaleType.Major);
     }
 
     [Fact]
@@ -23,16 +23,16 @@ public class ScaleTests
         var notes = scale.GetNotes().ToList();
         
         // Assert
-        notes.Should().HaveCount(8); // Including octave
-        notes[0].Name.Should().Be(NoteName.C);
-        notes[1].Name.Should().Be(NoteName.D);
-        notes[2].Name.Should().Be(NoteName.E);
-        notes[3].Name.Should().Be(NoteName.F);
-        notes[4].Name.Should().Be(NoteName.G);
-        notes[5].Name.Should().Be(NoteName.A);
-        notes[6].Name.Should().Be(NoteName.B);
-        notes[7].Name.Should().Be(NoteName.C);
-        notes[7].Octave.Should().Be(5);
+        notes.Count.ShouldBe(8); // Including octave
+        notes[0].Name.ShouldBe(NoteName.C);
+        notes[1].Name.ShouldBe(NoteName.D);
+        notes[2].Name.ShouldBe(NoteName.E);
+        notes[3].Name.ShouldBe(NoteName.F);
+        notes[4].Name.ShouldBe(NoteName.G);
+        notes[5].Name.ShouldBe(NoteName.A);
+        notes[6].Name.ShouldBe(NoteName.B);
+        notes[7].Name.ShouldBe(NoteName.C);
+        notes[7].Octave.ShouldBe(5);
     }
 
     [Fact]
@@ -45,15 +45,15 @@ public class ScaleTests
         var notes = scale.GetNotes().ToList();
         
         // Assert
-        notes.Should().HaveCount(8);
-        notes[0].Name.Should().Be(NoteName.A);
-        notes[1].Name.Should().Be(NoteName.B);
-        notes[2].Name.Should().Be(NoteName.C);
-        notes[3].Name.Should().Be(NoteName.D);
-        notes[4].Name.Should().Be(NoteName.E);
-        notes[5].Name.Should().Be(NoteName.F);
-        notes[6].Name.Should().Be(NoteName.G);
-        notes[7].Name.Should().Be(NoteName.A);
+        notes.Count.ShouldBe(8);
+        notes[0].Name.ShouldBe(NoteName.A);
+        notes[1].Name.ShouldBe(NoteName.B);
+        notes[2].Name.ShouldBe(NoteName.C);
+        notes[3].Name.ShouldBe(NoteName.D);
+        notes[4].Name.ShouldBe(NoteName.E);
+        notes[5].Name.ShouldBe(NoteName.F);
+        notes[6].Name.ShouldBe(NoteName.G);
+        notes[7].Name.ShouldBe(NoteName.A);
     }
 
     [Fact]
@@ -66,21 +66,21 @@ public class ScaleTests
         var notes = scale.GetNotes().ToList();
         
         // Assert
-        notes.Should().HaveCount(8);
-        notes[0].Name.Should().Be(NoteName.G);
-        notes[0].Alteration.Should().Be(Alteration.Natural);
-        notes[1].Name.Should().Be(NoteName.A);
-        notes[1].Alteration.Should().Be(Alteration.Natural);
-        notes[2].Name.Should().Be(NoteName.B);
-        notes[2].Alteration.Should().Be(Alteration.Natural);
-        notes[3].Name.Should().Be(NoteName.C);
-        notes[3].Alteration.Should().Be(Alteration.Natural);
-        notes[4].Name.Should().Be(NoteName.D);
-        notes[4].Alteration.Should().Be(Alteration.Natural);
-        notes[5].Name.Should().Be(NoteName.E);
-        notes[5].Alteration.Should().Be(Alteration.Natural);
-        notes[6].Name.Should().Be(NoteName.F);
-        notes[6].Alteration.Should().Be(Alteration.Sharp); // F# in G major
-        notes[7].Name.Should().Be(NoteName.G);
+        notes.Count.ShouldBe(8);
+        notes[0].Name.ShouldBe(NoteName.G);
+        notes[0].Alteration.ShouldBe(Alteration.Natural);
+        notes[1].Name.ShouldBe(NoteName.A);
+        notes[1].Alteration.ShouldBe(Alteration.Natural);
+        notes[2].Name.ShouldBe(NoteName.B);
+        notes[2].Alteration.ShouldBe(Alteration.Natural);
+        notes[3].Name.ShouldBe(NoteName.C);
+        notes[3].Alteration.ShouldBe(Alteration.Natural);
+        notes[4].Name.ShouldBe(NoteName.D);
+        notes[4].Alteration.ShouldBe(Alteration.Natural);
+        notes[5].Name.ShouldBe(NoteName.E);
+        notes[5].Alteration.ShouldBe(Alteration.Natural);
+        notes[6].Name.ShouldBe(NoteName.F);
+        notes[6].Alteration.ShouldBe(Alteration.Sharp); // F# in G major
+        notes[7].Name.ShouldBe(NoteName.G);
     }
 }

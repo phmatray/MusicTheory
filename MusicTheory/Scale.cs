@@ -28,7 +28,19 @@ public enum ScaleType
     /// <summary>Aeolian mode (W-H-W-W-H-W-W) - same as Natural Minor</summary>
     Aeolian,
     /// <summary>Locrian mode (H-W-W-H-W-W-W)</summary>
-    Locrian
+    Locrian,
+    
+    // Other scales
+    /// <summary>Chromatic scale (all semitones)</summary>
+    Chromatic,
+    /// <summary>Whole tone scale (all whole tones)</summary>
+    WholeTone,
+    /// <summary>Blues scale (1-b3-4-#4-5-b7)</summary>
+    Blues,
+    /// <summary>Major pentatonic scale (1-2-3-5-6)</summary>
+    PentatonicMajor,
+    /// <summary>Minor pentatonic scale (1-b3-4-5-b7)</summary>
+    PentatonicMinor
 }
 
 /// <summary>
@@ -63,6 +75,26 @@ public class Scale
     /// <returns>An enumerable of notes in the scale, including the octave.</returns>
     public IEnumerable<Note> GetNotes()
     {
+        // Handle special scales differently
+        switch (Type)
+        {
+            case ScaleType.Chromatic:
+                return GetChromaticNotes();
+            case ScaleType.WholeTone:
+                return GetWholeToneNotes();
+            case ScaleType.Blues:
+                return GetBluesNotes();
+            case ScaleType.PentatonicMajor:
+                return GetPentatonicMajorNotes();
+            case ScaleType.PentatonicMinor:
+                return GetPentatonicMinorNotes();
+            default:
+                return GetDiatonicNotes();
+        }
+    }
+
+    private IEnumerable<Note> GetDiatonicNotes()
+    {
         yield return Root;
 
         // Get the interval pattern for the scale type
@@ -76,6 +108,85 @@ public class Scale
         }
     }
 
+    private IEnumerable<Note> GetChromaticNotes()
+    {
+        var currentNote = Root;
+        yield return currentNote;
+
+        for (int i = 1; i < 12; i++)
+        {
+            currentNote = currentNote.TransposeBySemitones(1);
+            yield return currentNote;
+        }
+    }
+
+    private IEnumerable<Note> GetWholeToneNotes()
+    {
+        var currentNote = Root;
+        yield return currentNote;
+
+        for (int i = 1; i < 6; i++)
+        {
+            currentNote = currentNote.TransposeBySemitones(2);
+            yield return currentNote;
+        }
+    }
+
+    private IEnumerable<Note> GetBluesNotes()
+    {
+        yield return Root; // 1
+        
+        // b3 - minor third
+        var minorThird = Root.Transpose(new Interval(IntervalQuality.Minor, 3));
+        yield return minorThird;
+        
+        // 4 - perfect fourth
+        var fourth = Root.Transpose(new Interval(IntervalQuality.Perfect, 4));
+        yield return fourth;
+        
+        // #4/b5 - augmented fourth/diminished fifth
+        var augmentedFourth = Root.Transpose(new Interval(IntervalQuality.Augmented, 4));
+        yield return augmentedFourth;
+        
+        // 5 - perfect fifth
+        var fifth = Root.Transpose(new Interval(IntervalQuality.Perfect, 5));
+        yield return fifth;
+        
+        // b7 - minor seventh
+        var minorSeventh = Root.Transpose(new Interval(IntervalQuality.Minor, 7));
+        yield return minorSeventh;
+    }
+
+    private IEnumerable<Note> GetPentatonicMajorNotes()
+    {
+        yield return Root; // 1
+        yield return Root.TransposeBySemitones(2); // 2
+        yield return Root.TransposeBySemitones(4); // 3
+        yield return Root.TransposeBySemitones(7); // 5
+        yield return Root.TransposeBySemitones(9); // 6
+    }
+
+    private IEnumerable<Note> GetPentatonicMinorNotes()
+    {
+        yield return Root; // 1
+        
+        // b3 - minor third
+        var minorThird = Root.Transpose(new Interval(IntervalQuality.Minor, 3));
+        yield return minorThird;
+        
+        // 4 - perfect fourth
+        var fourth = Root.Transpose(new Interval(IntervalQuality.Perfect, 4));
+        yield return fourth;
+        
+        // 5 - perfect fifth
+        var fifth = Root.Transpose(new Interval(IntervalQuality.Perfect, 5));
+        yield return fifth;
+        
+        // b7 - minor seventh
+        var minorSeventh = Root.Transpose(new Interval(IntervalQuality.Minor, 7));
+        yield return minorSeventh;
+    }
+
     /// <summary>
     /// Gets the interval pattern for the scale type.
     /// </summary>
@@ -83,51 +194,51 @@ public class Scale
     {
         return Type switch
         {
-            ScaleType.Major or ScaleType.Ionian => new[] 
-            { 
+            ScaleType.Major or ScaleType.Ionian =>
+            [
                 IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half, 
-                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half 
-            },
-            ScaleType.NaturalMinor or ScaleType.Aeolian => new[] 
-            { 
+                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half
+            ],
+            ScaleType.NaturalMinor or ScaleType.Aeolian =>
+            [
                 IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole, 
-                IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole 
-            },
-            ScaleType.HarmonicMinor => new[] 
-            { 
+                IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole
+            ],
+            ScaleType.HarmonicMinor =>
+            [
                 IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole, 
-                IntervalStep.Whole, IntervalStep.Half, IntervalStep.WholeAndHalf, IntervalStep.Half 
-            },
-            ScaleType.MelodicMinor => new[] 
-            { 
+                IntervalStep.Whole, IntervalStep.Half, IntervalStep.WholeAndHalf, IntervalStep.Half
+            ],
+            ScaleType.MelodicMinor =>
+            [
                 IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole, 
-                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half 
-            },
-            ScaleType.Dorian => new[]
-            {
+                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half
+            ],
+            ScaleType.Dorian =>
+            [
                 IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole,
                 IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole
-            },
-            ScaleType.Phrygian => new[]
-            {
+            ],
+            ScaleType.Phrygian =>
+            [
                 IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole,
                 IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole
-            },
-            ScaleType.Lydian => new[]
-            {
+            ],
+            ScaleType.Lydian =>
+            [
                 IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole,
                 IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half
-            },
-            ScaleType.Mixolydian => new[]
-            {
+            ],
+            ScaleType.Mixolydian =>
+            [
                 IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half,
                 IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole
-            },
-            ScaleType.Locrian => new[]
-            {
+            ],
+            ScaleType.Locrian =>
+            [
                 IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole,
                 IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole
-            },
+            ],
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -229,5 +340,76 @@ public class Scale
     {
         var newRoot = Root.Transpose(interval, direction);
         return new Scale(newRoot, Type);
+    }
+
+    /// <summary>
+    /// Gets the next note in the scale after the given note.
+    /// </summary>
+    /// <param name="note">The current note.</param>
+    /// <returns>The next note in the scale.</returns>
+    /// <exception cref="ArgumentException">Thrown when the note is not in the scale.</exception>
+    public Note GetNextNoteInScale(Note note)
+    {
+        var scaleNotes = GetNotes().ToList();
+        
+        // Find the note in the scale (ignoring octave)
+        var index = -1;
+        for (int i = 0; i < scaleNotes.Count; i++)
+        {
+            if (scaleNotes[i].Name == note.Name && scaleNotes[i].Alteration == note.Alteration)
+            {
+                index = i;
+                break;
+            }
+        }
+        
+        if (index == -1)
+        {
+            throw new ArgumentException($"Note {note} is not in the {Root.Name} {Type} scale");
+        }
+        
+        // Get next note, wrapping around to root if at end
+        var nextIndex = (index + 1) % scaleNotes.Count;
+        var nextNote = scaleNotes[nextIndex];
+        
+        // Check if we need to increment octave
+        // If the next note is C and current is B, or if we wrapped to index 0
+        if (nextIndex == 0 || (note.Name == NoteName.B && nextNote.Name == NoteName.C))
+        {
+            return new Note(nextNote.Name, nextNote.Alteration, note.Octave + 1);
+        }
+        
+        // Otherwise, maintain the same octave
+        return new Note(nextNote.Name, nextNote.Alteration, note.Octave);
+    }
+
+    /// <summary>
+    /// Determines if the scale contains the specified note.
+    /// </summary>
+    /// <param name="note">The note to check.</param>
+    /// <returns>True if the note is in the scale; otherwise, false.</returns>
+    public bool Contains(Note note)
+    {
+        return GetNotes().Any(n => n.Name == note.Name && n.Alteration == note.Alteration);
+    }
+
+    /// <summary>
+    /// Gets the scale degree of the given note.
+    /// </summary>
+    /// <param name="note">The note to find the degree for.</param>
+    /// <returns>The scale degree (1-based), or null if the note is not in the scale.</returns>
+    public int? GetDegree(Note note)
+    {
+        var scaleNotes = GetNotes().ToList();
+        
+        for (int i = 0; i < scaleNotes.Count; i++)
+        {
+            if (scaleNotes[i].Name == note.Name && scaleNotes[i].Alteration == note.Alteration)
+            {
+                return i + 1; // 1-based degree
+            }
+        }
+        
+        return null;
     }
 }

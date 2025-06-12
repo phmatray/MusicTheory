@@ -19,7 +19,7 @@ public class DurationTests
         var value = duration.GetValueInWholeNotes();
         
         // Assert
-        value.Should().Be(expectedValue);
+        value.ShouldBe(expectedValue);
     }
 
     [Theory]
@@ -40,7 +40,7 @@ public class DurationTests
         var value = duration.GetValueInWholeNotes();
         
         // Assert
-        value.Should().BeApproximately(expectedValue, 0.0001);
+        value.ShouldBe(expectedValue, 0.0001);
     }
 
     [Theory]
@@ -59,7 +59,7 @@ public class DurationTests
         var seconds = duration.GetTimeInSeconds(bpm);
         
         // Assert
-        seconds.Should().BeApproximately(expectedSeconds, 0.0001);
+        seconds.ShouldBe(expectedSeconds, 0.0001);
     }
 
     [Theory]
@@ -79,7 +79,7 @@ public class DurationTests
         var symbol = duration.GetSymbol();
         
         // Assert
-        symbol.Should().Be(expectedSymbol);
+        symbol.ShouldBe(expectedSymbol);
     }
 
     [Theory]
@@ -96,7 +96,7 @@ public class DurationTests
         var symbol = duration.GetSymbol();
         
         // Assert
-        symbol.Should().Be(expectedSymbol);
+        symbol.ShouldBe(expectedSymbol);
     }
 
     [Theory]
@@ -116,7 +116,7 @@ public class DurationTests
         var name = duration.ToString();
         
         // Assert
-        name.Should().Be(expectedName);
+        name.ShouldBe(expectedName);
     }
 
     [Theory]
@@ -134,7 +134,7 @@ public class DurationTests
         var name = duration.ToString();
         
         // Assert
-        name.Should().Be(expectedName);
+        name.ShouldBe(expectedName);
     }
 
     [Theory]
@@ -152,7 +152,7 @@ public class DurationTests
         var count = duration1.Divide(duration2);
         
         // Assert
-        count.Should().Be(expectedCount);
+        count.ShouldBe(expectedCount);
     }
 
     [Fact]
@@ -166,7 +166,7 @@ public class DurationTests
         var sum = quarter.Add(eighth);
         
         // Assert
-        sum.GetValueInWholeNotes().Should().Be(0.375); // Quarter + Eighth = 3/8
+        sum.GetValueInWholeNotes().ShouldBe(0.375); // Quarter + Eighth = 3/8
     }
 
     [Fact]
@@ -179,9 +179,9 @@ public class DurationTests
         var duration4 = new Duration(DurationType.Half, 0);
         
         // Act & Assert
-        duration1.Equals(duration2).Should().BeTrue();
-        duration1.Equals(duration3).Should().BeFalse();
-        duration1.Equals(duration4).Should().BeFalse();
+        duration1.Equals(duration2).ShouldBeTrue();
+        duration1.Equals(duration3).ShouldBeFalse();
+        duration1.Equals(duration4).ShouldBeFalse();
     }
 
     [Theory]
@@ -191,9 +191,9 @@ public class DurationTests
     public void Duration_Constructor_ShouldThrowForInvalidDots(int dots)
     {
         // Act & Assert
-        var act = () => new Duration(DurationType.Quarter, dots);
-        act.Should().Throw<ArgumentException>()
-            .WithMessage("*Dots must be between 0 and 3*");
+        Action act = () => new Duration(DurationType.Quarter, dots);
+        act.ShouldThrow<ArgumentException>()
+            .Message.ShouldContain("Dots must be between 0 and 3");
     }
 
     [Theory]
@@ -211,7 +211,7 @@ public class DurationTests
         var measures = duration.GetValueInMeasures(timeSignature);
         
         // Assert
-        measures.Should().BeApproximately(expectedMeasures, 0.0001);
+        measures.ShouldBe(expectedMeasures, 0.0001);
     }
 
     [Fact]
@@ -221,7 +221,7 @@ public class DurationTests
         var duration = new Duration(DurationType.Quarter);
         
         // Act & Assert
-        duration.IsTuplet.Should().BeFalse();
+        duration.IsTuplet.ShouldBeFalse();
     }
 
     [Theory]
@@ -236,7 +236,46 @@ public class DurationTests
         var tuplet = Duration.CreateTuplet(baseType, tupletCount, normalCount);
         
         // Assert
-        tuplet.IsTuplet.Should().BeTrue();
-        tuplet.GetValueInWholeNotes().Should().BeApproximately(expectedValue, 0.0001);
+        tuplet.IsTuplet.ShouldBeTrue();
+        tuplet.GetValueInWholeNotes().ShouldBe(expectedValue, 0.0001);
+    }
+
+    [Fact]
+    public void Duration_GetSymbol_WithInvalidDurationType_ShouldReturnQuestionMark()
+    {
+        // Use reflection to create an invalid enum value
+        var duration = new Duration((DurationType)99);
+        
+        // Act
+        var symbol = duration.GetSymbol();
+        
+        // Assert
+        symbol.ShouldBe("?");
+    }
+
+    [Fact]
+    public void Duration_GetValueInWholeNotes_WithInvalidDurationType_ShouldThrow()
+    {
+        // Use reflection to create an invalid enum value
+        var duration = new Duration((DurationType)99);
+        
+        // Act
+        Action act = () => duration.GetValueInWholeNotes();
+        
+        // Assert
+        act.ShouldThrow<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void Duration_ToString_WithUnknownDurationType_ShouldReturnUnknown()
+    {
+        // Use reflection to create an invalid enum value
+        var duration = new Duration((DurationType)99);
+        
+        // Act
+        var result = duration.ToString();
+        
+        // Assert
+        result.ShouldBe("unknown");
     }
 }

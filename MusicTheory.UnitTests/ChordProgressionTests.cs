@@ -12,7 +12,7 @@ public class ChordProgressionTests
         var progression = new ChordProgression(key);
         
         // Assert
-        progression.Key.Should().Be(key);
+        progression.Key.ShouldBe(key);
     }
 
     [Fact]
@@ -26,35 +26,35 @@ public class ChordProgressionTests
         var diatonicChords = progression.GetDiatonicChords().ToList();
         
         // Assert
-        diatonicChords.Should().HaveCount(7);
+        diatonicChords.Count.ShouldBe(7);
         
         // I - C major
-        diatonicChords[0].Root.Name.Should().Be(NoteName.C);
-        diatonicChords[0].Quality.Should().Be(ChordQuality.Major);
+        diatonicChords[0].Root.Name.ShouldBe(NoteName.C);
+        diatonicChords[0].Quality.ShouldBe(ChordQuality.Major);
         
         // ii - D minor
-        diatonicChords[1].Root.Name.Should().Be(NoteName.D);
-        diatonicChords[1].Quality.Should().Be(ChordQuality.Minor);
+        diatonicChords[1].Root.Name.ShouldBe(NoteName.D);
+        diatonicChords[1].Quality.ShouldBe(ChordQuality.Minor);
         
         // iii - E minor
-        diatonicChords[2].Root.Name.Should().Be(NoteName.E);
-        diatonicChords[2].Quality.Should().Be(ChordQuality.Minor);
+        diatonicChords[2].Root.Name.ShouldBe(NoteName.E);
+        diatonicChords[2].Quality.ShouldBe(ChordQuality.Minor);
         
         // IV - F major
-        diatonicChords[3].Root.Name.Should().Be(NoteName.F);
-        diatonicChords[3].Quality.Should().Be(ChordQuality.Major);
+        diatonicChords[3].Root.Name.ShouldBe(NoteName.F);
+        diatonicChords[3].Quality.ShouldBe(ChordQuality.Major);
         
         // V - G major
-        diatonicChords[4].Root.Name.Should().Be(NoteName.G);
-        diatonicChords[4].Quality.Should().Be(ChordQuality.Major);
+        diatonicChords[4].Root.Name.ShouldBe(NoteName.G);
+        diatonicChords[4].Quality.ShouldBe(ChordQuality.Major);
         
         // vi - A minor
-        diatonicChords[5].Root.Name.Should().Be(NoteName.A);
-        diatonicChords[5].Quality.Should().Be(ChordQuality.Minor);
+        diatonicChords[5].Root.Name.ShouldBe(NoteName.A);
+        diatonicChords[5].Quality.ShouldBe(ChordQuality.Minor);
         
         // vii° - B diminished
-        diatonicChords[6].Root.Name.Should().Be(NoteName.B);
-        diatonicChords[6].Quality.Should().Be(ChordQuality.Diminished);
+        diatonicChords[6].Root.Name.ShouldBe(NoteName.B);
+        diatonicChords[6].Quality.ShouldBe(ChordQuality.Diminished);
     }
 
     [Fact]
@@ -65,13 +65,13 @@ public class ChordProgressionTests
         var progression = new ChordProgression(cMajorKey);
         
         // Act & Assert
-        progression.GetRomanNumeral(1).Should().Be("I");
-        progression.GetRomanNumeral(2).Should().Be("ii");
-        progression.GetRomanNumeral(3).Should().Be("iii");
-        progression.GetRomanNumeral(4).Should().Be("IV");
-        progression.GetRomanNumeral(5).Should().Be("V");
-        progression.GetRomanNumeral(6).Should().Be("vi");
-        progression.GetRomanNumeral(7).Should().Be("vii°");
+        progression.GetRomanNumeral(1).ShouldBe("I");
+        progression.GetRomanNumeral(2).ShouldBe("ii");
+        progression.GetRomanNumeral(3).ShouldBe("iii");
+        progression.GetRomanNumeral(4).ShouldBe("IV");
+        progression.GetRomanNumeral(5).ShouldBe("V");
+        progression.GetRomanNumeral(6).ShouldBe("vi");
+        progression.GetRomanNumeral(7).ShouldBe("vii°");
     }
 
     [Fact]
@@ -86,11 +86,11 @@ public class ChordProgressionTests
         var dominant = progression.GetChordByDegree(5);
         
         // Assert
-        tonic.Root.Name.Should().Be(NoteName.G);
-        tonic.Quality.Should().Be(ChordQuality.Major);
+        tonic.Root.Name.ShouldBe(NoteName.G);
+        tonic.Quality.ShouldBe(ChordQuality.Major);
         
-        dominant.Root.Name.Should().Be(NoteName.D);
-        dominant.Quality.Should().Be(ChordQuality.Major);
+        dominant.Root.Name.ShouldBe(NoteName.D);
+        dominant.Quality.ShouldBe(ChordQuality.Major);
     }
 
     [Fact]
@@ -104,11 +104,11 @@ public class ChordProgressionTests
         var chords = progression.ParseProgression("I - IV - V - I").ToList();
         
         // Assert
-        chords.Should().HaveCount(4);
-        chords[0].Root.Name.Should().Be(NoteName.C); // I
-        chords[1].Root.Name.Should().Be(NoteName.F); // IV
-        chords[2].Root.Name.Should().Be(NoteName.G); // V
-        chords[3].Root.Name.Should().Be(NoteName.C); // I
+        chords.Count.ShouldBe(4);
+        chords[0].Root.Name.ShouldBe(NoteName.C); // I
+        chords[1].Root.Name.ShouldBe(NoteName.F); // IV
+        chords[2].Root.Name.ShouldBe(NoteName.G); // V
+        chords[3].Root.Name.ShouldBe(NoteName.C); // I
     }
 
     [Fact]
@@ -122,35 +122,35 @@ public class ChordProgressionTests
         var diatonicChords = progression.GetDiatonicChords().ToList();
         
         // Assert
-        diatonicChords.Should().HaveCount(7);
+        diatonicChords.Count.ShouldBe(7);
         
         // i - A minor
-        diatonicChords[0].Root.Name.Should().Be(NoteName.A);
-        diatonicChords[0].Quality.Should().Be(ChordQuality.Minor);
+        diatonicChords[0].Root.Name.ShouldBe(NoteName.A);
+        diatonicChords[0].Quality.ShouldBe(ChordQuality.Minor);
         
         // ii° - B diminished
-        diatonicChords[1].Root.Name.Should().Be(NoteName.B);
-        diatonicChords[1].Quality.Should().Be(ChordQuality.Diminished);
+        diatonicChords[1].Root.Name.ShouldBe(NoteName.B);
+        diatonicChords[1].Quality.ShouldBe(ChordQuality.Diminished);
         
         // III - C major
-        diatonicChords[2].Root.Name.Should().Be(NoteName.C);
-        diatonicChords[2].Quality.Should().Be(ChordQuality.Major);
+        diatonicChords[2].Root.Name.ShouldBe(NoteName.C);
+        diatonicChords[2].Quality.ShouldBe(ChordQuality.Major);
         
         // iv - D minor
-        diatonicChords[3].Root.Name.Should().Be(NoteName.D);
-        diatonicChords[3].Quality.Should().Be(ChordQuality.Minor);
+        diatonicChords[3].Root.Name.ShouldBe(NoteName.D);
+        diatonicChords[3].Quality.ShouldBe(ChordQuality.Minor);
         
         // v - E minor (natural minor)
-        diatonicChords[4].Root.Name.Should().Be(NoteName.E);
-        diatonicChords[4].Quality.Should().Be(ChordQuality.Minor);
+        diatonicChords[4].Root.Name.ShouldBe(NoteName.E);
+        diatonicChords[4].Quality.ShouldBe(ChordQuality.Minor);
         
         // VI - F major
-        diatonicChords[5].Root.Name.Should().Be(NoteName.F);
-        diatonicChords[5].Quality.Should().Be(ChordQuality.Major);
+        diatonicChords[5].Root.Name.ShouldBe(NoteName.F);
+        diatonicChords[5].Quality.ShouldBe(ChordQuality.Major);
         
         // VII - G major
-        diatonicChords[6].Root.Name.Should().Be(NoteName.G);
-        diatonicChords[6].Quality.Should().Be(ChordQuality.Major);
+        diatonicChords[6].Root.Name.ShouldBe(NoteName.G);
+        diatonicChords[6].Quality.ShouldBe(ChordQuality.Major);
     }
 
     [Fact]
@@ -164,20 +164,20 @@ public class ChordProgressionTests
         var chords = progression.ParseProgression("IMaj7 - ii7 - V7 - IMaj7").ToList();
         
         // Assert
-        chords.Should().HaveCount(4);
+        chords.Count.ShouldBe(4);
         
         // IMaj7
-        chords[0].Root.Name.Should().Be(NoteName.C);
-        chords[0].GetNotes().Should().HaveCount(4);
+        chords[0].Root.Name.ShouldBe(NoteName.C);
+        chords[0].GetNotes().Count().ShouldBe(4);
         
         // ii7
-        chords[1].Root.Name.Should().Be(NoteName.D);
-        chords[1].Quality.Should().Be(ChordQuality.Minor);
-        chords[1].GetNotes().Should().HaveCount(4);
+        chords[1].Root.Name.ShouldBe(NoteName.D);
+        chords[1].Quality.ShouldBe(ChordQuality.Minor);
+        chords[1].GetNotes().Count().ShouldBe(4);
         
         // V7
-        chords[2].Root.Name.Should().Be(NoteName.G);
-        chords[2].GetNotes().Should().HaveCount(4);
+        chords[2].Root.Name.ShouldBe(NoteName.G);
+        chords[2].GetNotes().Count().ShouldBe(4);
     }
 
     [Fact]
@@ -191,8 +191,8 @@ public class ChordProgressionTests
         var vOfV = progression.GetSecondaryDominant(5); // V/V (D major in C major)
         
         // Assert
-        vOfV.Root.Name.Should().Be(NoteName.D);
-        vOfV.Quality.Should().Be(ChordQuality.Major);
+        vOfV.Root.Name.ShouldBe(NoteName.D);
+        vOfV.Quality.ShouldBe(ChordQuality.Major);
     }
 
     [Theory]
@@ -209,6 +209,20 @@ public class ChordProgressionTests
         var chords = chordProgression.ParseProgression(progression).ToList();
         
         // Assert
-        chords.Should().HaveCount(expectedCount);
+        chords.Count.ShouldBe(expectedCount);
+    }
+
+    [Fact]
+    public void ChordProgression_ParseProgression_WithInvalidRomanNumeral_ShouldThrow()
+    {
+        // Arrange
+        var progression = new ChordProgression(new KeySignature(new Note(NoteName.C), KeyMode.Major));
+        
+        // Act
+        Action act = () => progression.ParseProgression("I - IX - V").ToList(); // IX is not valid
+        
+        // Assert
+        act.ShouldThrow<ArgumentException>()
+            .Message.ShouldBe("Invalid Roman numeral: IX");
     }
 }

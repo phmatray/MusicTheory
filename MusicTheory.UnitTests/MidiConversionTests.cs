@@ -21,7 +21,7 @@ public class MidiConversionTests
         var midiNumber = note.MidiNumber;
         
         // Assert
-        midiNumber.Should().Be(expectedMidi);
+        midiNumber.ShouldBe(expectedMidi);
     }
 
     [Fact]
@@ -31,9 +31,9 @@ public class MidiConversionTests
         var note = Note.FromMidiNumber(60);
         
         // Assert
-        note.Name.Should().Be(NoteName.C);
-        note.Alteration.Should().Be(Alteration.Natural);
-        note.Octave.Should().Be(4);
+        note.Name.ShouldBe(NoteName.C);
+        note.Alteration.ShouldBe(Alteration.Natural);
+        note.Octave.ShouldBe(4);
     }
 
     [Theory]
@@ -48,9 +48,9 @@ public class MidiConversionTests
         var note = Note.FromMidiNumber(midiNumber);
         
         // Assert
-        note.Name.Should().Be(expectedName);
-        note.Alteration.Should().Be(expectedAlteration);
-        note.Octave.Should().Be(expectedOctave);
+        note.Name.ShouldBe(expectedName);
+        note.Alteration.ShouldBe(expectedAlteration);
+        note.Octave.ShouldBe(expectedOctave);
     }
 
     [Theory]
@@ -60,9 +60,9 @@ public class MidiConversionTests
     public void Note_ShouldThrowForInvalidMidiNumber(int invalidMidiNumber)
     {
         // Act & Assert
-        var act = () => Note.FromMidiNumber(invalidMidiNumber);
-        act.Should().Throw<ArgumentOutOfRangeException>()
-            .WithMessage("*MIDI note number must be between 0 and 127*");
+        Action act = () => Note.FromMidiNumber(invalidMidiNumber);
+        act.ShouldThrow<ArgumentOutOfRangeException>()
+            .Message.ShouldContain("MIDI note number must be between 0 and 127");
     }
 
     [Fact]
@@ -73,11 +73,11 @@ public class MidiConversionTests
         var fSharp = Note.FromMidiNumber(66);
         
         // Assert
-        cSharp.Name.Should().Be(NoteName.C);
-        cSharp.Alteration.Should().Be(Alteration.Sharp);
+        cSharp.Name.ShouldBe(NoteName.C);
+        cSharp.Alteration.ShouldBe(Alteration.Sharp);
         
-        fSharp.Name.Should().Be(NoteName.F);
-        fSharp.Alteration.Should().Be(Alteration.Sharp);
+        fSharp.Name.ShouldBe(NoteName.F);
+        fSharp.Alteration.ShouldBe(Alteration.Sharp);
     }
 
     [Fact]
@@ -88,11 +88,11 @@ public class MidiConversionTests
         var gFlat = Note.FromMidiNumber(66, preferFlats: true);
         
         // Assert
-        dFlat.Name.Should().Be(NoteName.D);
-        dFlat.Alteration.Should().Be(Alteration.Flat);
+        dFlat.Name.ShouldBe(NoteName.D);
+        dFlat.Alteration.ShouldBe(Alteration.Flat);
         
-        gFlat.Name.Should().Be(NoteName.G);
-        gFlat.Alteration.Should().Be(Alteration.Flat);
+        gFlat.Name.ShouldBe(NoteName.G);
+        gFlat.Alteration.ShouldBe(Alteration.Flat);
     }
 
     [Theory]
@@ -109,7 +109,7 @@ public class MidiConversionTests
         var midiNumber = note.MidiNumber;
         
         // Assert
-        midiNumber.Should().Be(expectedMidi);
+        midiNumber.ShouldBe(expectedMidi);
     }
 
     [Fact]
@@ -123,7 +123,7 @@ public class MidiConversionTests
             var midiNumber = note.MidiNumber;
             
             // Assert
-            midiNumber.Should().Be(midi, $"Failed for MIDI number {midi}");
+            midiNumber.ShouldBe(midi, $"Failed for MIDI number {midi}");
         }
     }
 
@@ -135,8 +135,8 @@ public class MidiConversionTests
         var highestNote = new Note(NoteName.G, Alteration.Natural, 9);
         
         // Act & Assert
-        lowestNote.MidiNumber.Should().Be(0);
-        highestNote.MidiNumber.Should().Be(127);
+        lowestNote.MidiNumber.ShouldBe(0);
+        highestNote.MidiNumber.ShouldBe(127);
     }
 
     [Theory]
@@ -149,8 +149,8 @@ public class MidiConversionTests
         var note = new Note(name, alteration, octave);
         
         // Act & Assert
-        var act = () => _ = note.MidiNumber;
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*outside the valid MIDI range*");
+        Action act = () => { var _ = note.MidiNumber; };
+        act.ShouldThrow<InvalidOperationException>()
+            .Message.ShouldContain("outside the valid MIDI range");
     }
 }

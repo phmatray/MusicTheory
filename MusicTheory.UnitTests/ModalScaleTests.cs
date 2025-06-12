@@ -9,8 +9,8 @@ public class ModalScaleTests
         var dDorian = new Scale(new Note(NoteName.D, Alteration.Natural, 4), ScaleType.Dorian);
         
         // Assert
-        dDorian.Type.Should().Be(ScaleType.Dorian);
-        dDorian.Root.Name.Should().Be(NoteName.D);
+        dDorian.Type.ShouldBe(ScaleType.Dorian);
+        dDorian.Root.Name.ShouldBe(NoteName.D);
     }
 
     [Fact]
@@ -23,33 +23,33 @@ public class ModalScaleTests
         var notes = dDorian.GetNotes().ToList();
         
         // Assert
-        notes.Should().HaveCount(8); // Including octave
+        notes.Count.ShouldBe(8); // Including octave
         
         // D Dorian: D E F G A B C D
-        notes[0].Name.Should().Be(NoteName.D);
-        notes[0].Alteration.Should().Be(Alteration.Natural);
+        notes[0].Name.ShouldBe(NoteName.D);
+        notes[0].Alteration.ShouldBe(Alteration.Natural);
         
-        notes[1].Name.Should().Be(NoteName.E);
-        notes[1].Alteration.Should().Be(Alteration.Natural);
+        notes[1].Name.ShouldBe(NoteName.E);
+        notes[1].Alteration.ShouldBe(Alteration.Natural);
         
-        notes[2].Name.Should().Be(NoteName.F);
-        notes[2].Alteration.Should().Be(Alteration.Natural);
+        notes[2].Name.ShouldBe(NoteName.F);
+        notes[2].Alteration.ShouldBe(Alteration.Natural);
         
-        notes[3].Name.Should().Be(NoteName.G);
-        notes[3].Alteration.Should().Be(Alteration.Natural);
+        notes[3].Name.ShouldBe(NoteName.G);
+        notes[3].Alteration.ShouldBe(Alteration.Natural);
         
-        notes[4].Name.Should().Be(NoteName.A);
-        notes[4].Alteration.Should().Be(Alteration.Natural);
+        notes[4].Name.ShouldBe(NoteName.A);
+        notes[4].Alteration.ShouldBe(Alteration.Natural);
         
-        notes[5].Name.Should().Be(NoteName.B);
-        notes[5].Alteration.Should().Be(Alteration.Natural);
+        notes[5].Name.ShouldBe(NoteName.B);
+        notes[5].Alteration.ShouldBe(Alteration.Natural);
         
-        notes[6].Name.Should().Be(NoteName.C);
-        notes[6].Alteration.Should().Be(Alteration.Natural);
-        notes[6].Octave.Should().Be(5); // Next octave
+        notes[6].Name.ShouldBe(NoteName.C);
+        notes[6].Alteration.ShouldBe(Alteration.Natural);
+        notes[6].Octave.ShouldBe(5); // Next octave
         
-        notes[7].Name.Should().Be(NoteName.D);
-        notes[7].Octave.Should().Be(5); // Octave
+        notes[7].Name.ShouldBe(NoteName.D);
+        notes[7].Octave.ShouldBe(5); // Octave
     }
 
     [Theory]
@@ -69,7 +69,7 @@ public class ModalScaleTests
         
         // Assert
         var actualPattern = GetIntervalPattern(notes);
-        actualPattern.Should().Be(expectedPattern);
+        actualPattern.ShouldBe(expectedPattern);
     }
 
     [Fact]
@@ -83,15 +83,15 @@ public class ModalScaleTests
         
         // Assert
         // E Phrygian: E F G A B C D E
-        notes[0].Name.Should().Be(NoteName.E);
-        notes[1].Name.Should().Be(NoteName.F);
-        notes[2].Name.Should().Be(NoteName.G);
-        notes[3].Name.Should().Be(NoteName.A);
-        notes[4].Name.Should().Be(NoteName.B);
-        notes[5].Name.Should().Be(NoteName.C);
-        notes[6].Name.Should().Be(NoteName.D);
-        notes[7].Name.Should().Be(NoteName.E);
-        notes[7].Octave.Should().Be(5);
+        notes[0].Name.ShouldBe(NoteName.E);
+        notes[1].Name.ShouldBe(NoteName.F);
+        notes[2].Name.ShouldBe(NoteName.G);
+        notes[3].Name.ShouldBe(NoteName.A);
+        notes[4].Name.ShouldBe(NoteName.B);
+        notes[5].Name.ShouldBe(NoteName.C);
+        notes[6].Name.ShouldBe(NoteName.D);
+        notes[7].Name.ShouldBe(NoteName.E);
+        notes[7].Octave.ShouldBe(5);
     }
 
     [Fact]
@@ -105,15 +105,15 @@ public class ModalScaleTests
         
         // Assert
         // F Lydian: F G A B C D E F
-        notes[0].Name.Should().Be(NoteName.F);
-        notes[1].Name.Should().Be(NoteName.G);
-        notes[2].Name.Should().Be(NoteName.A);
-        notes[3].Name.Should().Be(NoteName.B); // Raised 4th
-        notes[3].Alteration.Should().Be(Alteration.Natural);
-        notes[4].Name.Should().Be(NoteName.C);
-        notes[5].Name.Should().Be(NoteName.D);
-        notes[6].Name.Should().Be(NoteName.E);
-        notes[7].Name.Should().Be(NoteName.F);
+        notes[0].Name.ShouldBe(NoteName.F);
+        notes[1].Name.ShouldBe(NoteName.G);
+        notes[2].Name.ShouldBe(NoteName.A);
+        notes[3].Name.ShouldBe(NoteName.B); // Raised 4th
+        notes[3].Alteration.ShouldBe(Alteration.Natural);
+        notes[4].Name.ShouldBe(NoteName.C);
+        notes[5].Name.ShouldBe(NoteName.D);
+        notes[6].Name.ShouldBe(NoteName.E);
+        notes[7].Name.ShouldBe(NoteName.F);
     }
 
     [Fact]
@@ -127,15 +127,15 @@ public class ModalScaleTests
         
         // Assert
         // G Mixolydian: G A B C D E F G
-        notes[0].Name.Should().Be(NoteName.G);
-        notes[1].Name.Should().Be(NoteName.A);
-        notes[2].Name.Should().Be(NoteName.B);
-        notes[3].Name.Should().Be(NoteName.C);
-        notes[4].Name.Should().Be(NoteName.D);
-        notes[5].Name.Should().Be(NoteName.E);
-        notes[6].Name.Should().Be(NoteName.F); // Lowered 7th
-        notes[6].Alteration.Should().Be(Alteration.Natural);
-        notes[7].Name.Should().Be(NoteName.G);
+        notes[0].Name.ShouldBe(NoteName.G);
+        notes[1].Name.ShouldBe(NoteName.A);
+        notes[2].Name.ShouldBe(NoteName.B);
+        notes[3].Name.ShouldBe(NoteName.C);
+        notes[4].Name.ShouldBe(NoteName.D);
+        notes[5].Name.ShouldBe(NoteName.E);
+        notes[6].Name.ShouldBe(NoteName.F); // Lowered 7th
+        notes[6].Alteration.ShouldBe(Alteration.Natural);
+        notes[7].Name.ShouldBe(NoteName.G);
     }
 
     [Fact]
@@ -149,14 +149,14 @@ public class ModalScaleTests
         
         // Assert
         // B Locrian: B C D E F G A B
-        notes[0].Name.Should().Be(NoteName.B);
-        notes[1].Name.Should().Be(NoteName.C);
-        notes[2].Name.Should().Be(NoteName.D);
-        notes[3].Name.Should().Be(NoteName.E);
-        notes[4].Name.Should().Be(NoteName.F); // Lowered 5th
-        notes[5].Name.Should().Be(NoteName.G);
-        notes[6].Name.Should().Be(NoteName.A);
-        notes[7].Name.Should().Be(NoteName.B);
+        notes[0].Name.ShouldBe(NoteName.B);
+        notes[1].Name.ShouldBe(NoteName.C);
+        notes[2].Name.ShouldBe(NoteName.D);
+        notes[3].Name.ShouldBe(NoteName.E);
+        notes[4].Name.ShouldBe(NoteName.F); // Lowered 5th
+        notes[5].Name.ShouldBe(NoteName.G);
+        notes[6].Name.ShouldBe(NoteName.A);
+        notes[7].Name.ShouldBe(NoteName.B);
     }
 
     [Fact]
@@ -170,15 +170,15 @@ public class ModalScaleTests
         var eDorian = dDorian.Transpose(majorSecond);
         
         // Assert
-        eDorian.Root.Name.Should().Be(NoteName.E);
-        eDorian.Type.Should().Be(ScaleType.Dorian);
+        eDorian.Root.Name.ShouldBe(NoteName.E);
+        eDorian.Type.ShouldBe(ScaleType.Dorian);
         
         var notes = eDorian.GetNotes().ToList();
         // E Dorian: E F# G A B C# D E
-        notes[1].Name.Should().Be(NoteName.F);
-        notes[1].Alteration.Should().Be(Alteration.Sharp);
-        notes[6].Name.Should().Be(NoteName.D);
-        notes[6].Alteration.Should().Be(Alteration.Natural);
+        notes[1].Name.ShouldBe(NoteName.F);
+        notes[1].Alteration.ShouldBe(Alteration.Sharp);
+        notes[6].Name.ShouldBe(NoteName.D);
+        notes[6].Alteration.ShouldBe(Alteration.Natural);
     }
 
     [Theory]
@@ -199,7 +199,7 @@ public class ModalScaleTests
         
         // Assert
         // All modes of C major should contain only natural notes
-        notes.Should().OnlyContain(n => n.Alteration == Alteration.Natural);
+        notes.ShouldAllBe(n => n.Alteration == Alteration.Natural);
     }
 
     private string GetIntervalPattern(List<Note> notes)

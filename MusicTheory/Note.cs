@@ -415,17 +415,20 @@ public class Note
             (NoteName.B, Alteration.Sharp) => new Note(NoteName.C, Alteration.Natural, Octave + 1),
             (NoteName.C, Alteration.Flat) => new Note(NoteName.B, Alteration.Natural, Octave - 1),
             
-            // Double alterations to natural
+            // Double alterations to simpler equivalents
             (NoteName.C, Alteration.DoubleSharp) => new Note(NoteName.D, Alteration.Natural, Octave),
             (NoteName.D, Alteration.DoubleFlat) => new Note(NoteName.C, Alteration.Natural, Octave),
             (NoteName.D, Alteration.DoubleSharp) => new Note(NoteName.E, Alteration.Natural, Octave),
             (NoteName.E, Alteration.DoubleFlat) => new Note(NoteName.D, Alteration.Natural, Octave),
+            (NoteName.E, Alteration.DoubleSharp) => new Note(NoteName.F, Alteration.Sharp, Octave),
+            (NoteName.F, Alteration.DoubleFlat) => new Note(NoteName.E, Alteration.Flat, Octave),
             (NoteName.F, Alteration.DoubleSharp) => new Note(NoteName.G, Alteration.Natural, Octave),
             (NoteName.G, Alteration.DoubleFlat) => new Note(NoteName.F, Alteration.Natural, Octave),
             (NoteName.G, Alteration.DoubleSharp) => new Note(NoteName.A, Alteration.Natural, Octave),
             (NoteName.A, Alteration.DoubleFlat) => new Note(NoteName.G, Alteration.Natural, Octave),
             (NoteName.A, Alteration.DoubleSharp) => new Note(NoteName.B, Alteration.Natural, Octave),
             (NoteName.B, Alteration.DoubleFlat) => new Note(NoteName.A, Alteration.Natural, Octave),
+            (NoteName.B, Alteration.DoubleSharp) => new Note(NoteName.C, Alteration.Sharp, Octave + 1),
             
             // No simple equivalent for natural D, G, A
             _ => null
@@ -467,23 +470,30 @@ public class Note
     /// <returns>A simplified enharmonic equivalent.</returns>
     public Note SimplifyEnharmonic()
     {
-        // For sharp/flat notes, always try to get the enharmonic equivalent
-        if (Alteration == Alteration.Sharp || Alteration == Alteration.Flat)
+        // Only simplify specific cases where there's a simpler equivalent
+        // E#/Fb and B#/Cb should be simplified to their natural equivalents
+        // Double alterations should also be simplified
+        
+        var equivalent = GetEnharmonicEquivalent();
+        
+        // Check if the equivalent is simpler (natural or single alteration vs double)
+        if (equivalent != null)
         {
-            var equivalent = GetEnharmonicEquivalent();
-            if (equivalent != null)
+            // Always simplify double alterations
+            if (Alteration == Alteration.DoubleSharp || Alteration == Alteration.DoubleFlat)
                 return equivalent;
+            
+            // Simplify E#/Fb and B#/Cb to their natural equivalents
+            if ((Name == NoteName.E && Alteration == Alteration.Sharp) ||
+                (Name == NoteName.F && Alteration == Alteration.Flat) ||
+                (Name == NoteName.B && Alteration == Alteration.Sharp) ||
+                (Name == NoteName.C && Alteration == Alteration.Flat))
+            {
+                return equivalent;
+            }
         }
         
-        // For double alterations, definitely simplify
-        if (Alteration == Alteration.DoubleSharp || Alteration == Alteration.DoubleFlat)
-        {
-            var equivalent = GetEnharmonicEquivalent();
-            if (equivalent != null)
-                return equivalent;
-        }
-        
-        // If no simplification possible, return self
+        // Otherwise, keep the note as-is (including C#, Db, etc.)
         return this;
     }
 

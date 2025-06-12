@@ -16,7 +16,7 @@ public class TimeSignatureTests
         var timeSignature = new TimeSignature(numerator, denominator);
         
         // Act & Assert
-        timeSignature.ToString().Should().Be(expected);
+        timeSignature.ToString().ShouldBe(expected);
     }
 
     [Theory]
@@ -34,7 +34,7 @@ public class TimeSignatureTests
         var duration = timeSignature.GetMeasureDuration();
         
         // Assert
-        duration.Should().Be(expectedDuration);
+        duration.ShouldBe(expectedDuration);
     }
 
     [Theory]
@@ -53,7 +53,7 @@ public class TimeSignatureTests
         var timeSignature = new TimeSignature(numerator, denominator);
         
         // Act & Assert
-        timeSignature.IsSimple.Should().Be(expectedIsSimple);
+        timeSignature.IsSimple.ShouldBe(expectedIsSimple);
     }
 
     [Theory]
@@ -69,7 +69,7 @@ public class TimeSignatureTests
         var timeSignature = new TimeSignature(numerator, denominator);
         
         // Act & Assert
-        timeSignature.IsCompound.Should().Be(expectedIsCompound);
+        timeSignature.IsCompound.ShouldBe(expectedIsCompound);
     }
 
     [Theory]
@@ -84,7 +84,7 @@ public class TimeSignatureTests
         var timeSignature = new TimeSignature(numerator, denominator);
         
         // Act & Assert
-        timeSignature.IsComplex.Should().Be(expectedIsComplex);
+        timeSignature.IsComplex.ShouldBe(expectedIsComplex);
     }
 
     [Theory]
@@ -103,7 +103,7 @@ public class TimeSignatureTests
         var beats = timeSignature.GetBeatsPerMeasure();
         
         // Assert
-        beats.Should().Be(expectedBeats);
+        beats.ShouldBe(expectedBeats);
     }
 
     [Theory]
@@ -122,7 +122,7 @@ public class TimeSignatureTests
         var name = timeSignature.GetCommonName();
         
         // Assert
-        name.Should().Be(expectedName);
+        name.ShouldBe(expectedName);
     }
 
     [Theory]
@@ -135,8 +135,8 @@ public class TimeSignatureTests
     public void TimeSignature_Constructor_ShouldThrowForInvalidValues(int numerator, int denominator)
     {
         // Act & Assert
-        var act = () => new TimeSignature(numerator, denominator);
-        act.Should().Throw<ArgumentException>();
+        Action act = () => new TimeSignature(numerator, denominator);
+        act.ShouldThrow<ArgumentException>();
     }
 
     [Fact]
@@ -148,10 +148,10 @@ public class TimeSignatureTests
         var ts3 = new TimeSignature(3, 4);
         
         // Act & Assert
-        ts1.Equals(ts2).Should().BeTrue();
-        ts1.Equals(ts3).Should().BeFalse();
-        (ts1 == ts2).Should().BeTrue();
-        (ts1 != ts3).Should().BeTrue();
+        ts1.Equals(ts2).ShouldBeTrue();
+        ts1.Equals(ts3).ShouldBeFalse();
+        (ts1 == ts2).ShouldBeTrue();
+        (ts1 != ts3).ShouldBeTrue();
     }
 
     [Theory]
@@ -168,7 +168,7 @@ public class TimeSignatureTests
         var symbol = timeSignature.GetSymbol();
         
         // Assert
-        symbol.Should().Be(expectedSymbol);
+        symbol.ShouldBe(expectedSymbol);
     }
 
     [Theory]
@@ -186,7 +186,21 @@ public class TimeSignatureTests
         var (beatNumerator, beatDenominator) = timeSignature.GetBeatUnit();
         
         // Assert
-        beatNumerator.Should().Be(expectedNumerator);
-        beatDenominator.Should().Be(expectedDenominator);
+        beatNumerator.ShouldBe(expectedNumerator);
+        beatDenominator.ShouldBe(expectedDenominator);
+    }
+
+    [Fact]
+    public void TimeSignature_GetCommonName_ForUncommonTimeSignatures_ShouldReturnNull()
+    {
+        // Arrange
+        var fiveFour = new TimeSignature(5, 4);
+        var sevenEight = new TimeSignature(7, 8);
+        var elevenEight = new TimeSignature(11, 8);
+        
+        // Act & Assert
+        fiveFour.GetCommonName().ShouldBeNull();
+        sevenEight.GetCommonName().ShouldBeNull();
+        elevenEight.GetCommonName().ShouldBeNull();
     }
 }

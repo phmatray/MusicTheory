@@ -13,9 +13,9 @@ public class TranspositionTests
         var result = c4.Transpose(majorThird);
         
         // Assert
-        result.Name.Should().Be(NoteName.E);
-        result.Alteration.Should().Be(Alteration.Natural);
-        result.Octave.Should().Be(4);
+        result.Name.ShouldBe(NoteName.E);
+        result.Alteration.ShouldBe(Alteration.Natural);
+        result.Octave.ShouldBe(4);
     }
 
     [Fact]
@@ -29,9 +29,9 @@ public class TranspositionTests
         var result = e4.Transpose(majorThird, Direction.Down);
         
         // Assert
-        result.Name.Should().Be(NoteName.C);
-        result.Alteration.Should().Be(Alteration.Natural);
-        result.Octave.Should().Be(4);
+        result.Name.ShouldBe(NoteName.C);
+        result.Alteration.ShouldBe(Alteration.Natural);
+        result.Octave.ShouldBe(4);
     }
 
     [Fact]
@@ -45,9 +45,9 @@ public class TranspositionTests
         var result = b4.Transpose(majorSecond);
         
         // Assert
-        result.Name.Should().Be(NoteName.C);
-        result.Alteration.Should().Be(Alteration.Sharp);
-        result.Octave.Should().Be(5);
+        result.Name.ShouldBe(NoteName.C);
+        result.Alteration.ShouldBe(Alteration.Sharp);
+        result.Octave.ShouldBe(5);
     }
 
     [Theory]
@@ -66,9 +66,9 @@ public class TranspositionTests
         var result = note.TransposeBySemitones(semitones);
         
         // Assert
-        result.Name.Should().Be(expectedName);
-        result.Alteration.Should().Be(expectedAlteration);
-        result.Octave.Should().Be(expectedOctave);
+        result.Name.ShouldBe(expectedName);
+        result.Alteration.ShouldBe(expectedAlteration);
+        result.Octave.ShouldBe(expectedOctave);
     }
 
     [Fact]
@@ -83,11 +83,11 @@ public class TranspositionTests
         var notes = dMajor.GetNotes().ToList();
         
         // Assert
-        dMajor.Root.Name.Should().Be(NoteName.D);
-        notes[0].Name.Should().Be(NoteName.D); // Root
-        notes[1].Name.Should().Be(NoteName.F); // Third
-        notes[1].Alteration.Should().Be(Alteration.Sharp);
-        notes[2].Name.Should().Be(NoteName.A); // Fifth
+        dMajor.Root.Name.ShouldBe(NoteName.D);
+        notes[0].Name.ShouldBe(NoteName.D); // Root
+        notes[1].Name.ShouldBe(NoteName.F); // Third
+        notes[1].Alteration.ShouldBe(Alteration.Sharp);
+        notes[2].Name.ShouldBe(NoteName.A); // Fifth
     }
 
     [Fact]
@@ -102,9 +102,9 @@ public class TranspositionTests
         var notes = fMajorScale.GetNotes().ToList();
         
         // Assert
-        fMajorScale.Root.Name.Should().Be(NoteName.F);
-        notes[0].Name.Should().Be(NoteName.F);
-        notes[3].Name.Should().Be(NoteName.B);
-        notes[3].Alteration.Should().Be(Alteration.Flat); // Bb in F major
+        fMajorScale.Root.Name.ShouldBe(NoteName.F);
+        notes[0].Name.ShouldBe(NoteName.F);
+        notes[3].Name.ShouldBe(NoteName.B);
+        notes[3].Alteration.ShouldBe(Alteration.Flat); // Bb in F major
     }
 }

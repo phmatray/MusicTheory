@@ -18,8 +18,8 @@ public class CircleOfFifthsTests
         var nextKey = keySignature.NextInCircle();
         
         // Assert
-        nextKey.Tonic.Name.Should().Be(expectedTonic);
-        nextKey.Mode.Should().Be(mode);
+        nextKey.Tonic.Name.ShouldBe(expectedTonic);
+        nextKey.Mode.ShouldBe(mode);
     }
 
     [Theory]
@@ -38,8 +38,8 @@ public class CircleOfFifthsTests
         var previousKey = keySignature.PreviousInCircle();
         
         // Assert
-        previousKey.Tonic.Name.Should().Be(expectedTonic);
-        previousKey.Mode.Should().Be(mode);
+        previousKey.Tonic.Name.ShouldBe(expectedTonic);
+        previousKey.Mode.ShouldBe(mode);
     }
 
     [Fact]
@@ -52,9 +52,9 @@ public class CircleOfFifthsTests
         var nextKey = bMajor.NextInCircle();
         
         // Assert
-        nextKey.Tonic.Name.Should().Be(NoteName.F);
-        nextKey.Tonic.Alteration.Should().Be(Alteration.Sharp);
-        nextKey.AccidentalCount.Should().Be(6);
+        nextKey.Tonic.Name.ShouldBe(NoteName.F);
+        nextKey.Tonic.Alteration.ShouldBe(Alteration.Sharp);
+        nextKey.AccidentalCount.ShouldBe(6);
     }
 
     [Fact]
@@ -67,9 +67,9 @@ public class CircleOfFifthsTests
         var nextKey = cSharpMajor.NextInCircle();
         
         // Assert - C# major (7 sharps) wraps to Db major (5 flats)
-        nextKey.Tonic.Name.Should().Be(NoteName.D);
-        nextKey.Tonic.Alteration.Should().Be(Alteration.Flat);
-        nextKey.AccidentalCount.Should().Be(-5);
+        nextKey.Tonic.Name.ShouldBe(NoteName.D);
+        nextKey.Tonic.Alteration.ShouldBe(Alteration.Flat);
+        nextKey.AccidentalCount.ShouldBe(-5);
     }
 
     [Fact]
@@ -82,9 +82,9 @@ public class CircleOfFifthsTests
         var previousKey = cFlatMajor.PreviousInCircle();
         
         // Assert - Cb major (7 flats) wraps to B major (5 sharps)
-        previousKey.Tonic.Name.Should().Be(NoteName.B);
-        previousKey.Tonic.Alteration.Should().Be(Alteration.Natural);
-        previousKey.AccidentalCount.Should().Be(5);
+        previousKey.Tonic.Name.ShouldBe(NoteName.B);
+        previousKey.Tonic.Alteration.ShouldBe(Alteration.Natural);
+        previousKey.AccidentalCount.ShouldBe(5);
     }
 
     [Theory]
@@ -103,9 +103,9 @@ public class CircleOfFifthsTests
         var relativeKey = keySignature.GetRelative();
         
         // Assert
-        relativeKey.Tonic.Name.Should().Be(expectedTonic);
-        relativeKey.Mode.Should().Be(expectedMode);
-        relativeKey.AccidentalCount.Should().Be(keySignature.AccidentalCount);
+        relativeKey.Tonic.Name.ShouldBe(expectedTonic);
+        relativeKey.Mode.ShouldBe(expectedMode);
+        relativeKey.AccidentalCount.ShouldBe(keySignature.AccidentalCount);
     }
 
     [Theory]
@@ -122,9 +122,9 @@ public class CircleOfFifthsTests
         var parallelKey = keySignature.GetParallel();
         
         // Assert
-        parallelKey.Tonic.Name.Should().Be(tonic);
-        parallelKey.Tonic.Alteration.Should().Be(keySignature.Tonic.Alteration);
-        parallelKey.Mode.Should().Be(expectedMode);
+        parallelKey.Tonic.Name.ShouldBe(tonic);
+        parallelKey.Tonic.Alteration.ShouldBe(keySignature.Tonic.Alteration);
+        parallelKey.Mode.ShouldBe(expectedMode);
     }
 
     [Fact]
@@ -137,10 +137,10 @@ public class CircleOfFifthsTests
         var equivalents = fSharpMajor.GetEnharmonicEquivalents().ToList();
         
         // Assert
-        equivalents.Should().HaveCount(1);
-        equivalents[0].Tonic.Name.Should().Be(NoteName.G);
-        equivalents[0].Tonic.Alteration.Should().Be(Alteration.Flat);
-        equivalents[0].Mode.Should().Be(KeyMode.Major);
+        equivalents.Count.ShouldBe(1);
+        equivalents[0].Tonic.Name.ShouldBe(NoteName.G);
+        equivalents[0].Tonic.Alteration.ShouldBe(Alteration.Flat);
+        equivalents[0].Mode.ShouldBe(KeyMode.Major);
     }
 
     [Fact]
@@ -153,10 +153,10 @@ public class CircleOfFifthsTests
         var equivalents = cSharpMajor.GetEnharmonicEquivalents().ToList();
         
         // Assert
-        equivalents.Should().HaveCount(1);
-        equivalents[0].Tonic.Name.Should().Be(NoteName.D);
-        equivalents[0].Tonic.Alteration.Should().Be(Alteration.Flat);
-        equivalents[0].Mode.Should().Be(KeyMode.Major);
+        equivalents.Count.ShouldBe(1);
+        equivalents[0].Tonic.Name.ShouldBe(NoteName.D);
+        equivalents[0].Tonic.Alteration.ShouldBe(Alteration.Flat);
+        equivalents[0].Mode.ShouldBe(KeyMode.Major);
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public class CircleOfFifthsTests
         var equivalents = cMajor.GetEnharmonicEquivalents().ToList();
         
         // Assert
-        equivalents.Should().BeEmpty();
+        equivalents.ShouldBeEmpty();
     }
 
     [Theory]
@@ -186,8 +186,8 @@ public class CircleOfFifthsTests
         var dominant = keySignature.GetDominant();
         
         // Assert
-        dominant.Tonic.Name.Should().Be(expectedDominantTonic);
-        dominant.Mode.Should().Be(mode);
+        dominant.Tonic.Name.ShouldBe(expectedDominantTonic);
+        dominant.Mode.ShouldBe(mode);
     }
 
     [Theory]
@@ -204,8 +204,8 @@ public class CircleOfFifthsTests
         var subdominant = keySignature.GetSubdominant();
         
         // Assert
-        subdominant.Tonic.Name.Should().Be(expectedSubdominantTonic);
-        subdominant.Mode.Should().Be(mode);
+        subdominant.Tonic.Name.ShouldBe(expectedSubdominantTonic);
+        subdominant.Mode.ShouldBe(mode);
     }
 
     [Fact]
@@ -223,8 +223,8 @@ public class CircleOfFifthsTests
         
         // Assert - After 12 steps we should be at an enharmonic equivalent
         // C -> G -> D -> A -> E -> B -> F# -> C# -> Db -> Ab -> Eb -> Bb -> F
-        current.Tonic.Name.Should().Be(NoteName.F);
-        current.Tonic.Alteration.Should().Be(Alteration.Natural);
-        current.AccidentalCount.Should().Be(-1); // F major has 1 flat
+        current.Tonic.Name.ShouldBe(NoteName.F);
+        current.Tonic.Alteration.ShouldBe(Alteration.Natural);
+        current.AccidentalCount.ShouldBe(-1); // F major has 1 flat
     }
 }
