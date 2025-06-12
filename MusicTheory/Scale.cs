@@ -12,7 +12,23 @@ public enum ScaleType
     /// <summary>Harmonic minor scale (W-H-W-W-H-WH-H)</summary>
     HarmonicMinor,
     /// <summary>Melodic minor scale (W-H-W-W-W-W-H ascending)</summary>
-    MelodicMinor
+    MelodicMinor,
+    
+    // Modal scales
+    /// <summary>Ionian mode (W-W-H-W-W-W-H) - same as Major</summary>
+    Ionian,
+    /// <summary>Dorian mode (W-H-W-W-W-H-W)</summary>
+    Dorian,
+    /// <summary>Phrygian mode (H-W-W-W-H-W-W)</summary>
+    Phrygian,
+    /// <summary>Lydian mode (W-W-W-H-W-W-H)</summary>
+    Lydian,
+    /// <summary>Mixolydian mode (W-W-H-W-W-H-W)</summary>
+    Mixolydian,
+    /// <summary>Aeolian mode (W-H-W-W-H-W-W) - same as Natural Minor</summary>
+    Aeolian,
+    /// <summary>Locrian mode (H-W-W-H-W-W-W)</summary>
+    Locrian
 }
 
 /// <summary>
@@ -67,12 +83,12 @@ public class Scale
     {
         return Type switch
         {
-            ScaleType.Major => new[] 
+            ScaleType.Major or ScaleType.Ionian => new[] 
             { 
                 IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half, 
                 IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half 
             },
-            ScaleType.NaturalMinor => new[] 
+            ScaleType.NaturalMinor or ScaleType.Aeolian => new[] 
             { 
                 IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole, 
                 IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole 
@@ -86,6 +102,31 @@ public class Scale
             { 
                 IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole, 
                 IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half 
+            },
+            ScaleType.Dorian => new[]
+            {
+                IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole,
+                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole
+            },
+            ScaleType.Phrygian => new[]
+            {
+                IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole,
+                IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole
+            },
+            ScaleType.Lydian => new[]
+            {
+                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole,
+                IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half
+            },
+            ScaleType.Mixolydian => new[]
+            {
+                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half,
+                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole
+            },
+            ScaleType.Locrian => new[]
+            {
+                IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole,
+                IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole
             },
             _ => throw new ArgumentOutOfRangeException()
         };
@@ -108,9 +149,6 @@ public class Scale
             _ => throw new ArgumentOutOfRangeException()
         };
 
-        // Create interval and calculate the actual next note
-        var interval = new Interval(IntervalQuality.Major, 2); // This is temporary, we need to calculate proper interval
-        
         // Get current note semitones from C0
         int currentSemitones = GetTotalSemitones(currentNote);
         int targetSemitones = currentSemitones + semitones;
