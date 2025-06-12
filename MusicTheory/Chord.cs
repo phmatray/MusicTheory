@@ -257,7 +257,7 @@ public class Chord
     /// Gets the enharmonic equivalent of this chord.
     /// </summary>
     /// <returns>A new chord with an enharmonically equivalent root note, or null if no equivalent exists.</returns>
-    public Chord GetEnharmonicEquivalent()
+    public Chord? GetEnharmonicEquivalent()
     {
         var enharmonicRoot = Root.GetEnharmonicEquivalent();
         if (enharmonicRoot == null)

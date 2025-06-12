@@ -154,7 +154,7 @@ public class Interval
     /// </summary>
     /// <param name="other">The other interval to compare.</param>
     /// <returns>True if the intervals are enharmonic; otherwise, false.</returns>
-    public bool IsEnharmonicWith(Interval other)
+    public bool IsEnharmonicWith(Interval? other)
     {
         if (other == null) return false;
         return Semitones == other.Semitones;

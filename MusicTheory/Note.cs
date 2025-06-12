@@ -364,7 +364,7 @@ public class Note
     /// </summary>
     /// <param name="other">The other note to compare.</param>
     /// <returns>True if the notes are enharmonic; otherwise, false.</returns>
-    public bool IsEnharmonicWith(Note other)
+    public bool IsEnharmonicWith(Note? other)
     {
         if (other == null) return false;
         
@@ -384,7 +384,7 @@ public class Note
     /// Gets the most common enharmonic equivalent of this note.
     /// </summary>
     /// <returns>The enharmonic equivalent note, or null if no simple equivalent exists.</returns>
-    public Note GetEnharmonicEquivalent()
+    public Note? GetEnharmonicEquivalent()
     {
         // Common enharmonic equivalents
         return (Name, Alteration) switch
