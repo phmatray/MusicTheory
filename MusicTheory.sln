@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory", "MusicTheory\MusicTheory.csproj", "{A6B0992E-6A20-4FDA-938B-55B601DBA295}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.UnitTests", "MusicTheory.UnitTests\MusicTheory.UnitTests.csproj", "{701DECE8-C3A8-49EC-89D8-B1BB6FF3F628}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A6B0992E-6A20-4FDA-938B-55B601DBA295}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6B0992E-6A20-4FDA-938B-55B601DBA295}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6B0992E-6A20-4FDA-938B-55B601DBA295}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6B0992E-6A20-4FDA-938B-55B601DBA295}.Release|Any CPU.Build.0 = Release|Any CPU
+		{701DECE8-C3A8-49EC-89D8-B1BB6FF3F628}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{701DECE8-C3A8-49EC-89D8-B1BB6FF3F628}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{701DECE8-C3A8-49EC-89D8-B1BB6FF3F628}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{701DECE8-C3A8-49EC-89D8-B1BB6FF3F628}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
