@@ -47,6 +47,16 @@ public class Chord
     }
 
     /// <summary>
+    /// Private constructor for creating a transposed chord with extensions.
+    /// </summary>
+    private Chord(Note root, ChordQuality quality, List<(int Number, IntervalQuality Quality)> extensions)
+    {
+        Root = root;
+        Quality = quality;
+        Extensions = new List<(int Number, IntervalQuality Quality)>(extensions);
+    }
+
+    /// <summary>
     /// Adds an extension to the chord.
     /// </summary>
     /// <param name="intervalNumber">The interval number (e.g., 7 for seventh, 9 for ninth).</param>
@@ -140,5 +150,17 @@ public class Chord
     {
         int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 };
         return note.Octave * 12 + semitonesFromC[(int)note.Name] + (int)note.Alteration;
+    }
+
+    /// <summary>
+    /// Transposes the chord by the specified interval.
+    /// </summary>
+    /// <param name="interval">The interval to transpose by.</param>
+    /// <param name="direction">The direction to transpose (default is Up).</param>
+    /// <returns>A new chord transposed by the interval.</returns>
+    public Chord Transpose(Interval interval, Direction direction = Direction.Up)
+    {
+        var newRoot = Root.Transpose(interval, direction);
+        return new Chord(newRoot, Quality, Extensions);
     }
 }

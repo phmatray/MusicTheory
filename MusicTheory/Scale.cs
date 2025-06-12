@@ -180,4 +180,16 @@ public class Scale
         Whole,
         WholeAndHalf
     }
+
+    /// <summary>
+    /// Transposes the scale by the specified interval.
+    /// </summary>
+    /// <param name="interval">The interval to transpose by.</param>
+    /// <param name="direction">The direction to transpose (default is Up).</param>
+    /// <returns>A new scale transposed by the interval.</returns>
+    public Scale Transpose(Interval interval, Direction direction = Direction.Up)
+    {
+        var newRoot = Root.Transpose(interval, direction);
+        return new Scale(newRoot, Type);
+    }
 }

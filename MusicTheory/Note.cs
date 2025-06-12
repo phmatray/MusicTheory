@@ -127,4 +127,123 @@ public class Note
         
         return semitonesFromC0 - a4SemitonesFromC0;
     }
+
+    /// <summary>
+    /// Transposes the note by the specified interval.
+    /// </summary>
+    /// <param name="interval">The interval to transpose by.</param>
+    /// <param name="direction">The direction to transpose (default is Up).</param>
+    /// <returns>A new note transposed by the interval.</returns>
+    public Note Transpose(Interval interval, Direction direction = Direction.Up)
+    {
+        int semitones = interval.Semitones;
+        if (direction == Direction.Down)
+            semitones = -semitones;
+
+        // Calculate the new note name based on the interval number
+        int noteOffset = interval.Number - 1;
+        if (direction == Direction.Down)
+            noteOffset = -noteOffset;
+
+        int newNoteIndex = ((int)Name + noteOffset) % 7;
+        if (newNoteIndex < 0)
+            newNoteIndex += 7;
+
+        var targetNoteName = (NoteName)newNoteIndex;
+
+        // Calculate the actual semitones from C0
+        int currentSemitones = GetTotalSemitones();
+        int targetSemitones = currentSemitones + semitones;
+
+        // Calculate octave
+        int baseOctave = Octave;
+        if (direction == Direction.Up && targetNoteName < Name)
+            baseOctave++;
+        else if (direction == Direction.Down && targetNoteName > Name)
+            baseOctave--;
+
+        // Adjust octave based on total semitone change
+        int octaveAdjustment = 0;
+        if (direction == Direction.Up)
+        {
+            octaveAdjustment = noteOffset / 7;
+        }
+        else
+        {
+            octaveAdjustment = -((-noteOffset + 6) / 7);
+        }
+
+        int targetOctave = baseOctave + octaveAdjustment;
+
+        // Calculate the required alteration
+        int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 };
+        int expectedSemitones = targetOctave * 12 + semitonesFromC[(int)targetNoteName];
+        int alterationValue = targetSemitones - expectedSemitones;
+
+        // Clamp alteration to valid range
+        if (alterationValue < -2)
+        {
+            alterationValue += 12;
+            targetOctave--;
+        }
+        else if (alterationValue > 2)
+        {
+            alterationValue -= 12;
+            targetOctave++;
+        }
+
+        return new Note(targetNoteName, (Alteration)alterationValue, targetOctave);
+    }
+
+    /// <summary>
+    /// Transposes the note by a specific number of semitones.
+    /// </summary>
+    /// <param name="semitones">The number of semitones to transpose (positive for up, negative for down).</param>
+    /// <returns>A new note transposed by the specified semitones.</returns>
+    public Note TransposeBySemitones(int semitones)
+    {
+        // Calculate target semitones from C0
+        int currentSemitones = GetTotalSemitones();
+        int targetSemitones = currentSemitones + semitones;
+
+        // Calculate octave and note
+        int targetOctave = targetSemitones / 12;
+        int semitonesInOctave = targetSemitones % 12;
+
+        // Handle negative modulo
+        if (semitonesInOctave < 0)
+        {
+            semitonesInOctave += 12;
+            targetOctave--;
+        }
+
+        // Find the closest natural note
+        int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 };
+        int bestNote = 0;
+        int bestDifference = int.MaxValue;
+
+        for (int i = 0; i < 7; i++)
+        {
+            int difference = Math.Abs(semitonesInOctave - semitonesFromC[i]);
+            if (difference < bestDifference)
+            {
+                bestDifference = difference;
+                bestNote = i;
+            }
+        }
+
+        // Calculate alteration
+        int alterationValue = semitonesInOctave - semitonesFromC[bestNote];
+
+        return new Note((NoteName)bestNote, (Alteration)alterationValue, targetOctave);
+    }
+
+    /// <summary>
+    /// Gets the total semitones from C0 for this note.
+    /// </summary>
+    private int GetTotalSemitones()
+    {
+        int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 };
+        return Octave * 12 + semitonesFromC[(int)Name] + (int)Alteration;
+    }
 }
