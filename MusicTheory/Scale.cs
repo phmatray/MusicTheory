@@ -113,7 +113,7 @@ public class Scale
         var currentNote = Root;
         yield return currentNote;
 
-        for (int i = 1; i < 12; i++)
+        for (int i = 1; i < MusicTheoryConstants.SemitonesPerOctave; i++)
         {
             currentNote = currentNote.TransposeBySemitones(1);
             yield return currentNote;
@@ -261,16 +261,15 @@ public class Scale
         };
 
         // Get current note semitones from C0
-        int currentSemitones = GetTotalSemitones(currentNote);
+        int currentSemitones = MusicTheoryUtilities.GetTotalSemitones(currentNote);
         int targetSemitones = currentSemitones + semitones;
         
         // Calculate octave and alteration
-        int targetOctave = targetSemitones / 12;
-        int semitonesInOctave = targetSemitones % 12;
+        int targetOctave = targetSemitones / MusicTheoryConstants.SemitonesPerOctave;
+        int semitonesInOctave = targetSemitones % MusicTheoryConstants.SemitonesPerOctave;
         
         // Get expected semitones for the next note name
-        int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 };
-        int expectedSemitones = semitonesFromC[(int)nextNoteName];
+        int expectedSemitones = MusicTheoryConstants.SemitonesFromC[(int)nextNoteName];
         
         // Calculate alteration needed
         int alterationValue = semitonesInOctave - expectedSemitones;
@@ -278,12 +277,12 @@ public class Scale
         // Handle octave wrapping
         if (alterationValue < -2)
         {
-            alterationValue += 12;
+            alterationValue += MusicTheoryConstants.SemitonesPerOctave;
             targetOctave--;
         }
         else if (alterationValue > 2)
         {
-            alterationValue -= 12;
+            alterationValue -= MusicTheoryConstants.SemitonesPerOctave;
             targetOctave++;
         }
 
@@ -303,7 +302,7 @@ public class Scale
 
         // Recalculate alteration with correct octave
         targetSemitones = currentSemitones + semitones;
-        int actualSemitonesFromC0 = targetOctave * 12 + expectedSemitones;
+        int actualSemitonesFromC0 = targetOctave * MusicTheoryConstants.SemitonesPerOctave + expectedSemitones;
         alterationValue = targetSemitones - actualSemitonesFromC0;
 
         var alteration = (Alteration)alterationValue;
@@ -311,14 +310,6 @@ public class Scale
         return new Note(nextNoteName, alteration, targetOctave);
     }
 
-    /// <summary>
-    /// Gets the total semitones from C0 for a given note.
-    /// </summary>
-    private static int GetTotalSemitones(Note note)
-    {
-        int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 };
-        return note.Octave * 12 + semitonesFromC[(int)note.Name] + (int)note.Alteration;
-    }
 
     /// <summary>
     /// Represents the interval steps in a scale.

@@ -73,8 +73,9 @@ public class Note
         {
             // MIDI note 60 is Middle C (C4)
             // Calculate semitones from C-1 (MIDI 0)
-            int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 };
-            int midiNumber = (Octave + 1) * 12 + semitonesFromC[(int)Name] + (int)Alteration;
+            int midiNumber = (Octave + 1) * MusicTheoryConstants.SemitonesPerOctave + 
+                           MusicTheoryConstants.SemitonesFromC[(int)Name] + 
+                           (int)Alteration;
             
             if (midiNumber < 0 || midiNumber > 127)
             {
@@ -122,14 +123,12 @@ public class Note
     private double CalculateFrequency()
     {
         // A4 is the reference note at 440 Hz
-        const double a4Frequency = 440.0;
-        
         // Calculate semitones from A4
         int semitonesFromA4 = GetSemitonesFromA4();
         
         // Apply equal temperament formula: f = 440 * 2^(n/12)
         // where n is the number of semitones from A4
-        return a4Frequency * Math.Pow(2.0, semitonesFromA4 / 12.0);
+        return MusicTheoryConstants.A4Frequency * Math.Pow(2.0, semitonesFromA4 / 12.0);
     }
 
     /// <summary>
@@ -138,11 +137,8 @@ public class Note
     /// <returns>The number of semitones (positive for higher notes, negative for lower).</returns>
     private int GetSemitonesFromA4()
     {
-        // Semitones from C to each note
-        int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 }; // C, D, E, F, G, A, B
-        
         // Calculate semitones from C0 to this note
-        int semitonesFromC0 = Octave * 12 + semitonesFromC[(int)Name] + (int)Alteration;
+        int semitonesFromC0 = MusicTheoryUtilities.GetTotalSemitones(this);
         
         // A4 is 57 semitones from C0 (4 * 12 + 9 = 57)
         const int a4SemitonesFromC0 = 57;
@@ -198,19 +194,19 @@ public class Note
         int targetOctave = baseOctave + octaveAdjustment;
 
         // Calculate the required alteration
-        int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 };
-        int expectedSemitones = targetOctave * 12 + semitonesFromC[(int)targetNoteName];
+        int expectedSemitones = targetOctave * MusicTheoryConstants.SemitonesPerOctave + 
+                              MusicTheoryConstants.SemitonesFromC[(int)targetNoteName];
         int alterationValue = targetSemitones - expectedSemitones;
 
         // Clamp alteration to valid range
         if (alterationValue < -2)
         {
-            alterationValue += 12;
+            alterationValue += MusicTheoryConstants.SemitonesPerOctave;
             targetOctave--;
         }
         else if (alterationValue > 2)
         {
-            alterationValue -= 12;
+            alterationValue -= MusicTheoryConstants.SemitonesPerOctave;
             targetOctave++;
         }
 
@@ -229,24 +225,23 @@ public class Note
         int targetSemitones = currentSemitones + semitones;
 
         // Calculate octave and note
-        int targetOctave = targetSemitones / 12;
-        int semitonesInOctave = targetSemitones % 12;
+        int targetOctave = targetSemitones / MusicTheoryConstants.SemitonesPerOctave;
+        int semitonesInOctave = targetSemitones % MusicTheoryConstants.SemitonesPerOctave;
 
         // Handle negative modulo
         if (semitonesInOctave < 0)
         {
-            semitonesInOctave += 12;
+            semitonesInOctave += MusicTheoryConstants.SemitonesPerOctave;
             targetOctave--;
         }
 
         // Find the closest natural note
-        int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 };
         int bestNote = 0;
         int bestDifference = int.MaxValue;
 
         for (int i = 0; i < 7; i++)
         {
-            int difference = Math.Abs(semitonesInOctave - semitonesFromC[i]);
+            int difference = Math.Abs(semitonesInOctave - MusicTheoryConstants.SemitonesFromC[i]);
             if (difference < bestDifference)
             {
                 bestDifference = difference;
@@ -255,7 +250,7 @@ public class Note
         }
 
         // Calculate alteration
-        int alterationValue = semitonesInOctave - semitonesFromC[bestNote];
+        int alterationValue = semitonesInOctave - MusicTheoryConstants.SemitonesFromC[bestNote];
 
         return new Note((NoteName)bestNote, (Alteration)alterationValue, targetOctave);
     }
@@ -265,8 +260,7 @@ public class Note
     /// </summary>
     private int GetTotalSemitones()
     {
-        int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 };
-        return Octave * 12 + semitonesFromC[(int)Name] + (int)Alteration;
+        return MusicTheoryUtilities.GetTotalSemitones(this);
     }
 
     /// <summary>
@@ -293,8 +287,8 @@ public class Note
         }
 
         // Calculate octave (C-1 = 0, C0 = 12, C1 = 24, etc.)
-        int octave = (midiNumber / 12) - 1;
-        int noteInOctave = midiNumber % 12;
+        int octave = (midiNumber / MusicTheoryConstants.SemitonesPerOctave) - 1;
+        int noteInOctave = midiNumber % MusicTheoryConstants.SemitonesPerOctave;
 
         // Map semitones to note names and alterations
         if (preferFlats)
@@ -374,8 +368,8 @@ public class Note
         var otherSemitones = other.GetSemitonesFromC();
         
         // Normalize to same octave for comparison
-        var thisNormalized = thisSemitones % 12;
-        var otherNormalized = otherSemitones % 12;
+        var thisNormalized = thisSemitones % MusicTheoryConstants.SemitonesPerOctave;
+        var otherNormalized = otherSemitones % MusicTheoryConstants.SemitonesPerOctave;
         
         return thisNormalized == otherNormalized;
     }
@@ -442,7 +436,7 @@ public class Note
     public IEnumerable<Note> GetAllEnharmonicEquivalents()
     {
         var equivalents = new List<Note>();
-        var targetSemitones = GetSemitonesFromC() % 12;
+        var targetSemitones = GetSemitonesFromC() % MusicTheoryConstants.SemitonesPerOctave;
         
         // Check all possible note name and alteration combinations
         foreach (NoteName noteName in Enum.GetValues<NoteName>())
@@ -454,7 +448,7 @@ public class Note
                     continue;
                 
                 var candidate = new Note(noteName, alteration, Octave);
-                if (candidate.GetSemitonesFromC() % 12 == targetSemitones)
+                if (candidate.GetSemitonesFromC() % MusicTheoryConstants.SemitonesPerOctave == targetSemitones)
                 {
                     equivalents.Add(candidate);
                 }

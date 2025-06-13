@@ -77,8 +77,7 @@ public class Interval
     /// </summary>
     private static int GetTotalSemitones(Note note)
     {
-        int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 };
-        return note.Octave * 12 + semitonesFromC[(int)note.Name] + (int)note.Alteration;
+        return MusicTheoryUtilities.GetTotalSemitones(note);
     }
 
     /// <summary>
@@ -91,9 +90,8 @@ public class Interval
         bool isPerfectInterval = baseNumber == 1 || baseNumber == 4 || baseNumber == 5 || baseNumber == 8;
 
         // Expected semitones for perfect/major intervals
-        int[] expectedSemitones = { 0, 2, 4, 5, 7, 9, 11 };
         int octaves = (number - 1) / 7;
-        int expectedSemitonesForMajorOrPerfect = expectedSemitones[baseNumber - 1] + (octaves * 12);
+        int expectedSemitonesForMajorOrPerfect = MusicTheoryConstants.SemitonesFromC[baseNumber - 1] + (octaves * MusicTheoryConstants.SemitonesPerOctave);
 
         // Determine quality based on actual vs expected semitones
         int difference = semitones - expectedSemitonesForMajorOrPerfect;
@@ -126,7 +124,7 @@ public class Interval
         int octaves = (Number - 1) / 7;
         
         // Get base semitones for this interval number
-        int semitones = baseSemitones[baseNumber - 1] + (octaves * 12);
+        int semitones = baseSemitones[baseNumber - 1] + (octaves * MusicTheoryConstants.SemitonesPerOctave);
         
         // Adjust for quality
         bool isPerfectInterval = baseNumber == 1 || baseNumber == 4 || baseNumber == 5 || baseNumber == 8;

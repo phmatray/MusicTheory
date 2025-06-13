@@ -7,6 +7,9 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=729dfb1f_002D3771_002D48f3_002D9fe5_002D8a426c19170d/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;MusicTheory.UnitTests&amp;gt; #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Project Location="/Users/phmatray/Repositories/github-phm/MusicTheory/MusicTheory.UnitTests" Presentation="&amp;lt;MusicTheory.UnitTests&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=ce6f6749_002D6106_002D47c3_002D9f21_002De12f92ef2df0/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;MusicTheory.UnitTests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;Project Location="/Users/phmatray/Repositories/github-phm/MusicTheory/MusicTheory.UnitTests" Presentation="&amp;lt;MusicTheory.UnitTests&amp;gt;" /&gt;
+&lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=fe6b7d05_002Da24a_002D44f0_002Da8dc_002D05cd012581d5/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;MusicTheory.UnitTests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Project Location="/Users/phmatray/Repositories/github-phm/MusicTheory/MusicTheory.UnitTests" Presentation="&amp;lt;MusicTheory.UnitTests&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

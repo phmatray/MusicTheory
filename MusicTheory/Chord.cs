@@ -314,16 +314,15 @@ public class Chord
     private static Note GetNoteAtInterval(Note baseNote, Interval interval)
     {
         // Calculate target semitones from C0
-        int baseSemitones = GetTotalSemitones(baseNote);
+        int baseSemitones = MusicTheoryUtilities.GetTotalSemitones(baseNote);
         int targetSemitones = baseSemitones + interval.Semitones;
 
         // Calculate target octave and note within octave
-        int targetOctave = targetSemitones / 12;
-        int semitonesInOctave = targetSemitones % 12;
+        int targetOctave = targetSemitones / MusicTheoryConstants.SemitonesPerOctave;
+        int semitonesInOctave = targetSemitones % MusicTheoryConstants.SemitonesPerOctave;
 
         // Find the note name and alteration
         // This is a simplified approach - in practice, we'd need to consider enharmonic equivalents
-        int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 };
         
         // Calculate the expected note based on interval number
         int baseNoteIndex = (int)baseNote.Name;
@@ -331,19 +330,19 @@ public class Chord
         NoteName targetNoteName = (NoteName)targetNoteIndex;
 
         // Calculate required alteration
-        int expectedSemitones = semitonesFromC[targetNoteIndex];
+        int expectedSemitones = MusicTheoryConstants.SemitonesFromC[targetNoteIndex];
         int actualSemitonesInOctave = semitonesInOctave;
         int alterationValue = actualSemitonesInOctave - expectedSemitones;
 
         // Handle wrapping around octave
         if (alterationValue < -2)
         {
-            alterationValue += 12;
+            alterationValue += MusicTheoryConstants.SemitonesPerOctave;
             targetOctave--;
         }
         else if (alterationValue > 2)
         {
-            alterationValue -= 12;
+            alterationValue -= MusicTheoryConstants.SemitonesPerOctave;
             targetOctave++;
         }
 
@@ -352,14 +351,6 @@ public class Chord
         return new Note(targetNoteName, alteration, targetOctave);
     }
 
-    /// <summary>
-    /// Gets the total semitones from C0 for a given note.
-    /// </summary>
-    private static int GetTotalSemitones(Note note)
-    {
-        int[] semitonesFromC = { 0, 2, 4, 5, 7, 9, 11 };
-        return note.Octave * 12 + semitonesFromC[(int)note.Name] + (int)note.Alteration;
-    }
 
     /// <summary>
     /// Transposes the chord by the specified interval.
