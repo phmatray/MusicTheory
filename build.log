@@ -1,0 +1,10 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  MusicTheory -> /Users/phmatray/Repositories/github-phm/MusicTheory/MusicTheory/bin/Debug/net9.0/MusicTheory.dll
+  MusicTheory.UnitTests -> /Users/phmatray/Repositories/github-phm/MusicTheory/MusicTheory.UnitTests/bin/Debug/net9.0/MusicTheory.UnitTests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.83

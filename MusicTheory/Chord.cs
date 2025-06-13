@@ -16,6 +16,112 @@ public enum ChordQuality
 }
 
 /// <summary>
+/// Represents the type of chord with all possible variations.
+/// </summary>
+public enum ChordType
+{
+    // Triads
+    /// <summary>Major triad (1-3-5)</summary>
+    Major,
+    /// <summary>Minor triad (1-♭3-5)</summary>
+    Minor,
+    /// <summary>Diminished triad (1-♭3-♭5)</summary>
+    Diminished,
+    /// <summary>Augmented triad (1-3-♯5)</summary>
+    Augmented,
+    
+    // Seventh chords
+    /// <summary>Major 7th (1-3-5-7)</summary>
+    Major7,
+    /// <summary>Minor 7th (1-♭3-5-♭7)</summary>
+    Minor7,
+    /// <summary>Dominant 7th (1-3-5-♭7)</summary>
+    Dominant7,
+    /// <summary>Minor major 7th (1-♭3-5-7)</summary>
+    MinorMajor7,
+    /// <summary>Half-diminished 7th (1-♭3-♭5-♭7)</summary>
+    HalfDiminished7,
+    /// <summary>Diminished 7th (1-♭3-♭5-♭♭7)</summary>
+    Diminished7,
+    /// <summary>Augmented 7th (1-3-♯5-♭7)</summary>
+    Augmented7,
+    /// <summary>Augmented major 7th (1-3-♯5-7)</summary>
+    AugmentedMajor7,
+    
+    // Suspended chords
+    /// <summary>Suspended 2nd (1-2-5)</summary>
+    Sus2,
+    /// <summary>Suspended 4th (1-4-5)</summary>
+    Sus4,
+    /// <summary>Suspended 2nd and 4th (1-2-4-5)</summary>
+    Sus2Sus4,
+    /// <summary>Dominant 7th suspended 4th (1-4-5-♭7)</summary>
+    Dominant7Sus4,
+    
+    // Sixth chords
+    /// <summary>Major 6th (1-3-5-6)</summary>
+    Major6,
+    /// <summary>Minor 6th (1-♭3-5-6)</summary>
+    Minor6,
+    /// <summary>Major 6th add 9 (1-3-5-6-9)</summary>
+    Major6Add9,
+    
+    // Extended chords
+    /// <summary>Major 9th (1-3-5-7-9)</summary>
+    Major9,
+    /// <summary>Minor 9th (1-♭3-5-♭7-9)</summary>
+    Minor9,
+    /// <summary>Dominant 9th (1-3-5-♭7-9)</summary>
+    Dominant9,
+    /// <summary>Major 11th (1-3-5-7-9-11)</summary>
+    Major11,
+    /// <summary>Minor 11th (1-♭3-5-♭7-9-11)</summary>
+    Minor11,
+    /// <summary>Dominant 11th (1-3-5-♭7-9-11)</summary>
+    Dominant11,
+    /// <summary>Major 13th (1-3-5-7-9-11-13)</summary>
+    Major13,
+    /// <summary>Minor 13th (1-♭3-5-♭7-9-11-13)</summary>
+    Minor13,
+    /// <summary>Dominant 13th (1-3-5-♭7-9-11-13)</summary>
+    Dominant13,
+    
+    // Add chords
+    /// <summary>Major add 9 (1-3-5-9)</summary>
+    MajorAdd9,
+    /// <summary>Minor add 9 (1-♭3-5-9)</summary>
+    MinorAdd9,
+    /// <summary>Major add 11 (1-3-5-11)</summary>
+    MajorAdd11,
+    /// <summary>Minor add 11 (1-♭3-5-11)</summary>
+    MinorAdd11,
+    
+    // Altered chords
+    /// <summary>Dominant 7th flat 5 (1-3-♭5-♭7)</summary>
+    Dominant7Flat5,
+    /// <summary>Dominant 7th sharp 5 (1-3-♯5-♭7)</summary>
+    Dominant7Sharp5,
+    /// <summary>Dominant 7th flat 9 (1-3-5-♭7-♭9)</summary>
+    Dominant7Flat9,
+    /// <summary>Dominant 7th sharp 9 (1-3-5-♭7-♯9)</summary>
+    Dominant7Sharp9,
+    /// <summary>Dominant 7th flat 5 flat 9 (1-3-♭5-♭7-♭9)</summary>
+    Dominant7Flat5Flat9,
+    /// <summary>Dominant 7th flat 5 sharp 9 (1-3-♭5-♭7-♯9)</summary>
+    Dominant7Flat5Sharp9,
+    /// <summary>Dominant 7th sharp 5 flat 9 (1-3-♯5-♭7-♭9)</summary>
+    Dominant7Sharp5Flat9,
+    /// <summary>Dominant 7th sharp 5 sharp 9 (1-3-♯5-♭7-♯9)</summary>
+    Dominant7Sharp5Sharp9,
+    /// <summary>Dominant 7th altered (1-3-♭5-♯5-♭7-♭9)</summary>
+    Dominant7Alt,
+    
+    // Power chords
+    /// <summary>Power chord (1-5)</summary>
+    Power5
+}
+
+/// <summary>
 /// Represents a musical chord.
 /// </summary>
 public class Chord
@@ -29,6 +135,11 @@ public class Chord
     /// Gets the quality of the chord.
     /// </summary>
     public ChordQuality Quality { get; }
+    
+    /// <summary>
+    /// Gets the type of the chord.
+    /// </summary>
+    public ChordType Type { get; }
 
     /// <summary>
     /// Gets the extensions added to the chord.
@@ -41,7 +152,7 @@ public class Chord
     public ChordInversion Inversion { get; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Chord"/> class.
+    /// Initializes a new instance of the <see cref="Chord"/> class with ChordQuality.
     /// </summary>
     /// <param name="root">The root note of the chord.</param>
     /// <param name="quality">The quality of the chord.</param>
@@ -49,16 +160,45 @@ public class Chord
     {
         Root = root;
         Quality = quality;
+        Type = quality switch
+        {
+            ChordQuality.Major => ChordType.Major,
+            ChordQuality.Minor => ChordType.Minor,
+            ChordQuality.Diminished => ChordType.Diminished,
+            ChordQuality.Augmented => ChordType.Augmented,
+            _ => throw new ArgumentOutOfRangeException(nameof(quality))
+        };
+        Inversion = ChordInversion.Root;
+    }
+    
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Chord"/> class with ChordType.
+    /// </summary>
+    /// <param name="root">The root note of the chord.</param>
+    /// <param name="type">The type of the chord.</param>
+    public Chord(Note root, ChordType type)
+    {
+        Root = root;
+        Type = type;
+        Quality = type switch
+        {
+            ChordType.Major => ChordQuality.Major,
+            ChordType.Minor => ChordQuality.Minor,
+            ChordType.Diminished => ChordQuality.Diminished,
+            ChordType.Augmented => ChordQuality.Augmented,
+            _ => ChordQuality.Major // Default for extended chords
+        };
         Inversion = ChordInversion.Root;
     }
 
     /// <summary>
     /// Private constructor for creating a chord with all properties.
     /// </summary>
-    private Chord(Note root, ChordQuality quality, List<(int Number, IntervalQuality Quality)> extensions, ChordInversion inversion)
+    private Chord(Note root, ChordQuality quality, ChordType type, List<(int Number, IntervalQuality Quality)> extensions, ChordInversion inversion)
     {
         Root = root;
         Quality = quality;
+        Type = type;
         Extensions = new List<(int Number, IntervalQuality Quality)>(extensions);
         Inversion = inversion;
     }
@@ -83,14 +223,7 @@ public class Chord
     {
         yield return Root;
 
-        var intervals = Quality switch
-        {
-            ChordQuality.Major => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5) },
-            ChordQuality.Minor => new[] { (IntervalQuality.Minor, 3), (IntervalQuality.Perfect, 5) },
-            ChordQuality.Diminished => new[] { (IntervalQuality.Minor, 3), (IntervalQuality.Diminished, 5) },
-            ChordQuality.Augmented => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Augmented, 5) },
-            _ => throw new ArgumentOutOfRangeException()
-        };
+        var intervals = GetIntervalsForChordType(Type);
 
         foreach (var (quality, number) in intervals)
         {
@@ -98,12 +231,81 @@ public class Chord
             yield return GetNoteAtInterval(Root, interval);
         }
 
-        // Add extension notes
+        // Add extension notes (for backwards compatibility)
         foreach (var (number, quality) in Extensions)
         {
             var interval = new Interval(quality, number);
             yield return GetNoteAtInterval(Root, interval);
         }
+    }
+    
+    /// <summary>
+    /// Gets the intervals for a specific chord type.
+    /// </summary>
+    private static (IntervalQuality Quality, int Number)[] GetIntervalsForChordType(ChordType type)
+    {
+        return type switch
+        {
+            // Triads
+            ChordType.Major => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5) },
+            ChordType.Minor => new[] { (IntervalQuality.Minor, 3), (IntervalQuality.Perfect, 5) },
+            ChordType.Diminished => new[] { (IntervalQuality.Minor, 3), (IntervalQuality.Diminished, 5) },
+            ChordType.Augmented => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Augmented, 5) },
+            
+            // Seventh chords
+            ChordType.Major7 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Major, 7) },
+            ChordType.Minor7 => new[] { (IntervalQuality.Minor, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Minor, 7) },
+            ChordType.Dominant7 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Minor, 7) },
+            ChordType.MinorMajor7 => new[] { (IntervalQuality.Minor, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Major, 7) },
+            ChordType.HalfDiminished7 => new[] { (IntervalQuality.Minor, 3), (IntervalQuality.Diminished, 5), (IntervalQuality.Minor, 7) },
+            ChordType.Diminished7 => new[] { (IntervalQuality.Minor, 3), (IntervalQuality.Diminished, 5), (IntervalQuality.Diminished, 7) },
+            ChordType.Augmented7 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Augmented, 5), (IntervalQuality.Minor, 7) },
+            ChordType.AugmentedMajor7 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Augmented, 5), (IntervalQuality.Major, 7) },
+            
+            // Suspended chords
+            ChordType.Sus2 => new[] { (IntervalQuality.Major, 2), (IntervalQuality.Perfect, 5) },
+            ChordType.Sus4 => new[] { (IntervalQuality.Perfect, 4), (IntervalQuality.Perfect, 5) },
+            ChordType.Sus2Sus4 => new[] { (IntervalQuality.Major, 2), (IntervalQuality.Perfect, 4), (IntervalQuality.Perfect, 5) },
+            ChordType.Dominant7Sus4 => new[] { (IntervalQuality.Perfect, 4), (IntervalQuality.Perfect, 5), (IntervalQuality.Minor, 7) },
+            
+            // Sixth chords
+            ChordType.Major6 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Major, 6) },
+            ChordType.Minor6 => new[] { (IntervalQuality.Minor, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Major, 6) },
+            ChordType.Major6Add9 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Major, 6), (IntervalQuality.Major, 9) },
+            
+            // Extended chords
+            ChordType.Major9 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Major, 7), (IntervalQuality.Major, 9) },
+            ChordType.Minor9 => new[] { (IntervalQuality.Minor, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Minor, 7), (IntervalQuality.Major, 9) },
+            ChordType.Dominant9 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Minor, 7), (IntervalQuality.Major, 9) },
+            ChordType.Major11 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Major, 7), (IntervalQuality.Major, 9), (IntervalQuality.Perfect, 11) },
+            ChordType.Minor11 => new[] { (IntervalQuality.Minor, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Minor, 7), (IntervalQuality.Major, 9), (IntervalQuality.Perfect, 11) },
+            ChordType.Dominant11 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Minor, 7), (IntervalQuality.Major, 9), (IntervalQuality.Perfect, 11) },
+            ChordType.Major13 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Major, 7), (IntervalQuality.Major, 9), (IntervalQuality.Perfect, 11), (IntervalQuality.Major, 13) },
+            ChordType.Minor13 => new[] { (IntervalQuality.Minor, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Minor, 7), (IntervalQuality.Major, 9), (IntervalQuality.Perfect, 11), (IntervalQuality.Major, 13) },
+            ChordType.Dominant13 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Minor, 7), (IntervalQuality.Major, 9), (IntervalQuality.Perfect, 11), (IntervalQuality.Major, 13) },
+            
+            // Add chords
+            ChordType.MajorAdd9 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Major, 9) },
+            ChordType.MinorAdd9 => new[] { (IntervalQuality.Minor, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Major, 9) },
+            ChordType.MajorAdd11 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Perfect, 11) },
+            ChordType.MinorAdd11 => new[] { (IntervalQuality.Minor, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Perfect, 11) },
+            
+            // Altered chords
+            ChordType.Dominant7Flat5 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Diminished, 5), (IntervalQuality.Minor, 7) },
+            ChordType.Dominant7Sharp5 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Augmented, 5), (IntervalQuality.Minor, 7) },
+            ChordType.Dominant7Flat9 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Minor, 7), (IntervalQuality.Minor, 9) },
+            ChordType.Dominant7Sharp9 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Perfect, 5), (IntervalQuality.Minor, 7), (IntervalQuality.Augmented, 9) },
+            ChordType.Dominant7Flat5Flat9 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Diminished, 5), (IntervalQuality.Minor, 7), (IntervalQuality.Minor, 9) },
+            ChordType.Dominant7Flat5Sharp9 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Diminished, 5), (IntervalQuality.Minor, 7), (IntervalQuality.Augmented, 9) },
+            ChordType.Dominant7Sharp5Flat9 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Augmented, 5), (IntervalQuality.Minor, 7), (IntervalQuality.Minor, 9) },
+            ChordType.Dominant7Sharp5Sharp9 => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Augmented, 5), (IntervalQuality.Minor, 7), (IntervalQuality.Augmented, 9) },
+            ChordType.Dominant7Alt => new[] { (IntervalQuality.Major, 3), (IntervalQuality.Diminished, 5), (IntervalQuality.Augmented, 5), (IntervalQuality.Minor, 7), (IntervalQuality.Minor, 9) },
+            
+            // Power chords
+            ChordType.Power5 => new[] { (IntervalQuality.Perfect, 5) },
+            
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+        };
     }
 
     /// <summary>
@@ -168,7 +370,7 @@ public class Chord
     public Chord Transpose(Interval interval, Direction direction = Direction.Up)
     {
         var newRoot = Root.Transpose(interval, direction);
-        return new Chord(newRoot, Quality, Extensions, Inversion);
+        return new Chord(newRoot, Quality, Type, Extensions, Inversion);
     }
 
     /// <summary>
@@ -178,7 +380,7 @@ public class Chord
     /// <returns>A new chord with the specified inversion.</returns>
     public Chord WithInversion(ChordInversion inversion)
     {
-        return new Chord(Root, Quality, Extensions, inversion);
+        return new Chord(Root, Quality, Type, Extensions, inversion);
     }
 
     /// <summary>
@@ -263,6 +465,88 @@ public class Chord
         if (enharmonicRoot == null)
             return null;
             
-        return new Chord(enharmonicRoot, Quality, Extensions, Inversion);
+        return new Chord(enharmonicRoot, Quality, Type, Extensions, Inversion);
+    }
+    
+    /// <summary>
+    /// Gets the chord symbol representation.
+    /// </summary>
+    /// <returns>The chord symbol as a string.</returns>
+    public string GetSymbol()
+    {
+        var rootSymbol = Root.Name.ToString();
+        if (Root.Alteration == Alteration.Sharp)
+            rootSymbol += "#";
+        else if (Root.Alteration == Alteration.Flat)
+            rootSymbol += "b";
+        else if (Root.Alteration == Alteration.DoubleSharp)
+            rootSymbol += "##";
+        else if (Root.Alteration == Alteration.DoubleFlat)
+            rootSymbol += "bb";
+        
+        var typeSymbol = Type switch
+        {
+            // Triads
+            ChordType.Major => "",
+            ChordType.Minor => "m",
+            ChordType.Diminished => "°",
+            ChordType.Augmented => "+",
+            
+            // Seventh chords
+            ChordType.Major7 => "maj7",
+            ChordType.Minor7 => "m7",
+            ChordType.Dominant7 => "7",
+            ChordType.MinorMajor7 => "m(maj7)",
+            ChordType.HalfDiminished7 => "ø7",
+            ChordType.Diminished7 => "°7",
+            ChordType.Augmented7 => "+7",
+            ChordType.AugmentedMajor7 => "+maj7",
+            
+            // Suspended chords
+            ChordType.Sus2 => "sus2",
+            ChordType.Sus4 => "sus4",
+            ChordType.Sus2Sus4 => "sus2sus4",
+            ChordType.Dominant7Sus4 => "7sus4",
+            
+            // Sixth chords
+            ChordType.Major6 => "6",
+            ChordType.Minor6 => "m6",
+            ChordType.Major6Add9 => "6/9",
+            
+            // Extended chords
+            ChordType.Major9 => "maj9",
+            ChordType.Minor9 => "m9",
+            ChordType.Dominant9 => "9",
+            ChordType.Major11 => "maj11",
+            ChordType.Minor11 => "m11",
+            ChordType.Dominant11 => "11",
+            ChordType.Major13 => "maj13",
+            ChordType.Minor13 => "m13",
+            ChordType.Dominant13 => "13",
+            
+            // Add chords
+            ChordType.MajorAdd9 => "add9",
+            ChordType.MinorAdd9 => "m(add9)",
+            ChordType.MajorAdd11 => "add11",
+            ChordType.MinorAdd11 => "m(add11)",
+            
+            // Altered chords
+            ChordType.Dominant7Flat5 => "7♭5",
+            ChordType.Dominant7Sharp5 => "7♯5",
+            ChordType.Dominant7Flat9 => "7♭9",
+            ChordType.Dominant7Sharp9 => "7♯9",
+            ChordType.Dominant7Flat5Flat9 => "7♭5♭9",
+            ChordType.Dominant7Flat5Sharp9 => "7♭5♯9",
+            ChordType.Dominant7Sharp5Flat9 => "7♯5♭9",
+            ChordType.Dominant7Sharp5Sharp9 => "7♯5♯9",
+            ChordType.Dominant7Alt => "7alt",
+            
+            // Power chords
+            ChordType.Power5 => "5",
+            
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        
+        return rootSymbol + typeSymbol;
     }
 }

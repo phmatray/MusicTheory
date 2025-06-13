@@ -75,13 +75,9 @@ public class ChordTests
     [Fact]
     public void Chord_GetNotes_WithInvalidQuality_ShouldThrow()
     {
-        // Use reflection to create an invalid enum value
-        var chord = new Chord(new Note(NoteName.C), (ChordQuality)99);
+        // Act & Assert - Constructor should throw for invalid quality
+        Action act = () => new Chord(new Note(NoteName.C), (ChordQuality)99);
         
-        // Act
-        Action act = () => chord.GetNotes().ToList();
-        
-        // Assert
         act.ShouldThrow<ArgumentOutOfRangeException>();
     }
 
