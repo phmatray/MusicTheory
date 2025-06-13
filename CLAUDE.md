@@ -44,6 +44,7 @@ The library models music theory concepts as immutable domain objects:
 - **Calculated Properties**: `Note.Frequency`, `Interval.Semitones` computed on-demand
 - **Fluent Interface**: `Chord.AddExtension()` returns self for chaining
 - **Factory Methods**: `Interval.Between()` creates intervals from two notes
+- **Interval Inversion**: `Interval.Invert()` returns the inverted interval following music theory rules
 
 ### Testing Strategy
 - **Framework**: xUnit with FluentAssertions

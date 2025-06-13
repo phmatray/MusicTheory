@@ -157,4 +157,37 @@ public class Interval
         if (other == null) return false;
         return Semitones == other.Semitones;
     }
+    
+    /// <summary>
+    /// Inverts the interval according to music theory rules.
+    /// </summary>
+    /// <returns>The inverted interval.</returns>
+    /// <remarks>
+    /// Interval inversion follows these rules:
+    /// - Number: The sum of an interval and its inversion equals 9 (for simple intervals)
+    /// - Quality: Perfect remains Perfect, Major becomes Minor, Minor becomes Major, 
+    ///   Augmented becomes Diminished, Diminished becomes Augmented
+    /// - For compound intervals (> 8), they are reduced to their simple form before inversion
+    /// </remarks>
+    public Interval Invert()
+    {
+        // Reduce compound intervals to simple intervals
+        int simpleNumber = Number > 8 ? ((Number - 1) % 7) + 1 : Number;
+        
+        // Calculate inverted number: original + inverted = 9
+        int invertedNumber = 9 - simpleNumber;
+        
+        // Determine inverted quality
+        IntervalQuality invertedQuality = Quality switch
+        {
+            IntervalQuality.Perfect => IntervalQuality.Perfect,
+            IntervalQuality.Major => IntervalQuality.Minor,
+            IntervalQuality.Minor => IntervalQuality.Major,
+            IntervalQuality.Augmented => IntervalQuality.Diminished,
+            IntervalQuality.Diminished => IntervalQuality.Augmented,
+            _ => throw new InvalidOperationException($"Unknown interval quality: {Quality}")
+        };
+        
+        return new Interval(invertedQuality, invertedNumber);
+    }
 }
