@@ -62,7 +62,7 @@ jobs:
         dotnet run --configuration Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
         
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       with:
         file: ./MusicTheory.UnitTests/coverage.cobertura.xml
         fail_ci_if_error: false
