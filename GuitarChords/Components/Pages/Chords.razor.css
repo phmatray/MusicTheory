@@ -1,0 +1,85 @@
+.chord-container {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.chord-container:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+.chord-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.chord-name {
+    font-weight: 600;
+    color: #1976d2;
+}
+
+.chord-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.difficulty-chip {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+}
+
+::deep .mud-dialog {
+    animation: slide-in 0.3s ease-out;
+}
+
+@keyframes slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+::deep .mud-chip-set .mud-chip {
+    transition: all 0.2s ease;
+}
+
+::deep .mud-chip-set .mud-chip:hover {
+    transform: scale(1.05);
+}
+
+::deep .mud-list-item {
+    transition: background-color 0.2s ease;
+    border-radius: 4px;
+    margin: 4px 0;
+}
+
+::deep .mud-list-item:hover {
+    background-color: rgba(0,0,0,0.04);
+}
+
+::deep .mud-tabs .mud-tab {
+    min-width: 120px;
+}
+
+@media (max-width: 600px) {
+    .chord-card {
+        margin: 4px;
+    }
+    
+    .chord-card .add-to-progression,
+    .chord-card .favorite-button {
+        top: 4px;
+    }
+}
