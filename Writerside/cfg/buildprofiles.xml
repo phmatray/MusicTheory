@@ -3,10 +3,33 @@
 <buildprofiles xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/build-profiles.xsd"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-    <variables></variables>
+  <variables>
+    <header-logo>icon.png</header-logo>
+    <primary-color>aqua</primary-color>
+    <content-max-width>1200</content-max-width>
+    <resizable-sidebar>true</resizable-sidebar>
+    <download-title>Get MusicTheory</download-title>
+    <download-page>https://github.com/phmatray/MusicTheory</download-page>
+    <showDownloadButton>true</showDownloadButton>
+  </variables>
+
+  <footer>
+    <copyright>2025 Atypical Consulting SRL</copyright>
+    <social type="linkedin"
+            href="https://www.linkedin.com/in/phmatray/">
+      LinkedIn
+    </social>
+    <social type="github"
+            href="https://github.com/phmatray/MusicTheory">
+      Repository on GitHub
+    </social>
+  </footer>
+
+  <sitemap priority="0.35" change-frequency="monthly"/>
+  
   <build-profile instance="aug">
     <variables>
-      <noindex-content>true</noindex-content>
+      <noindex-content>false</noindex-content>
     </variables>
   </build-profile>
 

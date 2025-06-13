@@ -350,6 +350,23 @@ The library is optimized for performance:
 - Advanced rhythm and meter analysis
 - Microtonal support
 
+## 📖 Documentation
+
+Comprehensive documentation is available at [GitHub Pages](https://phmatray.github.io/MusicTheory/) (once deployed).
+
+The documentation includes:
+- Getting Started Guide
+- Core Concepts (Notes, Intervals, Scales, Chords)
+- Advanced Topics (Transposition, MIDI, Enharmonics)
+- API Reference
+- Code Examples
+- Tutorials
+
+To build the documentation locally:
+1. Install [Writerside](https://www.jetbrains.com/writerside/)
+2. Open the project in Writerside
+3. Build the documentation
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

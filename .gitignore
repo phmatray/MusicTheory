@@ -6,3 +6,7 @@ riderModule.iml
 coveragereport/
 node_modules/
 package-lock.json
+
+# Writerside
+artifacts/
+.idea/
