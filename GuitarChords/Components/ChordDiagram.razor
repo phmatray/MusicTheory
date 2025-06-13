@@ -29,7 +29,7 @@
             </defs>
             
             <!-- Fretboard -->
-            <rect x="@FretboardX" y="@FretboardY" width="@FretboardWidth" height="@FretboardHeight" 
+            <rect x="@(FretboardX - 10)" y="@FretboardY" width="@(FretboardWidth + 20)" height="@FretboardHeight" 
                   fill="url(#fretboard-gradient)" stroke="#654321" stroke-width="2" rx="4" ry="4"/>
             
             <!-- Fret markers (dots) -->
@@ -56,23 +56,35 @@
             @for (int fret = 0; fret <= VisibleFrets; fret++)
             {
                 var y = FretboardY + (fret * FretHeight);
-                <line x1="@FretboardX" y1="@y" x2="@(FretboardX + FretboardWidth)" y2="@y" 
+                <line x1="@(FretboardX - 10)" y1="@y" x2="@(FretboardX + FretboardWidth + 10)" y2="@y" 
                       stroke="@(fret == 0 ? "#FFF" : "#C0C0C0")" stroke-width="@(fret == 0 ? 4 : 2)"/>
             }
             
             <!-- Strings (reversed order - low E on left, high E on right) -->
             @for (int str = 0; str < 6; str++)
             {
-                var x = FretboardX + StringSpacing + (str * StringSpacing);
-                var thickness = 3 - (str * 0.4); // Thicker strings on left
+                var x = FretboardX + (str * StringSpacing);
+                // More realistic string thickness progression
+                string thickness = str switch
+                {
+                    0 => "5.0",  // Low E (6th string) - wound
+                    1 => "4.2",  // A (5th string) - wound
+                    2 => "3.4",  // D (4th string) - wound
+                    3 => "2.2",  // G (3rd string) - wound or plain
+                    4 => "1.6",  // B (2nd string) - plain
+                    5 => "1.2",  // High E (1st string) - plain
+                    _ => "2.0"
+                };
+                // Wound strings are darker
+                var color = str <= 2 ? "#999" : "#C0C0C0";
                 <line x1="@x" y1="@FretboardY" x2="@x" y2="@(FretboardY + FretboardHeight)" 
-                      stroke="#C0C0C0" stroke-width="@thickness" class="guitar-string"/>
+                      stroke="@color" stroke-width="@thickness" class="guitar-string"/>
             }
             
             <!-- String labels (corrected order) -->
             @for (int str = 0; str < 6; str++)
             {
-                var x = FretboardX + StringSpacing + (str * StringSpacing);
+                var x = FretboardX + (str * StringSpacing);
                 var note = GuitarTuning.StandardTuning[str]; // Direct order - no reversal
                 var noteText = note.Name.ToString() + (note.Alteration == Alteration.Sharp ? "♯" : (note.Alteration == Alteration.Flat ? "♭" : ""));
                 <g>
@@ -94,22 +106,25 @@
             @for (int str = 0; str < 6; str++)
             {
                 var fret = Chord.FretPositions[str]; // Direct order - no reversal
-                var x = FretboardX + StringSpacing + (str * StringSpacing);
+                var x = FretboardX + (str * StringSpacing);
                 var stringNote = GuitarTuning.StandardTuning[str];
                 
                 if (fret == -1)
                 {
                     // Muted string (X)
                     <g class="muted-string">
-                        <text x="@x" y="@(FretboardY - 15)" style="text-anchor: middle; font-size: 24px; font-weight: bold; fill: #D32F2F">×</text>
+                        <line x1="@(x - 7)" y1="@(FretboardY - 22)" x2="@(x + 7)" y2="@(FretboardY - 8)" 
+                              stroke="#D32F2F" stroke-width="2.5" stroke-linecap="round"/>
+                        <line x1="@(x - 7)" y1="@(FretboardY - 8)" x2="@(x + 7)" y2="@(FretboardY - 22)" 
+                              stroke="#D32F2F" stroke-width="2.5" stroke-linecap="round"/>
                     </g>
                 }
                 else if (fret == 0)
                 {
                     // Open string (O)
                     <g class="open-string">
-                        <circle cx="@x" cy="@(FretboardY - 15)" r="10" 
-                                fill="none" stroke="#4CAF50" stroke-width="3"/>
+                        <circle cx="@x" cy="@(FretboardY - 15)" r="9" 
+                                fill="none" stroke="#4CAF50" stroke-width="2"/>
                         @{
                             var openNote = stringNote;
                             var noteTooltip = $"{openNote.Name}{(openNote.Alteration == Alteration.Sharp ? "♯" : (openNote.Alteration == Alteration.Flat ? "♭" : ""))}";
@@ -145,12 +160,12 @@
             }
             
             <!-- Barre indication (corrected for new string order) -->
-            @if (Chord.IsBarreChord && Chord.BarreFret.HasValue && Chord.BarredStrings.Count > 1)
+            @if (Chord is { IsBarreChord: true, BarreFret: not null, BarredStrings.Count: > 1 })
             {
                 var minString = Chord.BarredStrings.Min();
                 var maxString = Chord.BarredStrings.Max();
-                var x1 = FretboardX + StringSpacing + (minString * StringSpacing);
-                var x2 = FretboardX + StringSpacing + (maxString * StringSpacing);
+                var x1 = FretboardX + (minString * StringSpacing);
+                var x2 = FretboardX + (maxString * StringSpacing);
                 var barreFret = Chord.BarreFret.Value - Chord.BaseFret;
                 if (barreFret >= 0 && barreFret < VisibleFrets)
                 {
@@ -172,7 +187,7 @@
     private int FretboardY => 40;
     private int FretboardWidth => Width - 60;
     private int FretboardHeight => Height - 80;
-    private int StringSpacing => FretboardWidth / 6;
+    private int StringSpacing => FretboardWidth / 5; // 5 spaces between 6 strings
     private int VisibleFrets => 4;
     private int FretHeight => FretboardHeight / VisibleFrets;
 }

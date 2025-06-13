@@ -37,17 +37,17 @@
 }
 
 .open-string:hover circle {
-    stroke-width: 4;
+    stroke-width: 3;
 }
 
-.muted-string text {
+.muted-string line {
     transition: all 0.2s ease;
     cursor: pointer;
 }
 
-.muted-string:hover text {
-    font-size: 28px;
-    fill: #F44336;
+.muted-string:hover line {
+    stroke-width: 3.5;
+    stroke: #F44336;
 }
 
 .string-label {
