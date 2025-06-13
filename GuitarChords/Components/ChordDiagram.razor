@@ -52,12 +52,19 @@
                 }
             }
             
+            <!-- Nut (only visible when showing from first fret) -->
+            @if (Chord.BaseFret == 0)
+            {
+                <rect x="@(FretboardX - 10)" y="@(FretboardY - 6)" width="@(FretboardWidth + 20)" height="6" 
+                      fill="#E8D4B0" stroke="#666" stroke-width="0.5" class="guitar-nut"/>
+            }
+            
             <!-- Frets -->
             @for (int fret = 0; fret <= VisibleFrets; fret++)
             {
                 var y = FretboardY + (fret * FretHeight);
                 <line x1="@(FretboardX - 10)" y1="@y" x2="@(FretboardX + FretboardWidth + 10)" y2="@y" 
-                      stroke="@(fret == 0 ? "#FFF" : "#C0C0C0")" stroke-width="@(fret == 0 ? 4 : 2)"/>
+                      stroke="#C0C0C0" stroke-width="2"/>
             }
             
             <!-- Strings (reversed order - low E on left, high E on right) -->
@@ -113,9 +120,9 @@
                 {
                     // Muted string (X)
                     <g class="muted-string">
-                        <line x1="@(x - 7)" y1="@(FretboardY - 22)" x2="@(x + 7)" y2="@(FretboardY - 8)" 
+                        <line x1="@(x - 7)" y1="@(FretboardY - 26)" x2="@(x + 7)" y2="@(FretboardY - 12)" 
                               stroke="#D32F2F" stroke-width="2.5" stroke-linecap="round"/>
-                        <line x1="@(x - 7)" y1="@(FretboardY - 8)" x2="@(x + 7)" y2="@(FretboardY - 22)" 
+                        <line x1="@(x - 7)" y1="@(FretboardY - 12)" x2="@(x + 7)" y2="@(FretboardY - 26)" 
                               stroke="#D32F2F" stroke-width="2.5" stroke-linecap="round"/>
                     </g>
                 }
@@ -123,7 +130,7 @@
                 {
                     // Open string (O)
                     <g class="open-string">
-                        <circle cx="@x" cy="@(FretboardY - 15)" r="9" 
+                        <circle cx="@x" cy="@(FretboardY - 19)" r="9" 
                                 fill="none" stroke="#4CAF50" stroke-width="2"/>
                         @{
                             var openNote = stringNote;
