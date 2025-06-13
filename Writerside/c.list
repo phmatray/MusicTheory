@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE categories
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/categories.dtd">
+<categories>
+    <category id="wrs" name="Writerside documentation" order="1"/>
+    <category id="related" name="Related topics" order="2"/>
+    <category id="external" name="External links" order="3"/>
+    <category id="tutorials" name="Tutorials" order="4"/>
+    <category id="api" name="API Reference" order="5"/>
+    <category id="detailed-api" name="Detailed API" order="6"/>
+    <category id="getting-started" name="Getting Started" order="7"/>
+    <category id="core-concepts" name="Core Concepts" order="8"/>
+    <category id="support" name="Support" order="9"/>
+</categories>

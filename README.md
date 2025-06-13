@@ -1,7 +1,7 @@
 # MusicTheory
 
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue)](https://dotnet.microsoft.com/)
-[![Tests](https://img.shields.io/badge/tests-413%20passing-brightgreen)](#testing)
+[![Tests](https://img.shields.io/badge/tests-479%20passing-brightgreen)](#testing)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A comprehensive C# library for music theory concepts, providing immutable domain objects for notes, intervals, scales, chords, and more. Built with modern .NET practices and extensive test coverage.
@@ -12,7 +12,7 @@ A comprehensive C# library for music theory concepts, providing immutable domain
 - **Notes**: Create and manipulate musical notes with support for all alterations
 - **Intervals**: Calculate musical intervals with proper quality handling
 - **Scales**: Generate scales with 15+ scale types including modal and exotic scales
-- **Chords**: Build chords with extensions, inversions, and quality variations
+- **Chords**: Build chords with 40+ types including triads, seventh chords, extended, altered, and suspended chords
 - **Key Signatures**: Handle key signatures with circle of fifths navigation
 
 ### 🔄 Advanced Functionality
@@ -66,13 +66,16 @@ var g4 = c4.Transpose(perfectFifth, Direction.Up);
 var transposedDown = cSharp.TransposeBySemitones(-3);
 
 // Build chords
-var cMajor = new Chord(c4, ChordQuality.Major);
-var cMaj7 = cMajor.AddExtension(7, IntervalQuality.Major);
+var cMajor = new Chord(c4, ChordType.Major);
+var cMaj7 = new Chord(c4, ChordType.Major7);
+var cSus4 = new Chord(c4, ChordType.Sus4);
+var c7b9 = new Chord(c4, ChordType.Dominant7Flat9);
 var firstInversion = cMajor.WithInversion(ChordInversion.First);
 
-// Get chord notes
+// Get chord notes and symbols
 var notes = cMaj7.GetNotes(); // C, E, G, B
 var bassNote = firstInversion.GetBassNote(); // E
+var symbol = cMaj7.GetSymbol(); // "Cmaj7"
 ```
 
 ### Scales and Modes
@@ -117,6 +120,24 @@ var chords = progression.ParseProgression("I - vi - IV - V"); // C - Am - F - G
 var romanNumeral = progression.GetRomanNumeral(5); // "V"
 ```
 
+### Advanced Chord Examples
+
+```csharp
+// Jazz chords
+var maj7 = new Chord(c4, ChordType.Major7);
+var min9 = new Chord(new Note(NoteName.D), ChordType.Minor9);
+var dom7b9 = new Chord(new Note(NoteName.G), ChordType.Dominant7Flat9);
+var halfDim = new Chord(new Note(NoteName.B), ChordType.HalfDiminished7);
+
+// Suspended and altered chords
+var sus2 = new Chord(c4, ChordType.Sus2);
+var alt = new Chord(new Note(NoteName.G), ChordType.Dominant7Alt);
+
+// Get chord symbols
+Console.WriteLine(dom7b9.GetSymbol()); // "G7♭9"
+Console.WriteLine(halfDim.GetSymbol()); // "Bø7"
+```
+
 ### Time Signatures and Durations
 
 ```csharp
@@ -141,7 +162,7 @@ var symbol = quarter.GetSymbol(); // "♩"
 ```csharp
 // MIDI conversion
 var middleC = Note.FromMidiNumber(60); // C4
-var midiNumber = new Note(NoteName.A, 4).ToMidiNumber(); // 69
+var midiNumber = new Note(NoteName.A, 4).MidiNumber; // 69
 
 // Prefer flats for black keys
 var dFlat = Note.FromMidiNumber(61, preferFlats: true); // Db4 instead of C#4
@@ -181,9 +202,10 @@ Represents a chord with root, quality, extensions, and inversions.
 public class Chord
 {
     public Note Root { get; }
-    public ChordQuality Quality { get; }     // Major, Minor, Diminished, Augmented
+    public ChordType Type { get; }           // 40+ types: Major7, Dom7b9, Sus4, etc.
     public ChordInversion Inversion { get; } // Root, First, Second, Third
     
+    public string GetSymbol();               // Returns chord symbol (e.g., "Cmaj7")
     public Chord AddExtension(int number, IntervalQuality quality);
     public Chord WithInversion(ChordInversion inversion);
 }
@@ -213,9 +235,22 @@ public class Scale
 | **Pentatonic** | Pentatonic Major, Pentatonic Minor |
 | **Exotic** | Blues, Chromatic, Whole Tone |
 
+## 🎸 Supported Chord Types
+
+| Category | Chord Types |
+|----------|-------------|
+| **Triads** | Major, Minor, Diminished, Augmented |
+| **Seventh** | Major7, Minor7, Dominant7, MinorMajor7, HalfDiminished7, Diminished7, Augmented7, AugmentedMajor7 |
+| **Extended** | Major9, Minor9, Dominant9, Major11, Minor11, Dominant11, Major13, Minor13, Dominant13 |
+| **Altered** | Dom7b5, Dom7#5, Dom7b9, Dom7#9, Dom7b5b9, Dom7b5#9, Dom7#5b9, Dom7#5#9, Dom7Alt |
+| **Suspended** | Sus2, Sus4, Sus2Sus4, Dom7Sus4 |
+| **Sixth** | Major6, Minor6, Major6Add9 |
+| **Add** | MajorAdd9, MinorAdd9, MajorAdd11, MinorAdd11 |
+| **Power** | Power5 |
+
 ## 🧪 Testing
 
-The library includes comprehensive test coverage with **413 passing tests** using xUnit and Shouldly.
+The library includes comprehensive test coverage with **479 passing tests** using xUnit and Shouldly.
 
 ```bash
 # Run all tests
