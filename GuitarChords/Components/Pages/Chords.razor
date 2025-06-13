@@ -1,0 +1,201 @@
+@page "/chords"
+@using GuitarChords.Services
+@using GuitarChords.Models
+@inject GuitarChordService ChordService
+
+<PageTitle>Explore Chords</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-4">Guitar Chord Dictionary</MudText>
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudPaper Class="pa-4">
+            <MudGrid>
+                <MudItem xs="12" md="4">
+                    <MudSelect T="string" Label="Root Note" @bind-Value="selectedRoot" Dense="true">
+                        <MudSelectItem Value="@("C")">C</MudSelectItem>
+                        <MudSelectItem Value="@("D")">D</MudSelectItem>
+                        <MudSelectItem Value="@("E")">E</MudSelectItem>
+                        <MudSelectItem Value="@("F")">F</MudSelectItem>
+                        <MudSelectItem Value="@("G")">G</MudSelectItem>
+                        <MudSelectItem Value="@("A")">A</MudSelectItem>
+                        <MudSelectItem Value="@("B")">B</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudSelect T="string" Label="Chord Type" @bind-Value="selectedType" Dense="true">
+                        <MudSelectItem Value="@("Major")">Major</MudSelectItem>
+                        <MudSelectItem Value="@("Minor")">Minor</MudSelectItem>
+                        <MudSelectItem Value="@("7th")">7th</MudSelectItem>
+                        <MudSelectItem Value="@("Major7")">Major 7th</MudSelectItem>
+                        <MudSelectItem Value="@("Minor7")">Minor 7th</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SearchChords" Class="mt-2">
+                        Search Chords
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+<MudDivider Class="my-4" />
+
+@if (filteredChords.Any())
+{
+    <MudText Typo="Typo.h5" Class="mb-3">@(string.IsNullOrEmpty(searchQuery) ? "Common Chords" : "Search Results")</MudText>
+    
+    <MudGrid>
+        @foreach (var chord in filteredChords)
+        {
+            <MudItem xs="6" sm="4" md="3" lg="2">
+                <div @onclick="() => SelectChord(chord)" style="cursor: pointer;">
+                    <ChordDiagram Chord="chord" Width="180" Height="220" />
+                </div>
+            </MudItem>
+        }
+    </MudGrid>
+}
+else if (!string.IsNullOrEmpty(searchQuery))
+{
+    <MudAlert Severity="Severity.Info">No chords found matching your search criteria.</MudAlert>
+}
+
+@if (selectedChord != null)
+{
+    <MudDivider Class="my-4" />
+    
+    <MudPaper Class="pa-4">
+        <MudText Typo="Typo.h5" Class="mb-3">Chord Details: @selectedChord.Name</MudText>
+        
+        <MudGrid>
+            <MudItem xs="12" md="4">
+                <ChordDiagram Chord="selectedChord" Width="250" Height="300" />
+            </MudItem>
+            <MudItem xs="12" md="8">
+                <MudSimpleTable>
+                    <tbody>
+                        <tr>
+                            <td><strong>Chord Name:</strong></td>
+                            <td>@selectedChord.Name</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Root Note:</strong></td>
+                            <td>@selectedChord.Chord.Root</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Chord Type:</strong></td>
+                            <td>@selectedChord.Chord.Type</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Notes in Chord:</strong></td>
+                            <td>@string.Join(", ", selectedChord.Chord.GetNotes().Select(n => n.ToString()))</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Barre Chord:</strong></td>
+                            <td>@(selectedChord.IsBarreChord ? "Yes" : "No")</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Fingering:</strong></td>
+                            <td>
+                                @for (int i = 0; i < 6; i++)
+                                {
+                                    var fret = selectedChord.FretPositions[i];
+                                    var finger = selectedChord.Fingerings[i];
+                                    <span class="mr-2">
+                                        String @(i + 1): 
+                                        @if (fret == -1) { <text>X</text> }
+                                        else if (fret == 0) { <text>O</text> }
+                                        else { <text>Fret @fret (@(finger > 0 ? $"Finger {finger}" : ""))</text> }
+                                    </span>
+                                    @if (i < 5) { <br /> }
+                                }
+                            </td>
+                        </tr>
+                    </tbody>
+                </MudSimpleTable>
+                
+                <MudText Typo="Typo.h6" Class="mt-4 mb-2">Notes on the Fretboard:</MudText>
+                <MudSimpleTable Dense="true">
+                    <thead>
+                        <tr>
+                            <th>String</th>
+                            <th>Open</th>
+                            <th>Played Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < 6; i++)
+                        {
+                            var stringIndex = 5 - i; // Display from high E to low E
+                            var fret = selectedChord.FretPositions[stringIndex];
+                            var openNote = GuitarTuning.StandardTuning[stringIndex];
+                            
+                            <tr>
+                                <td>@(i + 1) (@openNote.Name)</td>
+                                <td>@openNote</td>
+                                <td>
+                                    @if (fret == -1) { <text>Muted</text> }
+                                    else if (fret == 0) { <text>@openNote</text> }
+                                    else { <text>@GuitarTuning.GetNoteAtFret(stringIndex, fret)</text> }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+}
+
+@code {
+    private List<GuitarChord> allChords = new();
+    private List<GuitarChord> filteredChords = new();
+    private GuitarChord? selectedChord;
+    private string selectedRoot = "C";
+    private string selectedType = "Major";
+    private string searchQuery = "";
+
+    protected override void OnInitialized()
+    {
+        allChords = ChordService.GetAllChords().ToList();
+        filteredChords = allChords;
+    }
+
+    private void SearchChords()
+    {
+        searchQuery = $"{selectedRoot} {selectedType}";
+        
+        // Simple filtering based on chord name
+        filteredChords = allChords.Where(c => 
+        {
+            var chordName = c.Name.ToUpper();
+            var root = selectedRoot.ToUpper();
+            
+            // Check if chord starts with the selected root
+            if (!chordName.StartsWith(root))
+                return false;
+                
+            // Check chord type
+            if (selectedType == "Major" && (chordName.Contains("M") && !chordName.Contains("MAJ")))
+                return false;
+            if (selectedType == "Minor" && !chordName.Contains("M"))
+                return false;
+            if (selectedType == "7th" && !chordName.Contains("7"))
+                return false;
+            if (selectedType == "Major7" && !chordName.Contains("MAJ7"))
+                return false;
+            if (selectedType == "Minor7" && (!chordName.Contains("M") || !chordName.Contains("7")))
+                return false;
+                
+            return true;
+        }).ToList();
+    }
+
+    private void SelectChord(GuitarChord chord)
+    {
+        selectedChord = chord;
+    }
+}
