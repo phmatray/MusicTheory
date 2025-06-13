@@ -1,0 +1,62 @@
+.chord-diagram {
+    display: inline-block;
+    margin: 8px;
+    transition: transform 0.2s ease;
+    animation: chord-fade-in 0.3s ease-out;
+}
+
+.chord-diagram:hover {
+    transform: translateY(-2px);
+}
+
+.chord-svg {
+    cursor: default;
+}
+
+.chord-title {
+    color: #1976d2;
+    font-weight: 600;
+}
+
+.guitar-string {
+    transition: stroke 0.2s ease;
+}
+
+.finger-position circle {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.finger-position:hover circle {
+    filter: url(#shadow) brightness(1.2);
+}
+
+.open-string circle {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.open-string:hover circle {
+    stroke-width: 4;
+}
+
+.muted-string text {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.muted-string:hover text {
+    font-size: 28px;
+    fill: #F44336;
+}
+
+.string-label {
+    user-select: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes chord-fade-in {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+}
