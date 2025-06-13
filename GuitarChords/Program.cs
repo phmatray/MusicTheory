@@ -12,6 +12,8 @@ builder.Services.AddMudServices();
 
 // Add application services
 builder.Services.AddSingleton<GuitarChords.Services.GuitarChordService>();
+builder.Services.AddSingleton<GuitarChords.Services.ChordProgressionService>();
+builder.Services.AddScoped<GuitarChords.Services.ChordPlayerService>();
 
 var app = builder.Build();
 
