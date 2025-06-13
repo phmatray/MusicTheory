@@ -98,7 +98,7 @@ jobs:
     - name: Generate changelog
       if: steps.should_release.outputs.new_release == 'true'
       id: changelog
-      uses: TriPSs/conventional-changelog-action@v5
+      uses: TriPSs/conventional-changelog-action@v6
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         version-file: './MusicTheory/MusicTheory.csproj'
