@@ -38,7 +38,7 @@
                 var dotFret = 3 - Chord.BaseFret;
                 if (dotFret > 0 && dotFret <= VisibleFrets)
                 {
-                    var dotY = FretboardY + (dotFret * FretHeight) - (FretHeight / 2);
+                    var dotY = FretboardY + ((Chord.BaseFret == 0 ? dotFret - 1 : dotFret) * FretHeight) + (FretHeight / 2);
                     <circle cx="@(FretboardX + FretboardWidth / 2)" cy="@dotY" r="6" fill="#E6D7C3" opacity="0.6"/>
                 }
             }
@@ -47,7 +47,7 @@
                 var dotFret = 5 - Chord.BaseFret;
                 if (dotFret > 0 && dotFret <= VisibleFrets)
                 {
-                    var dotY = FretboardY + (dotFret * FretHeight) - (FretHeight / 2);
+                    var dotY = FretboardY + ((Chord.BaseFret == 0 ? dotFret - 1 : dotFret) * FretHeight) + (FretHeight / 2);
                     <circle cx="@(FretboardX + FretboardWidth / 2)" cy="@dotY" r="6" fill="#E6D7C3" opacity="0.6"/>
                 }
             }
@@ -145,7 +145,7 @@
                     var displayFret = fret - Chord.BaseFret;
                     if (displayFret >= 0 && displayFret < VisibleFrets)
                     {
-                        var y = FretboardY + (displayFret * FretHeight) + (FretHeight / 2);
+                        var y = FretboardY + ((Chord.BaseFret == 0 ? displayFret - 1 : displayFret) * FretHeight) + (FretHeight / 2);
                         var finger = Chord.Fingerings[str];
                         
                         var frettedNote = GuitarTuning.GetNoteAtFret(str, fret);
@@ -176,7 +176,7 @@
                 var barreFret = Chord.BarreFret.Value - Chord.BaseFret;
                 if (barreFret >= 0 && barreFret < VisibleFrets)
                 {
-                    var y = FretboardY + (barreFret * FretHeight) + (FretHeight / 2);
+                    var y = FretboardY + ((Chord.BaseFret == 0 ? barreFret - 1 : barreFret) * FretHeight) + (FretHeight / 2);
                     <rect x="@(x1 - 12)" y="@(y - 12)" width="@(x2 - x1 + 24)" height="24" 
                           rx="12" ry="12" fill="url(#dot-gradient)" opacity="0.9" filter="url(#shadow)"/>
                 }
