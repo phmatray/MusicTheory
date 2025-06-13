@@ -259,21 +259,37 @@ var minorSeventh = root.Transpose(new Interval(IntervalQuality.Minor, 7));
 
 ## Interval Inversions
 
-Get the inversion of an interval:
+Invert intervals using the `Invert()` method:
 
 ```C#
-// Manual inversion calculation
-// Rule: Interval + Inversion = 9 (within octave)
-// Quality inverts: Major ↔ Minor, Augmented ↔ Diminished, Perfect ↔ Perfect
-
+// Basic inversions
 var majorThird = new Interval(IntervalQuality.Major, 3);
-// Inversion would be minor 6th
+var minorSixth = majorThird.Invert(); // Minor 6th
 
 var perfectFifth = new Interval(IntervalQuality.Perfect, 5);
-// Inversion would be perfect 4th
+var perfectFourth = perfectFifth.Invert(); // Perfect 4th
 
 var minorSecond = new Interval(IntervalQuality.Minor, 2);
-// Inversion would be major 7th
+var majorSeventh = minorSecond.Invert(); // Major 7th
+
+// Quality inversion rules:
+// - Perfect remains Perfect
+// - Major becomes Minor
+// - Minor becomes Major
+// - Augmented becomes Diminished
+// - Diminished becomes Augmented
+
+// Number rule: original + inverted = 9
+var unison = new Interval(IntervalQuality.Perfect, 1);
+var octave = unison.Invert(); // Perfect 8th (1 + 8 = 9)
+
+// Compound intervals are reduced before inversion
+var majorNinth = new Interval(IntervalQuality.Major, 9);
+var minorSeventh = majorNinth.Invert(); // Minor 7th (not 0!)
+
+// Tritone inverts to tritone
+var augFourth = new Interval(IntervalQuality.Augmented, 4);
+var dimFifth = augFourth.Invert(); // Diminished 5th
 ```
 
 ## Enharmonic Intervals

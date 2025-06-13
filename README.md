@@ -1,7 +1,7 @@
 # MusicTheory
 
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue)](https://dotnet.microsoft.com/)
-[![Tests](https://img.shields.io/badge/tests-479%20passing-brightgreen)](#testing)
+[![Tests](https://img.shields.io/badge/tests-504%20passing-brightgreen)](#testing)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A comprehensive C# library for music theory concepts, providing immutable domain objects for notes, intervals, scales, chords, and more. Built with modern .NET practices and extensive test coverage.
@@ -60,6 +60,10 @@ Console.WriteLine(c4.Frequency); // 261.63 Hz
 // Create intervals
 var perfectFifth = new Interval(IntervalQuality.Perfect, 5);
 var intervalBetween = Interval.Between(c4, new Note(NoteName.G, 4));
+
+// Invert intervals
+var majorThird = new Interval(IntervalQuality.Major, 3);
+var minorSixth = majorThird.Invert(); // Minor 6th
 
 // Transpose notes
 var g4 = c4.Transpose(perfectFifth, Direction.Up);
@@ -192,6 +196,8 @@ public class Interval
     public IntervalQuality Quality { get; }  // Perfect, Major, Minor, etc.
     public int Number { get; }               // 1-8 (unison to octave)
     public int Semitones { get; }            // Total semitones
+    
+    public Interval Invert();                // Returns the inverted interval
 }
 ```
 
@@ -250,7 +256,7 @@ public class Scale
 
 ## 🧪 Testing
 
-The library includes comprehensive test coverage with **479 passing tests** using xUnit and Shouldly.
+The library includes comprehensive test coverage with **504 passing tests** using xUnit and Shouldly.
 
 ```bash
 # Run all tests
