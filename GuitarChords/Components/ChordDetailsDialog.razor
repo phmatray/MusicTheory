@@ -1,0 +1,139 @@
+@using GuitarChords.Models
+
+@if (Chord != null)
+{
+    <MudDialog @bind-Visible="IsVisible" Options="DialogOptions">
+        <TitleContent>
+            <MudText Typo="Typo.h5">
+                @Chord.Name
+                <MudIconButton Icon="@(IsFavorite ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)" 
+                             Color="@(IsFavorite ? Color.Error : Color.Default)"
+                             Size="Size.Small"
+                             OnClick="@(() => OnToggleFavorite.InvokeAsync(Chord))" />
+            </MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudTabs Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+                <MudTabPanel Text="Diagram" Icon="@Icons.Material.Filled.GridOn">
+                    <div class="d-flex justify-center">
+                        <ChordDiagram Chord="Chord" Width="300" Height="350" />
+                    </div>
+                </MudTabPanel>
+                <MudTabPanel Text="Details" Icon="@Icons.Material.Filled.Info">
+                    <MudGrid>
+                        <MudItem xs="12">
+                            <MudList T="string" Dense="true">
+                                <MudListItem T="string" Icon="@Icons.Material.Filled.MusicNote">
+                                    <div class="d-flex justify-space-between">
+                                        <MudText>Root Note:</MudText>
+                                        <MudText>@Chord.Chord.Root</MudText>
+                                    </div>
+                                </MudListItem>
+                                <MudListItem T="string" Icon="@Icons.Material.Filled.Category">
+                                    <div class="d-flex justify-space-between">
+                                        <MudText>Type:</MudText>
+                                        <MudText>@Chord.Chord.Type</MudText>
+                                    </div>
+                                </MudListItem>
+                                <MudListItem T="string" Icon="@Icons.Material.Filled.QueueMusic">
+                                    <div class="d-flex justify-space-between">
+                                        <MudText>Notes:</MudText>
+                                        <MudText>@string.Join(" - ", Chord.Chord.GetNotes().Select(n => n.ToString()))</MudText>
+                                    </div>
+                                </MudListItem>
+                                <MudListItem T="string" Icon="@Icons.Material.Filled.Straighten">
+                                    <div class="d-flex justify-space-between">
+                                        <MudText>Barre:</MudText>
+                                        <MudText>@(Chord.IsBarreChord ? "Yes" : "No")</MudText>
+                                    </div>
+                                </MudListItem>
+                                <MudListItem T="string" Icon="@Icons.Material.Filled.SignalCellularAlt">
+                                    <div class="d-flex justify-space-between">
+                                        <MudText>Difficulty:</MudText>
+                                        <MudChip T="string" Text="@Difficulty" Size="Size.Small" Color="@DifficultyColor" />
+                                    </div>
+                                </MudListItem>
+                            </MudList>
+                        </MudItem>
+                    </MudGrid>
+                </MudTabPanel>
+                <MudTabPanel Text="Fingering" Icon="@Icons.Material.Filled.PanTool">
+                    <MudSimpleTable Dense="true" Hover="true" Bordered="true">
+                        <thead>
+                            <tr>
+                                <th>String</th>
+                                <th>Note</th>
+                                <th>Fret</th>
+                                <th>Finger</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < 6; i++)
+                            {
+                                var stringIndex = 5 - i;
+                                var fret = Chord.FretPositions[stringIndex];
+                                var finger = Chord.Fingerings[stringIndex];
+                                var openNote = GuitarTuning.StandardTuning[stringIndex];
+                                
+                                <tr>
+                                    <td>@(i + 1) (@openNote.Name@(openNote.Octave))</td>
+                                    <td>
+                                        @if (fret == -1) { <MudChip T="string" Text="Muted" Size="Size.Small" Color="Color.Error" /> }
+                                        else if (fret == 0) { <text>@openNote</text> }
+                                        else { <text>@GuitarTuning.GetNoteAtFret(stringIndex, fret)</text> }
+                                    </td>
+                                    <td>
+                                        @if (fret >= 0) { <text>@fret</text> }
+                                        else { <text>-</text> }
+                                    </td>
+                                    <td>
+                                        @if (finger > 0) { <MudAvatar Size="Size.Small" Color="Color.Primary">@finger</MudAvatar> }
+                                        else if (fret == 0) { <MudChip T="string" Text="Open" Size="Size.Small" Color="Color.Success" /> }
+                                        else { <text>-</text> }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudTabPanel>
+            </MudTabs>
+        </DialogContent>
+        <DialogActions>
+            @if (ShowProgressionButton)
+            {
+                <MudButton Color="Color.Primary" Variant="Variant.Text" OnClick="@(() => OnAddToProgression.InvokeAsync(Chord))">
+                    Add to Progression
+                </MudButton>
+            }
+            <MudButton Color="Color.Default" OnClick="@(() => IsVisible = false)">Close</MudButton>
+        </DialogActions>
+    </MudDialog>
+}
+
+@code {
+    [Parameter] public GuitarChord? Chord { get; set; }
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public bool ShowProgressionButton { get; set; }
+    [Parameter] public bool IsFavorite { get; set; }
+    [Parameter] public string Difficulty { get; set; } = "Beginner";
+    [Parameter] public Color DifficultyColor { get; set; } = Color.Success;
+    [Parameter] public EventCallback<GuitarChord> OnAddToProgression { get; set; }
+    [Parameter] public EventCallback<GuitarChord> OnToggleFavorite { get; set; }
+
+    private DialogOptions DialogOptions = new()
+    {
+        MaxWidth = MaxWidth.Medium,
+        FullWidth = true,
+        CloseButton = true,
+        Position = DialogPosition.Center
+    };
+
+    protected override void OnParametersSet()
+    {
+        if (IsVisible != (Chord != null))
+        {
+            IsVisibleChanged.InvokeAsync(IsVisible);
+        }
+    }
+}

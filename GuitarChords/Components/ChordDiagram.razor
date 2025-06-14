@@ -1,10 +1,7 @@
 @using GuitarChords.Models
 
 <div class="chord-diagram">
-    <MudPaper Class="pa-4" Elevation="3">
-        <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-3 chord-title">@Chord.Name</MudText>
-        
-        <svg width="@Width" height="@Height" viewBox="0 0 @Width @Height" class="chord-svg">
+    <svg width="@Width" height="@Height" viewBox="0 0 @Width @Height" class="chord-svg">
             <!-- Definitions for gradients and filters -->
             <defs>
                 <linearGradient id="fretboard-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -182,7 +179,6 @@
                 }
             }
         </svg>
-    </MudPaper>
 </div>
 
 @code {

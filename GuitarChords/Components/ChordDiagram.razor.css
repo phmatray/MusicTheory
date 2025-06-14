@@ -1,21 +1,11 @@
 .chord-diagram {
     display: inline-block;
-    margin: 8px;
     transition: transform 0.2s ease;
     animation: chord-fade-in 0.3s ease-out;
 }
 
-.chord-diagram:hover {
-    transform: translateY(-2px);
-}
-
 .chord-svg {
     cursor: default;
-}
-
-.chord-title {
-    color: #1976d2;
-    font-weight: 600;
 }
 
 .guitar-string {
