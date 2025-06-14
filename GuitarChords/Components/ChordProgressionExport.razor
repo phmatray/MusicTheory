@@ -1,0 +1,266 @@
+@using GuitarChords.Models
+@using System.Text
+@inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
+
+<MudDialog @bind-Visible="IsVisible" Options="DialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Share" Class="mr-2" />
+            Export Chord Progression
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTabs Elevation="0" Rounded="true" ApplyEffectsToContainer="true">
+            <MudTabPanel Text="Text Format" Icon="@Icons.Material.Filled.TextFields">
+                <MudPaper Class="pa-3" Elevation="1">
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">Plain Text</MudText>
+                    <MudTextField @bind-Value="_textFormat" 
+                                 Label="Chord Progression" 
+                                 Variant="Variant.Outlined"
+                                 ReadOnly="true"
+                                 Lines="3" />
+                    <MudButton StartIcon="@Icons.Material.Filled.ContentCopy" 
+                             Color="Color.Primary" 
+                             Size="Size.Small"
+                             Class="mt-2"
+                             OnClick="CopyToClipboard">
+                        Copy to Clipboard
+                    </MudButton>
+                </MudPaper>
+                
+                <MudPaper Class="pa-3 mt-3" Elevation="1">
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">Formatted (with bars)</MudText>
+                    <MudTextField @bind-Value="_formattedText" 
+                                 Label="Chord Progression with Bars" 
+                                 Variant="Variant.Outlined"
+                                 ReadOnly="true"
+                                 Lines="5" />
+                </MudPaper>
+            </MudTabPanel>
+            
+            <MudTabPanel Text="ChordPro" Icon="@Icons.Material.Filled.Code">
+                <MudPaper Class="pa-3" Elevation="1">
+                    <MudText Typo="Typo.body2" Class="mb-2">
+                        ChordPro format is widely used for chord charts and can be imported into many guitar apps.
+                    </MudText>
+                    <MudTextField @bind-Value="_chordProFormat" 
+                                 Label="ChordPro Format" 
+                                 Variant="Variant.Outlined"
+                                 ReadOnly="true"
+                                 Lines="10" />
+                    <MudButton StartIcon="@Icons.Material.Filled.Download" 
+                             Color="Color.Primary" 
+                             Size="Size.Small"
+                             Class="mt-2"
+                             OnClick="DownloadChordPro">
+                        Download .cho File
+                    </MudButton>
+                </MudPaper>
+            </MudTabPanel>
+            
+            <MudTabPanel Text="Share Link" Icon="@Icons.Material.Filled.Link">
+                <MudPaper Class="pa-3" Elevation="1">
+                    <MudText Typo="Typo.body2" Class="mb-2">
+                        Share this progression with others using a unique link.
+                    </MudText>
+                    <MudTextField @bind-Value="_shareLink" 
+                                 Label="Shareable Link" 
+                                 Variant="Variant.Outlined"
+                                 ReadOnly="true"
+                                 Adornment="Adornment.End"
+                                 AdornmentIcon="@Icons.Material.Filled.ContentCopy"
+                                 OnAdornmentClick="CopyShareLink" />
+                    
+                    <MudGrid Class="mt-3">
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.subtitle2" Class="mb-2">Share via:</MudText>
+                        </MudItem>
+                        <MudItem xs="6" sm="3">
+                            <MudButton FullWidth="true" 
+                                     Variant="Variant.Outlined" 
+                                     StartIcon="@Icons.Material.Filled.Email"
+                                     OnClick="ShareViaEmail">
+                                Email
+                            </MudButton>
+                        </MudItem>
+                        <MudItem xs="6" sm="3">
+                            <MudButton FullWidth="true" 
+                                     Variant="Variant.Outlined" 
+                                     Color="Color.Info"
+                                     OnClick="ShareViaTwitter">
+                                𝕏 Twitter
+                            </MudButton>
+                        </MudItem>
+                        <MudItem xs="6" sm="3">
+                            <MudButton FullWidth="true" 
+                                     Variant="Variant.Outlined" 
+                                     Color="Color.Primary"
+                                     OnClick="ShareViaFacebook">
+                                Facebook
+                            </MudButton>
+                        </MudItem>
+                        <MudItem xs="6" sm="3">
+                            <MudButton FullWidth="true" 
+                                     Variant="Variant.Outlined" 
+                                     Color="Color.Success"
+                                     OnClick="ShareViaWhatsApp">
+                                WhatsApp
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
+            </MudTabPanel>
+            
+            <MudTabPanel Text="PDF" Icon="@Icons.Material.Filled.PictureAsPdf">
+                <MudPaper Class="pa-3" Elevation="1">
+                    <MudText Typo="Typo.body2" Class="mb-2">
+                        Generate a printable PDF chord chart with diagrams.
+                    </MudText>
+                    <MudTextField @bind-Value="_songTitle" 
+                                 Label="Song Title (optional)" 
+                                 Variant="Variant.Outlined"
+                                 Class="mb-3" />
+                    <MudTextField @bind-Value="_artist" 
+                                 Label="Artist (optional)" 
+                                 Variant="Variant.Outlined"
+                                 Class="mb-3" />
+                    <MudButton StartIcon="@Icons.Material.Filled.PictureAsPdf" 
+                             Color="Color.Error" 
+                             Variant="Variant.Filled"
+                             OnClick="GeneratePDF">
+                        Generate PDF
+                    </MudButton>
+                </MudPaper>
+            </MudTabPanel>
+        </MudTabs>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="@(() => IsVisible = false)">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public List<GuitarChord> Chords { get; set; } = new();
+    [Parameter] public int Tempo { get; set; } = 120;
+    [Parameter] public string ProgressionName { get; set; } = "My Progression";
+    
+    private string _textFormat = "";
+    private string _formattedText = "";
+    private string _chordProFormat = "";
+    private string _shareLink = "";
+    private string _songTitle = "";
+    private string _artist = "";
+    
+    private DialogOptions DialogOptions = new()
+    {
+        MaxWidth = MaxWidth.Medium,
+        FullWidth = true,
+        CloseButton = true,
+        Position = DialogPosition.Center
+    };
+    
+    protected override void OnParametersSet()
+    {
+        if (IsVisible && Chords.Any())
+        {
+            GenerateFormats();
+        }
+    }
+    
+    private void GenerateFormats()
+    {
+        // Plain text format
+        _textFormat = string.Join(" - ", Chords.Select(c => c.Name));
+        
+        // Formatted text with bars (4 chords per bar)
+        var bars = new StringBuilder();
+        for (int i = 0; i < Chords.Count; i += 4)
+        {
+            var barChords = Chords.Skip(i).Take(4).Select(c => c.Name);
+            bars.AppendLine($"| {string.Join(" | ", barChords.Concat(Enumerable.Repeat("", 4 - barChords.Count())))} |");
+        }
+        _formattedText = bars.ToString().TrimEnd();
+        
+        // ChordPro format
+        var chordPro = new StringBuilder();
+        chordPro.AppendLine("{title: " + (string.IsNullOrEmpty(_songTitle) ? ProgressionName : _songTitle) + "}");
+        if (!string.IsNullOrEmpty(_artist))
+        {
+            chordPro.AppendLine("{artist: " + _artist + "}");
+        }
+        chordPro.AppendLine("{tempo: " + Tempo + "}");
+        chordPro.AppendLine();
+        
+        for (int i = 0; i < Chords.Count; i++)
+        {
+            chordPro.Append($"[{Chords[i].Name}]");
+            if ((i + 1) % 4 == 0)
+            {
+                chordPro.AppendLine();
+            }
+            else
+            {
+                chordPro.Append(" ");
+            }
+        }
+        _chordProFormat = chordPro.ToString();
+        
+        // Generate share link (simplified - in real app, this would save to server)
+        var encodedChords = Uri.EscapeDataString(string.Join(",", Chords.Select(c => c.Name)));
+        _shareLink = $"https://guitarchords.app/progression?chords={encodedChords}&tempo={Tempo}";
+    }
+    
+    private async Task CopyToClipboard()
+    {
+        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", _textFormat);
+        Snackbar.Add("Copied to clipboard!", Severity.Success);
+    }
+    
+    private async Task CopyShareLink()
+    {
+        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", _shareLink);
+        Snackbar.Add("Share link copied!", Severity.Success);
+    }
+    
+    private async Task DownloadChordPro()
+    {
+        var fileName = $"{ProgressionName.Replace(" ", "_")}.cho";
+        var bytes = Encoding.UTF8.GetBytes(_chordProFormat);
+        var base64 = Convert.ToBase64String(bytes);
+        await JSRuntime.InvokeVoidAsync("downloadFile", fileName, base64, "text/plain");
+        Snackbar.Add($"Downloaded {fileName}", Severity.Success);
+    }
+    
+    private async Task ShareViaEmail()
+    {
+        var subject = Uri.EscapeDataString($"Check out this chord progression: {ProgressionName}");
+        var body = Uri.EscapeDataString($"I wanted to share this chord progression with you:\n\n{_textFormat}\n\nTempo: {Tempo} BPM\n\nView it here: {_shareLink}");
+        await JSRuntime.InvokeVoidAsync("window.open", $"mailto:?subject={subject}&body={body}");
+    }
+    
+    private async Task ShareViaTwitter()
+    {
+        var text = Uri.EscapeDataString($"Check out this chord progression: {_textFormat} 🎸\n{_shareLink}");
+        await JSRuntime.InvokeVoidAsync("window.open", $"https://twitter.com/intent/tweet?text={text}");
+    }
+    
+    private async Task ShareViaFacebook()
+    {
+        await JSRuntime.InvokeVoidAsync("window.open", $"https://www.facebook.com/sharer/sharer.php?u={Uri.EscapeDataString(_shareLink)}");
+    }
+    
+    private async Task ShareViaWhatsApp()
+    {
+        var text = Uri.EscapeDataString($"Check out this chord progression: {_textFormat}\nTempo: {Tempo} BPM\n{_shareLink}");
+        await JSRuntime.InvokeVoidAsync("window.open", $"https://wa.me/?text={text}");
+    }
+    
+    private void GeneratePDF()
+    {
+        // In a real app, this would generate a PDF server-side
+        Snackbar.Add("PDF generation would be implemented with a server-side library", Severity.Info);
+    }
+}

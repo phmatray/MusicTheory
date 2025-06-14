@@ -5,8 +5,10 @@
 @inject GuitarChordService ChordService
 @inject ChordProgressionService ProgressionService
 @inject ChordPlayerService PlayerService
+@inject KeyboardShortcutService KeyboardService
 @inject ISnackbar Snackbar
 @implements IDisposable
+@implements IAsyncDisposable
 
 <PageTitle>Explore Chords</PageTitle>
 
@@ -21,7 +23,25 @@
                   @bind-SelectedType="_selectedType"
                   @bind-SelectedDifficulty="_selectedDifficulty"
                   @bind-SelectedTags="_selectedTags"
+                  AvailableChordNames="_allChords.Select(c => c.Name).Distinct().ToList()"
+                  RecentSearches="_recentSearches"
                   OnFiltersChanged="ApplyFilters" />
+    
+    <div class="mb-3">
+        <MudButton StartIcon="@Icons.Material.Filled.Compare" 
+                   Color="Color.Secondary" 
+                   Variant="Variant.Outlined"
+                   OnClick="@(() => _showComparisonDialog = true)"
+                   Class="mr-2">
+            Compare Chords
+        </MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.School" 
+                   Color="Color.Tertiary" 
+                   Variant="Variant.Outlined"
+                   OnClick="@(() => _showPracticeDialog = true)">
+            Practice Mode
+        </MudButton>
+    </div>
 
     @if (_showProgression)
     {
@@ -33,11 +53,37 @@
                                 OnClearProgression="ClearProgression"
                                 OnSaveProgression="SaveProgression"
                                 OnShuffleProgression="ShuffleProgression"
+                                OnExportProgression="ExportProgression"
                                 OnShowTemplates="ShowTemplates"
                                 OnShowSavedProgressions="ShowSavedProgressions"
                                 OnRemoveChord="RemoveFromProgression" />
     }
 
+    @if (_recentlyViewedChords.Any() && string.IsNullOrEmpty(_searchText) && string.IsNullOrEmpty(_selectedRoot) && string.IsNullOrEmpty(_selectedType))
+    {
+        <MudPaper Class="pa-4 mb-4" Elevation="1">
+            <MudText Typo="Typo.h6" Class="mb-3">
+                <MudIcon Icon="@Icons.Material.Filled.History" Class="mr-2" />
+                Recently Viewed
+            </MudText>
+            <MudChipSet T="string">
+                @foreach (var chordName in _recentlyViewedChords.Take(8))
+                {
+                    var chord = _allChords.FirstOrDefault(c => c.Name == chordName);
+                    if (chord != null)
+                    {
+                        <MudChip T="string" 
+                               Text="@chord.Name" 
+                               Icon="@Icons.Material.Filled.MusicNote"
+                               OnClick="@(() => SelectChord(chord))"
+                               Color="Color.Primary"
+                               Variant="Variant.Outlined" />
+                    }
+                }
+            </MudChipSet>
+        </MudPaper>
+    }
+    
     @if (_filteredChords.Any())
     {
         <div class="d-flex justify-space-between align-center mb-3">
@@ -53,6 +99,11 @@
                              Color="@(_viewMode == "list" ? Color.Primary : Color.Default)"
                              OnClick="@(() => _viewMode = "list")" />
             </MudButtonGroup>
+            <MudTooltip Text="Keyboard shortcuts (?)">
+                <MudIconButton Icon="@Icons.Material.Filled.Help" 
+                             Size="Size.Small"
+                             OnClick="@(() => _showHelpDialog = true)" />
+            </MudTooltip>
         </div>
         
         @if (_viewMode == "grid")
@@ -202,6 +253,90 @@
             <MudButton Color="Color.Default" OnClick="@(() => _showSavedProgressionsDialog = false)">Close</MudButton>
         </DialogActions>
     </MudDialog>
+    
+    @* Chord Comparison Dialog *@
+    <ChordComparison @bind-IsVisible="_showComparisonDialog"
+                     AllChords="_allChords"
+                     OnAddToProgression="AddChordsToProgression" />
+    
+    @* Export Dialog *@
+    <ChordProgressionExport @bind-IsVisible="_showExportDialog"
+                           Chords="_progressionChords"
+                           Tempo="_tempo"
+                           ProgressionName="@(_progressionName ?? "My Progression")" />
+    
+    @* Practice Mode Dialog *@
+    <ChordPractice @bind-IsVisible="_showPracticeDialog"
+                   Chords="_allChords" />
+    
+    @* Help Dialog *@
+    <MudDialog @bind-Visible="_showHelpDialog" Options="_dialogOptions">
+        <TitleContent>
+            <MudText Typo="Typo.h6">
+                <MudIcon Icon="@Icons.Material.Filled.Help" Class="mr-2" />
+                Keyboard Shortcuts
+            </MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudSimpleTable Dense="true" Hover="true">
+                <thead>
+                    <tr>
+                        <th>Shortcut</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><MudChip T="string" Text="Ctrl+K" Size="Size.Small" /></td>
+                        <td>Focus search</td>
+                    </tr>
+                    <tr>
+                        <td><MudChip T="string" Text="Ctrl+P" Size="Size.Small" /></td>
+                        <td>Open practice mode</td>
+                    </tr>
+                    <tr>
+                        <td><MudChip T="string" Text="Ctrl+C" Size="Size.Small" /></td>
+                        <td>Compare chords</td>
+                    </tr>
+                    <tr>
+                        <td><MudChip T="string" Text="Ctrl+E" Size="Size.Small" /></td>
+                        <td>Export progression</td>
+                    </tr>
+                    <tr>
+                        <td><MudChip T="string" Text="Space" Size="Size.Small" /></td>
+                        <td>Play/Pause progression</td>
+                    </tr>
+                    <tr>
+                        <td><MudChip T="string" Text="Escape" Size="Size.Small" /></td>
+                        <td>Close dialog</td>
+                    </tr>
+                    <tr>
+                        <td><MudChip T="string" Text="G" Size="Size.Small" /></td>
+                        <td>Grid view</td>
+                    </tr>
+                    <tr>
+                        <td><MudChip T="string" Text="L" Size="Size.Small" /></td>
+                        <td>List view</td>
+                    </tr>
+                    <tr>
+                        <td><MudChip T="string" Text="F" Size="Size.Small" /></td>
+                        <td>Toggle filters</td>
+                    </tr>
+                    <tr>
+                        <td><MudChip T="string" Text="P" Size="Size.Small" /></td>
+                        <td>Toggle progression builder</td>
+                    </tr>
+                    <tr>
+                        <td><MudChip T="string" Text="?" Size="Size.Small" /></td>
+                        <td>Show this help</td>
+                    </tr>
+                </tbody>
+            </MudSimpleTable>
+        </DialogContent>
+        <DialogActions>
+            <MudButton Color="Color.Default" OnClick="@(() => _showHelpDialog = false)">Close</MudButton>
+        </DialogActions>
+    </MudDialog>
 </MudContainer>
 
 @code {
@@ -219,12 +354,18 @@
     private bool _showTemplateDialog;
     private bool _showSaveDialog;
     private bool _showSavedProgressionsDialog;
+    private bool _showComparisonDialog;
+    private bool _showExportDialog;
+    private bool _showPracticeDialog;
+    private bool _showHelpDialog;
     private string _progressionName = "";
     private int _tempo = 120;
     
     private IReadOnlyCollection<string> _selectedTags = new HashSet<string>();
     private HashSet<string> _favoriteChords = new();
     private List<GuitarChord> _progressionChords = new();
+    private List<string> _recentSearches = new();
+    private List<string> _recentlyViewedChords = new();
     
     private DialogOptions _dialogOptions = new()
     {
@@ -234,7 +375,7 @@
         Position = DialogPosition.Center
     };
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         _allChords = ChordService.GetAllChords().ToList();
         ApplyFilters();
@@ -243,10 +384,24 @@
         PlayerService.ChordChanged += OnChordChanged;
         PlayerService.PlaybackStarted += OnPlaybackStarted;
         PlayerService.PlaybackStopped += OnPlaybackStopped;
+        
+        // Initialize keyboard shortcuts
+        await KeyboardService.InitializeAsync();
+        KeyboardService.OnKeyPressed += HandleKeyboardShortcut;
     }
 
     private void ApplyFilters()
     {
+        // Track search history
+        if (!string.IsNullOrEmpty(_searchText) && !_recentSearches.Contains(_searchText))
+        {
+            _recentSearches.Insert(0, _searchText);
+            if (_recentSearches.Count > 10)
+            {
+                _recentSearches.RemoveAt(_recentSearches.Count - 1);
+            }
+        }
+        
         _filteredChords = _allChords.Where(c => 
         {
             // Search text filter
@@ -297,6 +452,22 @@
     {
         _selectedChord = chord;
         _showChordDialog = true;
+        
+        // Track recently viewed chords
+        if (!_recentlyViewedChords.Contains(chord.Name))
+        {
+            _recentlyViewedChords.Insert(0, chord.Name);
+            if (_recentlyViewedChords.Count > 12)
+            {
+                _recentlyViewedChords.RemoveAt(_recentlyViewedChords.Count - 1);
+            }
+        }
+        else
+        {
+            // Move to front if already in list
+            _recentlyViewedChords.Remove(chord.Name);
+            _recentlyViewedChords.Insert(0, chord.Name);
+        }
     }
 
     private string GetDifficulty(GuitarChord chord)
@@ -351,6 +522,19 @@
             Snackbar.Add($"Added {chord.Name} to progression", Severity.Success);
         }
     }
+    
+    private void AddChordsToProgression(List<GuitarChord> chords)
+    {
+        foreach (var chord in chords)
+        {
+            if (!_progressionChords.Contains(chord))
+            {
+                _progressionChords.Add(chord);
+            }
+        }
+        Snackbar.Add($"Added {chords.Count} chords to progression", Severity.Success);
+        _showProgression = true;
+    }
 
     private void RemoveFromProgression(GuitarChord chord)
     {
@@ -395,6 +579,11 @@
     {
         _showSaveDialog = true;
         _progressionName = $"Progression {DateTime.Now:yyyy-MM-dd HH:mm}";
+    }
+    
+    private void ExportProgression()
+    {
+        _showExportDialog = true;
     }
 
     private void ConfirmSaveProgression()
@@ -461,11 +650,82 @@
         InvokeAsync(StateHasChanged);
     }
 
+    private void HandleKeyboardShortcut(string shortcut)
+    {
+        switch (shortcut)
+        {
+            case "Ctrl+K":
+                // Focus search
+                _showFilters = true;
+                StateHasChanged();
+                break;
+            case "Ctrl+P":
+                _showPracticeDialog = true;
+                StateHasChanged();
+                break;
+            case "Ctrl+C":
+                _showComparisonDialog = true;
+                StateHasChanged();
+                break;
+            case "Ctrl+E":
+                if (_progressionChords.Any())
+                {
+                    _showExportDialog = true;
+                    StateHasChanged();
+                }
+                break;
+            case "Space":
+                if (_showProgression && _progressionChords.Any())
+                {
+                    _ = TogglePlayback();
+                }
+                break;
+            case "Escape":
+                // Close any open dialog
+                _showChordDialog = false;
+                _showComparisonDialog = false;
+                _showExportDialog = false;
+                _showPracticeDialog = false;
+                _showTemplateDialog = false;
+                _showSaveDialog = false;
+                _showSavedProgressionsDialog = false;
+                _showHelpDialog = false;
+                StateHasChanged();
+                break;
+            case "G":
+                _viewMode = "grid";
+                StateHasChanged();
+                break;
+            case "L":
+                _viewMode = "list";
+                StateHasChanged();
+                break;
+            case "F":
+                _showFilters = !_showFilters;
+                StateHasChanged();
+                break;
+            case "P":
+                _showProgression = !_showProgression;
+                StateHasChanged();
+                break;
+            case "?":
+                _showHelpDialog = true;
+                StateHasChanged();
+                break;
+        }
+    }
+
     public void Dispose()
     {
         PlayerService.ChordChanged -= OnChordChanged;
         PlayerService.PlaybackStarted -= OnPlaybackStarted;
         PlayerService.PlaybackStopped -= OnPlaybackStopped;
         PlayerService.StopPlayback();
+        KeyboardService.OnKeyPressed -= HandleKeyboardShortcut;
+    }
+    
+    public async ValueTask DisposeAsync()
+    {
+        await KeyboardService.DisposeAsync();
     }
 }

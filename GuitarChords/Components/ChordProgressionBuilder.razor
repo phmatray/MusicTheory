@@ -72,6 +72,12 @@
                           OnClick="OnSaveProgression">
                     Save
                 </MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Share" 
+                          Color="Color.Secondary"
+                          Disabled="@(!Chords.Any())"
+                          OnClick="OnExportProgression">
+                    Export
+                </MudButton>
                 <MudButton StartIcon="@Icons.Material.Filled.Shuffle" 
                           Color="Color.Secondary"
                           Disabled="@(Chords.Count < 2 || IsPlaying)"
@@ -98,6 +104,7 @@
     [Parameter] public EventCallback OnClearProgression { get; set; }
     [Parameter] public EventCallback OnSaveProgression { get; set; }
     [Parameter] public EventCallback OnShuffleProgression { get; set; }
+    [Parameter] public EventCallback OnExportProgression { get; set; }
     [Parameter] public EventCallback OnShowTemplates { get; set; }
     [Parameter] public EventCallback OnShowSavedProgressions { get; set; }
     [Parameter] public EventCallback<GuitarChord> OnRemoveChord { get; set; }

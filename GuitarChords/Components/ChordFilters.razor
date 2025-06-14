@@ -3,14 +3,30 @@
 <MudPaper Class="pa-4 mb-4" Elevation="2">
     <MudGrid>
         <MudItem xs="12" md="8">
-            <MudTextField @bind-Value="SearchText" 
-                         Label="Search chords" 
-                         Variant="Variant.Outlined"
-                         Adornment="Adornment.Start"
-                         AdornmentIcon="@Icons.Material.Filled.Search"
-                         @oninput="OnSearchInput"
-                         Placeholder="Type a chord name (e.g., C, Am, G7)..."
-                         Immediate="true" />
+            <MudAutocomplete T="string" 
+                           Value="SearchText" 
+                           Label="Search chords" 
+                           Variant="Variant.Outlined"
+                           AdornmentIcon="@Icons.Material.Filled.Search"
+                           Adornment="Adornment.Start"
+                           Placeholder="Type a chord name (e.g., C, Am, G7)..."
+                           SearchFunc="@SearchChords"
+                           MaxItems="10"
+                           CoerceText="false"
+                           CoerceValue="false"
+                           Clearable="true"
+                           ValueChanged="OnSearchValueChanged">
+                <MoreItemsTemplate>
+                    <MudText Align="Align.Center" Typo="Typo.body2" Class="pa-2">
+                        Only the first 10 items are shown
+                    </MudText>
+                </MoreItemsTemplate>
+                <NoItemsTemplate>
+                    <MudText Align="Align.Center" Typo="Typo.body2" Class="pa-2">
+                        No matching chords found
+                    </MudText>
+                </NoItemsTemplate>
+            </MudAutocomplete>
         </MudItem>
         <MudItem xs="12" md="4">
             <MudButtonGroup Variant="Variant.Outlined" Color="Color.Primary" OverrideStyles="false">
@@ -106,10 +122,35 @@
     [Parameter] public IReadOnlyCollection<string> SelectedTags { get; set; } = new HashSet<string>();
     [Parameter] public EventCallback<IReadOnlyCollection<string>> SelectedTagsChanged { get; set; }
     [Parameter] public EventCallback OnFiltersChanged { get; set; }
+    [Parameter] public List<string> AvailableChordNames { get; set; } = new();
+    [Parameter] public List<string> RecentSearches { get; set; } = new();
 
-    private async Task OnSearchInput(ChangeEventArgs e)
+    private Task<IEnumerable<string>> SearchChords(string value, CancellationToken token)
     {
-        SearchText = e.Value?.ToString() ?? "";
+        if (string.IsNullOrEmpty(value))
+        {
+            // Show recent searches when input is empty
+            var results = RecentSearches.Take(5).Concat(new[] { "----" }).Concat(AvailableChordNames.Take(5));
+            return Task.FromResult(results);
+        }
+
+        // Filter chord names based on search
+        var filtered = AvailableChordNames
+            .Where(name => name.Contains(value, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        // Include recent searches that match
+        var recentMatches = RecentSearches
+            .Where(s => s.Contains(value, StringComparison.OrdinalIgnoreCase) && !filtered.Contains(s))
+            .Take(3);
+
+        var results2 = recentMatches.Concat(filtered).Take(10);
+        return Task.FromResult(results2);
+    }
+
+    private async Task OnSearchValueChanged(string value)
+    {
+        SearchText = value ?? "";
         await SearchTextChanged.InvokeAsync(SearchText);
         await OnFiltersChanged.InvokeAsync();
     }

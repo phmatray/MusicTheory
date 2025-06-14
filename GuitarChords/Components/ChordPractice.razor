@@ -1,0 +1,431 @@
+@using GuitarChords.Models
+@using System.Timers
+@implements IDisposable
+
+<MudDialog @bind-Visible="IsVisible" Options="DialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h5">
+            <MudIcon Icon="@Icons.Material.Filled.School" Class="mr-2" />
+            Chord Practice Mode
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            @if (!_practiceStarted)
+            {
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6" Class="mb-3">Setup Your Practice Session</MudText>
+                </MudItem>
+                
+                <MudItem xs="12" md="6">
+                    <MudPaper Class="pa-4" Elevation="1">
+                        <MudText Typo="Typo.subtitle1" Class="mb-2">Practice Type</MudText>
+                        <MudRadioGroup @bind-Value="_practiceMode">
+                            <MudRadio Value="@("single")" Color="Color.Primary">
+                                <MudText Typo="Typo.body2">Single Chord - Master one chord at a time</MudText>
+                            </MudRadio>
+                            <MudRadio Value="@("sequence")" Color="Color.Primary">
+                                <MudText Typo="Typo.body2">Chord Sequence - Practice chord changes</MudText>
+                            </MudRadio>
+                            <MudRadio Value="@("random")" Color="Color.Primary">
+                                <MudText Typo="Typo.body2">Random Chords - Test your knowledge</MudText>
+                            </MudRadio>
+                        </MudRadioGroup>
+                    </MudPaper>
+                </MudItem>
+                
+                <MudItem xs="12" md="6">
+                    <MudPaper Class="pa-4" Elevation="1">
+                        <MudText Typo="Typo.subtitle1" Class="mb-2">Settings</MudText>
+                        
+                        <MudSlider @bind-Value="_bpm" Min="40" Max="200" Step="5" Class="mb-3">
+                            <MudText Typo="Typo.body2">Tempo: @_bpm BPM</MudText>
+                        </MudSlider>
+                        
+                        <MudSlider @bind-Value="_beatsPerChord" Min="1" Max="8" Step="1" Class="mb-3">
+                            <MudText Typo="Typo.body2">Beats per chord: @_beatsPerChord</MudText>
+                        </MudSlider>
+                        
+                        <MudSwitch @bind-Value="_showDiagram" Color="Color.Primary">
+                            Show chord diagram
+                        </MudSwitch>
+                        
+                        <MudSwitch @bind-Value="_playMetronome" Color="Color.Primary">
+                            Play metronome sound
+                        </MudSwitch>
+                    </MudPaper>
+                </MudItem>
+                
+                @if (_practiceMode == "single")
+                {
+                    <MudItem xs="12">
+                        <MudPaper Class="pa-4" Elevation="1">
+                            <MudText Typo="Typo.subtitle1" Class="mb-2">Select Chord to Practice</MudText>
+                            <MudSelect T="GuitarChord" @bind-Value="_selectedChord" Label="Choose a chord">
+                                @foreach (var chord in Chords)
+                                {
+                                    <MudSelectItem Value="chord">@chord.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudPaper>
+                    </MudItem>
+                }
+                else if (_practiceMode == "sequence")
+                {
+                    <MudItem xs="12">
+                        <MudPaper Class="pa-4" Elevation="1">
+                            <MudText Typo="Typo.subtitle1" Class="mb-2">Chord Sequence</MudText>
+                            <MudChipSet T="string">
+                                @foreach (var chord in _practiceChords)
+                                {
+                                    <MudChip T="string" 
+                                           Text="@chord.Name" 
+                                           OnClose="() => RemoveFromPractice(chord)"
+                                           Color="Color.Primary" />
+                                }
+                            </MudChipSet>
+                            <MudButton StartIcon="@Icons.Material.Filled.Add" 
+                                     Variant="Variant.Outlined"
+                                     OnClick="ShowChordSelector"
+                                     Class="mt-2">
+                                Add Chord
+                            </MudButton>
+                        </MudPaper>
+                    </MudItem>
+                }
+                else if (_practiceMode == "random")
+                {
+                    <MudItem xs="12">
+                        <MudPaper Class="pa-4" Elevation="1">
+                            <MudText Typo="Typo.subtitle1" Class="mb-2">Difficulty Filter</MudText>
+                            <MudChipSet T="string" SelectionMode="SelectionMode.MultiSelection" @bind-SelectedValues="_selectedDifficulties">
+                                <MudChip T="string" Text="Beginner" Value="@("Beginner")" Color="Color.Success" />
+                                <MudChip T="string" Text="Intermediate" Value="@("Intermediate")" Color="Color.Warning" />
+                                <MudChip T="string" Text="Advanced" Value="@("Advanced")" Color="Color.Error" />
+                            </MudChipSet>
+                        </MudPaper>
+                    </MudItem>
+                }
+            }
+            else
+            {
+                <MudItem xs="12">
+                    <div class="practice-display">
+                        <MudText Typo="Typo.h3" Align="Align.Center" Class="mb-4">
+                            @if (_currentChord != null)
+                            {
+                                @_currentChord.Name
+                            }
+                            else
+                            {
+                                <text>Get Ready...</text>
+                            }
+                        </MudText>
+                        
+                        @if (_showDiagram && _currentChord != null)
+                        {
+                            <div class="d-flex justify-center mb-4">
+                                <ChordDiagram Chord="_currentChord" Width="300" Height="350" />
+                            </div>
+                        }
+                        
+                        <div class="metronome-display">
+                            <MudGrid Justify="Justify.Center">
+                                @for (int i = 0; i < 4; i++)
+                                {
+                                    var beat = i;
+                                    <MudItem xs="3" Class="text-center">
+                                        <MudIcon Icon="@Icons.Material.Filled.Circle" 
+                                               Size="Size.Large"
+                                               Color="@(_currentBeat == beat ? Color.Primary : Color.Default)" />
+                                    </MudItem>
+                                }
+                            </MudGrid>
+                        </div>
+                        
+                        <MudPaper Class="pa-3 mt-4" Elevation="1">
+                            <MudGrid>
+                                <MudItem xs="6">
+                                    <MudText Typo="Typo.body2">Time: @FormatTime(_elapsedSeconds)</MudText>
+                                </MudItem>
+                                <MudItem xs="6" Class="text-right">
+                                    <MudText Typo="Typo.body2">Changes: @_chordChangeCount</MudText>
+                                </MudItem>
+                            </MudGrid>
+                            
+                            @if (_practiceMode == "sequence" && _practiceChords.Any())
+                            {
+                                <MudProgressLinear Value="@GetProgressValue()" Color="Color.Primary" Class="mt-2" />
+                            }
+                        </MudPaper>
+                        
+                        <div class="d-flex justify-center gap-2 mt-4">
+                            <MudButton Variant="Variant.Filled" 
+                                     Color="@(_isPaused ? Color.Success : Color.Warning)"
+                                     StartIcon="@(_isPaused ? Icons.Material.Filled.PlayArrow : Icons.Material.Filled.Pause)"
+                                     OnClick="TogglePause">
+                                @(_isPaused ? "Resume" : "Pause")
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined" 
+                                     Color="Color.Error"
+                                     StartIcon="@Icons.Material.Filled.Stop"
+                                     OnClick="StopPractice">
+                                Stop
+                            </MudButton>
+                        </div>
+                    </div>
+                </MudItem>
+            }
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        @if (!_practiceStarted)
+        {
+            <MudButton Color="Color.Default" OnClick="@(() => IsVisible = false)">Cancel</MudButton>
+            <MudButton Color="Color.Primary" 
+                     Variant="Variant.Filled"
+                     Disabled="@(!CanStartPractice())"
+                     OnClick="StartPractice">
+                Start Practice
+            </MudButton>
+        }
+        else
+        {
+            <MudButton Color="Color.Default" OnClick="@(() => { StopPractice(); IsVisible = false; })">Close</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-Visible="_showChordSelectorDialog" Options="_selectorDialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">Add Chord to Sequence</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudList T="GuitarChord">
+            @foreach (var chord in Chords.Where(c => !_practiceChords.Contains(c)))
+            {
+                <MudListItem T="GuitarChord" Value="chord" OnClick="() => AddToPractice(chord)">
+                    <MudText>@chord.Name</MudText>
+                </MudListItem>
+                <MudDivider />
+            }
+        </MudList>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="@(() => _showChordSelectorDialog = false)">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public List<GuitarChord> Chords { get; set; } = new();
+    
+    private DialogOptions DialogOptions = new()
+    {
+        MaxWidth = MaxWidth.Medium,
+        FullWidth = true,
+        CloseButton = false,
+        Position = DialogPosition.Center
+    };
+    
+    private DialogOptions _selectorDialogOptions = new()
+    {
+        MaxWidth = MaxWidth.Small,
+        FullWidth = true,
+        Position = DialogPosition.Center
+    };
+    
+    private string _practiceMode = "single";
+    private int _bpm = 60;
+    private int _beatsPerChord = 4;
+    private bool _showDiagram = true;
+    private bool _playMetronome = true;
+    private bool _practiceStarted = false;
+    private bool _isPaused = false;
+    private bool _showChordSelectorDialog = false;
+    
+    private GuitarChord? _selectedChord;
+    private GuitarChord? _currentChord;
+    private List<GuitarChord> _practiceChords = new();
+    private IReadOnlyCollection<string> _selectedDifficulties = new HashSet<string> { "Beginner" };
+    
+    private Timer? _metronomeTimer;
+    private Timer? _practiceTimer;
+    private int _currentBeat = -1;
+    private int _beatCount = 0;
+    private int _chordIndex = 0;
+    private int _chordChangeCount = 0;
+    private int _elapsedSeconds = 0;
+    private Random _random = new();
+    
+    private bool CanStartPractice()
+    {
+        return _practiceMode switch
+        {
+            "single" => _selectedChord != null,
+            "sequence" => _practiceChords.Any(),
+            "random" => _selectedDifficulties.Any(),
+            _ => false
+        };
+    }
+    
+    private void StartPractice()
+    {
+        _practiceStarted = true;
+        _isPaused = false;
+        _currentBeat = -1;
+        _beatCount = 0;
+        _chordIndex = 0;
+        _chordChangeCount = 0;
+        _elapsedSeconds = 0;
+        
+        // Set initial chord
+        UpdateCurrentChord();
+        
+        // Start metronome
+        var beatInterval = 60000.0 / _bpm; // milliseconds per beat
+        _metronomeTimer = new Timer(beatInterval);
+        _metronomeTimer.Elapsed += OnMetronomeTick;
+        _metronomeTimer.Start();
+        
+        // Start practice timer (updates every second)
+        _practiceTimer = new Timer(1000);
+        _practiceTimer.Elapsed += OnPracticeTick;
+        _practiceTimer.Start();
+    }
+    
+    private void StopPractice()
+    {
+        _practiceStarted = false;
+        _metronomeTimer?.Stop();
+        _metronomeTimer?.Dispose();
+        _practiceTimer?.Stop();
+        _practiceTimer?.Dispose();
+        _currentChord = null;
+        InvokeAsync(StateHasChanged);
+    }
+    
+    private void TogglePause()
+    {
+        _isPaused = !_isPaused;
+        if (_isPaused)
+        {
+            _metronomeTimer?.Stop();
+            _practiceTimer?.Stop();
+        }
+        else
+        {
+            _metronomeTimer?.Start();
+            _practiceTimer?.Start();
+        }
+    }
+    
+    private void OnMetronomeTick(object? sender, ElapsedEventArgs e)
+    {
+        if (_isPaused) return;
+        
+        _currentBeat = (_currentBeat + 1) % 4;
+        _beatCount++;
+        
+        // Check if we need to change chord
+        if (_beatCount >= _beatsPerChord)
+        {
+            _beatCount = 0;
+            NextChord();
+        }
+        
+        // Play metronome sound (placeholder)
+        if (_playMetronome)
+        {
+            // In a real app, play audio here
+        }
+        
+        InvokeAsync(StateHasChanged);
+    }
+    
+    private void OnPracticeTick(object? sender, ElapsedEventArgs e)
+    {
+        if (!_isPaused)
+        {
+            _elapsedSeconds++;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+    
+    private void NextChord()
+    {
+        _chordChangeCount++;
+        
+        if (_practiceMode == "sequence" && _practiceChords.Any())
+        {
+            _chordIndex = (_chordIndex + 1) % _practiceChords.Count;
+        }
+        
+        UpdateCurrentChord();
+    }
+    
+    private void UpdateCurrentChord()
+    {
+        _currentChord = _practiceMode switch
+        {
+            "single" => _selectedChord,
+            "sequence" => _practiceChords.Any() ? _practiceChords[_chordIndex] : null,
+            "random" => GetRandomChord(),
+            _ => null
+        };
+    }
+    
+    private GuitarChord? GetRandomChord()
+    {
+        var filtered = Chords.Where(c => _selectedDifficulties.Contains(GetDifficulty(c))).ToList();
+        return filtered.Any() ? filtered[_random.Next(filtered.Count)] : null;
+    }
+    
+    private string GetDifficulty(GuitarChord chord)
+    {
+        if (chord.IsBarreChord) return "Advanced";
+        var fingersUsed = chord.Fingerings.Count(f => f > 0);
+        if (fingersUsed <= 2) return "Beginner";
+        else if (fingersUsed <= 3) return "Intermediate";
+        else return "Advanced";
+    }
+    
+    private void ShowChordSelector()
+    {
+        _showChordSelectorDialog = true;
+    }
+    
+    private void AddToPractice(GuitarChord chord)
+    {
+        if (!_practiceChords.Contains(chord))
+        {
+            _practiceChords.Add(chord);
+        }
+        _showChordSelectorDialog = false;
+    }
+    
+    private void RemoveFromPractice(GuitarChord chord)
+    {
+        _practiceChords.Remove(chord);
+    }
+    
+    private double GetProgressValue()
+    {
+        if (!_practiceChords.Any()) return 0;
+        return (double)_chordIndex / _practiceChords.Count * 100;
+    }
+    
+    private string FormatTime(int seconds)
+    {
+        var minutes = seconds / 60;
+        var secs = seconds % 60;
+        return $"{minutes:00}:{secs:00}";
+    }
+    
+    public void Dispose()
+    {
+        _metronomeTimer?.Dispose();
+        _practiceTimer?.Dispose();
+    }
+}
