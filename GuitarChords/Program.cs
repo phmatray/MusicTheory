@@ -13,8 +13,10 @@ builder.Services.AddMudServices();
 // Add application services
 builder.Services.AddSingleton<GuitarChords.Services.GuitarChordService>();
 builder.Services.AddSingleton<GuitarChords.Services.ChordProgressionService>();
+builder.Services.AddSingleton<GuitarChords.Services.ChordTransitionService>();
 builder.Services.AddScoped<GuitarChords.Services.ChordPlayerService>();
 builder.Services.AddScoped<GuitarChords.Services.KeyboardShortcutService>();
+builder.Services.AddScoped<GuitarChords.Services.UserPreferencesService>();
 
 var app = builder.Build();
 

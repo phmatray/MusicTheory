@@ -118,6 +118,22 @@
     }
 }
 
+.suggestion-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.suggestion-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-color: var(--mud-palette-primary);
+}
+
+.suggestion-card .mud-card-content {
+    min-height: 120px;
+}
+
 @media (max-width: 600px) {
     .chord-card {
         margin: 4px;

@@ -5,6 +5,7 @@
 @inject GuitarChordService ChordService
 @inject ChordProgressionService ProgressionService
 @inject ChordPlayerService PlayerService
+@inject ChordTransitionService TransitionService
 @inject KeyboardShortcutService KeyboardService
 @inject ISnackbar Snackbar
 @implements IDisposable
@@ -57,6 +58,45 @@
                                 OnShowTemplates="ShowTemplates"
                                 OnShowSavedProgressions="ShowSavedProgressions"
                                 OnRemoveChord="RemoveFromProgression" />
+        
+        @if (_chordSuggestions.Any())
+        {
+            <MudPaper Class="pa-4 mt-4" Elevation="1">
+                <MudText Typo="Typo.h6" Class="mb-3">
+                    <MudIcon Icon="@Icons.Material.Filled.Lightbulb" Class="mr-2" />
+                    Suggested Next Chords
+                </MudText>
+                <MudGrid>
+                    @foreach (var suggestion in _chordSuggestions)
+                    {
+                        <MudItem xs="12" sm="6" md="4">
+                            <MudCard Outlined="true" Class="suggestion-card">
+                                <MudCardContent Class="pa-2">
+                                    <div class="d-flex justify-space-between align-center mb-2">
+                                        <MudText Typo="Typo.subtitle1">@suggestion.Chord.Name</MudText>
+                                        <MudChip T="string" 
+                                               Text="@($"{(int)(suggestion.Confidence * 100)}%")" 
+                                               Size="Size.Small" 
+                                               Color="@GetConfidenceColor(suggestion.Confidence)" />
+                                    </div>
+                                    <MudText Typo="Typo.body2" Class="mb-2">@suggestion.Reason</MudText>
+                                    <div class="d-flex justify-space-between align-center">
+                                        <MudChip T="string" 
+                                               Text="@suggestion.TransitionDifficulty" 
+                                               Size="Size.Small"
+                                               Color="@GetDifficultyColor(suggestion.TransitionDifficulty)" />
+                                        <MudIconButton Icon="@Icons.Material.Filled.Add" 
+                                                     Size="Size.Small"
+                                                     Color="Color.Primary"
+                                                     OnClick="@(() => AddToProgression(suggestion.Chord))" />
+                                    </div>
+                                </MudCardContent>
+                            </MudCard>
+                        </MudItem>
+                    }
+                </MudGrid>
+            </MudPaper>
+        }
     }
 
     @if (_recentlyViewedChords.Any() && string.IsNullOrEmpty(_searchText) && string.IsNullOrEmpty(_selectedRoot) && string.IsNullOrEmpty(_selectedType))
@@ -366,6 +406,7 @@
     private List<GuitarChord> _progressionChords = new();
     private List<string> _recentSearches = new();
     private List<string> _recentlyViewedChords = new();
+    private List<ChordSuggestion> _chordSuggestions = new();
     
     private DialogOptions _dialogOptions = new()
     {
@@ -520,6 +561,7 @@
         {
             _progressionChords.Add(chord);
             Snackbar.Add($"Added {chord.Name} to progression", Severity.Success);
+            UpdateChordSuggestions();
         }
     }
     
@@ -539,12 +581,14 @@
     private void RemoveFromProgression(GuitarChord chord)
     {
         _progressionChords.Remove(chord);
+        UpdateChordSuggestions();
     }
 
     private void ClearProgression()
     {
         _progressionChords.Clear();
         PlayerService.StopPlayback();
+        UpdateChordSuggestions();
     }
 
     private void ShuffleProgression()
@@ -724,6 +768,40 @@
         KeyboardService.OnKeyPressed -= HandleKeyboardShortcut;
     }
     
+    private void UpdateChordSuggestions()
+    {
+        if (_progressionChords.Any())
+        {
+            var currentChord = _progressionChords.Last();
+            _chordSuggestions = TransitionService.GetNextChordSuggestions(currentChord, _progressionChords);
+        }
+        else
+        {
+            _chordSuggestions.Clear();
+        }
+    }
+    
+    private Color GetConfidenceColor(float confidence)
+    {
+        return confidence switch
+        {
+            >= 0.8f => Color.Success,
+            >= 0.6f => Color.Warning,
+            _ => Color.Default
+        };
+    }
+    
+    private Color GetDifficultyColor(string difficulty)
+    {
+        return difficulty switch
+        {
+            "Easy" => Color.Success,
+            "Medium" => Color.Warning,
+            "Hard" => Color.Error,
+            _ => Color.Default
+        };
+    }
+
     public async ValueTask DisposeAsync()
     {
         await KeyboardService.DisposeAsync();
