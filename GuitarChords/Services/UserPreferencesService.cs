@@ -33,6 +33,11 @@ public class UserPreferencesService
                 _cachedPreferences = new UserPreferences();
             }
         }
+        catch (InvalidOperationException)
+        {
+            // During prerendering, localStorage is not available
+            _cachedPreferences = new UserPreferences();
+        }
         catch
         {
             _cachedPreferences = new UserPreferences();
@@ -44,9 +49,18 @@ public class UserPreferencesService
     public async Task SavePreferencesAsync(UserPreferences preferences)
     {
         _cachedPreferences = preferences;
-        var json = JsonSerializer.Serialize(preferences);
-        await _jsRuntime.InvokeVoidAsync("localStorage.setItem", PreferencesKey, json);
-        PreferencesChanged?.Invoke();
+        
+        try
+        {
+            var json = JsonSerializer.Serialize(preferences);
+            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", PreferencesKey, json);
+            PreferencesChanged?.Invoke();
+        }
+        catch (InvalidOperationException)
+        {
+            // During prerendering, localStorage is not available
+            // Just keep the cached value
+        }
     }
     
     public async Task UpdatePreferenceAsync<T>(string propertyName, T value)
@@ -63,7 +77,16 @@ public class UserPreferencesService
     public async Task ResetPreferencesAsync()
     {
         _cachedPreferences = new UserPreferences();
-        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", PreferencesKey);
+        
+        try
+        {
+            await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", PreferencesKey);
+        }
+        catch (InvalidOperationException)
+        {
+            // During prerendering, localStorage is not available
+        }
+        
         PreferencesChanged?.Invoke();
     }
 }

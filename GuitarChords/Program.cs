@@ -17,6 +17,7 @@ builder.Services.AddSingleton<GuitarChords.Services.ChordTransitionService>();
 builder.Services.AddScoped<GuitarChords.Services.ChordPlayerService>();
 builder.Services.AddScoped<GuitarChords.Services.KeyboardShortcutService>();
 builder.Services.AddScoped<GuitarChords.Services.UserPreferencesService>();
+builder.Services.AddScoped<GuitarChords.Services.GuitarAudioService>();
 
 var app = builder.Build();
 

@@ -6,6 +6,7 @@ public class KeyboardShortcutService : IAsyncDisposable
 {
     private readonly IJSRuntime _jsRuntime;
     private DotNetObjectReference<KeyboardShortcutService>? _objRef;
+    private bool _isInitialized;
     
     public event Action<string>? OnKeyPressed;
     
@@ -16,8 +17,17 @@ public class KeyboardShortcutService : IAsyncDisposable
     
     public async Task InitializeAsync()
     {
-        _objRef = DotNetObjectReference.Create(this);
-        await _jsRuntime.InvokeVoidAsync("registerKeyboardShortcuts", _objRef);
+        try
+        {
+            _objRef = DotNetObjectReference.Create(this);
+            await _jsRuntime.InvokeVoidAsync("registerKeyboardShortcuts", _objRef);
+            _isInitialized = true;
+        }
+        catch (InvalidOperationException)
+        {
+            // Ignore if we're in prerendering
+            _isInitialized = false;
+        }
     }
     
     [JSInvokable]
@@ -30,8 +40,21 @@ public class KeyboardShortcutService : IAsyncDisposable
     {
         if (_objRef != null)
         {
-            await _jsRuntime.InvokeVoidAsync("unregisterKeyboardShortcuts");
+            // Only try to unregister if we successfully initialized
+            if (_isInitialized)
+            {
+                try
+                {
+                    await _jsRuntime.InvokeVoidAsync("unregisterKeyboardShortcuts");
+                }
+                catch (InvalidOperationException)
+                {
+                    // Ignore if we're in prerendering or disposal
+                }
+            }
+            
             _objRef.Dispose();
+            _objRef = null;
         }
     }
 }

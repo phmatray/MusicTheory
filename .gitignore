@@ -10,3 +10,11 @@ package-lock.json
 # Writerside
 artifacts/
 .idea/
+
+# Rust/WASM
+guitar-audio-synth/target/
+guitar-audio-synth/pkg/
+guitar-audio-synth/Cargo.lock
+
+# WASM build output
+GuitarChords/wwwroot/wasm/

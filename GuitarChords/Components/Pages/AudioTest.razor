@@ -1,0 +1,186 @@
+@page "/audio-test"
+@using GuitarChords.Services
+@using Microsoft.JSInterop
+@inject GuitarAudioService AudioService
+@inject IJSRuntime JS
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+    <MudPaper Class="pa-4">
+        <MudText Typo="Typo.h4">Audio System Test</MudText>
+        
+        <MudGrid Class="mt-4">
+            <MudItem xs="12">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="PlayTestTone">
+                    Play Test Tone (440Hz)
+                </MudButton>
+            </MudItem>
+            
+            <MudItem xs="12">
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="PlaySimpleChord">
+                    Play C Major Chord
+                </MudButton>
+            </MudItem>
+            
+            <MudItem xs="12">
+                <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="CheckAudioState">
+                    Check Audio State
+                </MudButton>
+            </MudItem>
+            
+            <MudItem xs="12">
+                <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="InitializeAudio">
+                    Initialize Audio
+                </MudButton>
+            </MudItem>
+            
+            <MudItem xs="12">
+                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="PlayWorkletTestTone">
+                    Play Worklet Test Tone
+                </MudButton>
+            </MudItem>
+            
+            <MudItem xs="12">
+                <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="TestSimpleOscillator">
+                    Test Simple Oscillator (No Worklet)
+                </MudButton>
+            </MudItem>
+            
+            <MudItem xs="12">
+                <MudButton Variant="Variant.Filled" Color="Color.Dark" OnClick="TestMinimalWorklet">
+                    Test Minimal Worklet (White Noise)
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+        
+        <MudDivider Class="my-4" />
+        
+        <MudText Typo="Typo.h6">Console Output:</MudText>
+        <MudPaper Class="pa-2 mt-2" Style="background-color: #f5f5f5; font-family: monospace;">
+            @foreach (var log in _logs)
+            {
+                <div>@log</div>
+            }
+        </MudPaper>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private List<string> _logs = new();
+    
+    private void Log(string message)
+    {
+        _logs.Add($"{DateTime.Now:HH:mm:ss.fff} - {message}");
+        StateHasChanged();
+    }
+    
+    private async Task PlayTestTone()
+    {
+        try
+        {
+            Log("Playing test tone...");
+            await JS.InvokeVoidAsync("GuitarAudio.playTestTone");
+            Log("Test tone command sent");
+        }
+        catch (Exception ex)
+        {
+            Log($"Error: {ex.Message}");
+        }
+    }
+    
+    private async Task PlaySimpleChord()
+    {
+        try
+        {
+            Log("Playing C Major chord...");
+            var fretPositions = new[] { -1, 3, 2, 0, 1, 0 };
+            Log($"Fret positions: {string.Join(", ", fretPositions)}");
+            
+            await AudioService.PlayChordAsync(fretPositions);
+            Log("Chord command sent");
+        }
+        catch (Exception ex)
+        {
+            Log($"Error: {ex.Message}");
+        }
+    }
+    
+    private async Task CheckAudioState()
+    {
+        try
+        {
+            Log("Checking audio state...");
+            var state = await AudioService.GetStateAsync();
+            Log($"Initialized: {state.IsInitialized}");
+            Log($"Context State: {state.ContextState}");
+        }
+        catch (Exception ex)
+        {
+            Log($"Error: {ex.Message}");
+        }
+    }
+    
+    private async Task InitializeAudio()
+    {
+        try
+        {
+            Log("Initializing audio...");
+            await AudioService.InitializeAsync();
+            Log("Audio initialized");
+        }
+        catch (Exception ex)
+        {
+            Log($"Error: {ex.Message}");
+        }
+    }
+    
+    private async Task PlayWorkletTestTone()
+    {
+        try
+        {
+            Log("Playing worklet test tone...");
+            await JS.InvokeVoidAsync("eval", @"
+                if (window.GuitarAudio && window.GuitarAudio.audioWorkletNode) {
+                    window.GuitarAudio.audioWorkletNode.port.postMessage({
+                        type: 'testTone'
+                    });
+                    console.log('Worklet test tone message sent');
+                } else {
+                    console.error('Audio not initialized');
+                }
+            ");
+            Log("Worklet test tone command sent");
+        }
+        catch (Exception ex)
+        {
+            Log($"Error: {ex.Message}");
+        }
+    }
+    
+    private async Task TestSimpleOscillator()
+    {
+        try
+        {
+            Log("Testing simple oscillator (no worklet)...");
+            var result = await JS.InvokeAsync<bool>("SimpleAudioTest.playSimpleOscillator");
+            Log($"Simple oscillator test result: {result}");
+        }
+        catch (Exception ex)
+        {
+            Log($"Error: {ex.Message}");
+        }
+    }
+    
+    private async Task TestMinimalWorklet()
+    {
+        try
+        {
+            Log("Testing minimal worklet (white noise)...");
+            var result = await JS.InvokeAsync<bool>("SimpleAudioTest.testAudioWorklet");
+            Log($"Minimal worklet test result: {result}");
+        }
+        catch (Exception ex)
+        {
+            Log($"Error: {ex.Message}");
+        }
+    }
+}
