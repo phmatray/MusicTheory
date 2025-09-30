@@ -85,25 +85,45 @@ public class Interval
     /// </summary>
     private static Interval DetermineIntervalFromSemitonesAndNumber(int semitones, int number)
     {
-        // Get the base interval within an octave
+        // Get the base interval within an octave (1-7)
         int baseNumber = ((number - 1) % 7) + 1;
-        bool isPerfectInterval = baseNumber == 1 || baseNumber == 4 || baseNumber == 5 || baseNumber == 8;
+        bool isPerfectInterval = baseNumber == 1 || baseNumber == 4 || baseNumber == 5;
 
         // Expected semitones for perfect/major intervals
         int octaves = (number - 1) / 7;
-        int expectedSemitonesForMajorOrPerfect = MusicTheoryConstants.SemitonesFromC[baseNumber - 1] + (octaves * MusicTheoryConstants.SemitonesPerOctave);
+
+        // For base intervals 1-7, get semitones from array
+        // Note: baseNumber 1 = unison (0 semitones), 2 = second (2), ..., 7 = seventh (11)
+        int baseSemitones = baseNumber == 1 ? 0 : MusicTheoryConstants.SemitonesFromC[baseNumber - 1];
+        int expectedSemitonesForMajorOrPerfect = baseSemitones + (octaves * MusicTheoryConstants.SemitonesPerOctave);
 
         // Determine quality based on actual vs expected semitones
         int difference = semitones - expectedSemitonesForMajorOrPerfect;
 
-        IntervalQuality quality = difference switch
+        // Handle larger differences for compound intervals
+        IntervalQuality quality;
+        if (isPerfectInterval)
         {
-            -2 => IntervalQuality.Diminished,
-            -1 => isPerfectInterval ? IntervalQuality.Diminished : IntervalQuality.Minor,
-            0 => isPerfectInterval ? IntervalQuality.Perfect : IntervalQuality.Major,
-            1 => IntervalQuality.Augmented,
-            _ => throw new InvalidOperationException($"Cannot determine quality for interval with {semitones} semitones and number {number}")
-        };
+            quality = difference switch
+            {
+                < -1 => IntervalQuality.Diminished,
+                -1 => IntervalQuality.Diminished,
+                0 => IntervalQuality.Perfect,
+                1 => IntervalQuality.Augmented,
+                _ => IntervalQuality.Augmented  // > 1
+            };
+        }
+        else
+        {
+            quality = difference switch
+            {
+                < -1 => IntervalQuality.Diminished,
+                -1 => IntervalQuality.Minor,
+                0 => IntervalQuality.Major,
+                1 => IntervalQuality.Augmented,
+                _ => IntervalQuality.Augmented  // > 1
+            };
+        }
 
         return new Interval(quality, number);
     }
