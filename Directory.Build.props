@@ -1,0 +1,31 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Common Build Settings -->
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+
+    <!-- Common Package Metadata -->
+    <Authors>phmatray</Authors>
+    <Company>phmatray</Company>
+    <Copyright>Copyright © 2025 phmatray</Copyright>
+    <PackageProjectUrl>https://github.com/phmatray/MusicTheory</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/phmatray/MusicTheory</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <!-- SourceLink and Deterministic Build -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <!-- SourceLink for all projects -->
+  <ItemGroup Condition="'$(IsPackable)' == 'true'">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>
