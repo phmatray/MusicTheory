@@ -1,0 +1,155 @@
+<MudPaper Class="pa-4 mb-4" Elevation="2">
+    <MudGrid>
+        <MudItem xs="12" md="8">
+            <MudAutocomplete T="string" 
+                           Value="SearchText" 
+                           Label="Search chords" 
+                           Variant="Variant.Outlined"
+                           AdornmentIcon="@Icons.Material.Filled.Search"
+                           Adornment="Adornment.Start"
+                           Placeholder="Type a chord name (e.g., C, Am, G7)..."
+                           SearchFunc="@SearchChords"
+                           MaxItems="10"
+                           CoerceText="false"
+                           CoerceValue="false"
+                           Clearable="true"
+                           ValueChanged="OnSearchValueChanged">
+                <MoreItemsTemplate>
+                    <MudText Align="Align.Center" Typo="Typo.body2" Class="pa-2">
+                        Only the first 10 items are shown
+                    </MudText>
+                </MoreItemsTemplate>
+                <NoItemsTemplate>
+                    <MudText Align="Align.Center" Typo="Typo.body2" Class="pa-2">
+                        No matching chords found
+                    </MudText>
+                </NoItemsTemplate>
+            </MudAutocomplete>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudButtonGroup Variant="Variant.Outlined" Color="Color.Primary" OverrideStyles="false">
+                <MudToggleIconButton @bind-Toggled="ShowFilters"
+                                   Icon="@Icons.Material.Filled.FilterList"
+                                   ToggledIcon="@Icons.Material.Filled.FilterListOff"
+ />
+                <MudToggleIconButton @bind-Toggled="ShowProgression"
+                                   Icon="@Icons.Material.Filled.QueueMusic"
+                                   ToggledIcon="@Icons.Material.Filled.QueueMusic"
+                                   Color="@(ShowProgression ? Color.Primary : Color.Default)"
+ />
+            </MudButtonGroup>
+        </MudItem>
+    </MudGrid>
+
+    <MudCollapse Expanded="ShowFilters">
+        <MudDivider Class="my-4" />
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="3">
+                <MudSelect T="string" Label="Root Note" Value="SelectedRoot" Dense="true" Variant="Variant.Outlined"
+                          ValueChanged="@((string value) => { SelectedRoot = value; OnFiltersChanged.InvokeAsync(); })">
+                    <MudSelectItem Value="@("")">All Roots</MudSelectItem>
+                    <MudSelectItem Value="@("C")">C</MudSelectItem>
+                    <MudSelectItem Value="@("D")">D</MudSelectItem>
+                    <MudSelectItem Value="@("E")">E</MudSelectItem>
+                    <MudSelectItem Value="@("F")">F</MudSelectItem>
+                    <MudSelectItem Value="@("G")">G</MudSelectItem>
+                    <MudSelectItem Value="@("A")">A</MudSelectItem>
+                    <MudSelectItem Value="@("B")">B</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudSelect T="string" Label="Chord Type" Value="SelectedType" Dense="true" Variant="Variant.Outlined"
+                          ValueChanged="@((string value) => { SelectedType = value; OnFiltersChanged.InvokeAsync(); })">
+                    <MudSelectItem Value="@("")">All Types</MudSelectItem>
+                    <MudSelectItem Value="@("Major")">Major</MudSelectItem>
+                    <MudSelectItem Value="@("Minor")">Minor</MudSelectItem>
+                    <MudSelectItem Value="@("7th")">7th</MudSelectItem>
+                    <MudSelectItem Value="@("Major7")">Major 7th</MudSelectItem>
+                    <MudSelectItem Value="@("Minor7")">Minor 7th</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudSelect T="string" Label="Difficulty" Value="SelectedDifficulty" Dense="true" Variant="Variant.Outlined"
+                          ValueChanged="@((string value) => { SelectedDifficulty = value; OnFiltersChanged.InvokeAsync(); })">
+                    <MudSelectItem Value="@("")">All Levels</MudSelectItem>
+                    <MudSelectItem Value="@("Beginner")">
+                        <div class="d-flex align-center">
+                            <MudIcon Icon="@Icons.Material.Filled.StarBorder" Size="Size.Small" Class="mr-2" />
+                            Beginner
+                        </div>
+                    </MudSelectItem>
+                    <MudSelectItem Value="@("Intermediate")">
+                        <div class="d-flex align-center">
+                            <MudIcon Icon="@Icons.Material.Filled.StarHalf" Size="Size.Small" Class="mr-2" />
+                            Intermediate
+                        </div>
+                    </MudSelectItem>
+                    <MudSelectItem Value="@("Advanced")">
+                        <div class="d-flex align-center">
+                            <MudIcon Icon="@Icons.Material.Filled.Star" Size="Size.Small" Class="mr-2" />
+                            Advanced
+                        </div>
+                    </MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudChipSet T="string" SelectionMode="SelectionMode.MultiSelection" SelectedValues="SelectedTags" 
+                           SelectedValuesChanged="@((IReadOnlyCollection<string>? values) => { SelectedTags = values ?? new HashSet<string>(); OnFiltersChanged.InvokeAsync(); })" Class="mt-2">
+                    <MudChip Text="Open" Value="@("Open")" Size="Size.Small" />
+                    <MudChip Text="Barre" Value="@("Barre")" Size="Size.Small" />
+                    <MudChip Text="Common" Value="@("Common")" Size="Size.Small" />
+                </MudChipSet>
+            </MudItem>
+        </MudGrid>
+    </MudCollapse>
+</MudPaper>
+
+@code {
+    [Parameter] public string SearchText { get; set; } = "";
+    [Parameter] public EventCallback<string> SearchTextChanged { get; set; }
+    [Parameter] public bool ShowFilters { get; set; }
+    [Parameter] public EventCallback<bool> ShowFiltersChanged { get; set; }
+    [Parameter] public bool ShowProgression { get; set; }
+    [Parameter] public EventCallback<bool> ShowProgressionChanged { get; set; }
+    [Parameter] public string SelectedRoot { get; set; } = "";
+    [Parameter] public EventCallback<string> SelectedRootChanged { get; set; }
+    [Parameter] public string SelectedType { get; set; } = "";
+    [Parameter] public EventCallback<string> SelectedTypeChanged { get; set; }
+    [Parameter] public string SelectedDifficulty { get; set; } = "";
+    [Parameter] public EventCallback<string> SelectedDifficultyChanged { get; set; }
+    [Parameter] public IReadOnlyCollection<string> SelectedTags { get; set; } = new HashSet<string>();
+    [Parameter] public EventCallback<IReadOnlyCollection<string>> SelectedTagsChanged { get; set; }
+    [Parameter] public EventCallback OnFiltersChanged { get; set; }
+    [Parameter] public List<string> AvailableChordNames { get; set; } = new();
+    [Parameter] public List<string> RecentSearches { get; set; } = new();
+
+    private Task<IEnumerable<string>> SearchChords(string value, CancellationToken token)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            // Show recent searches when input is empty
+            var results = RecentSearches.Take(5).Concat(new[] { "----" }).Concat(AvailableChordNames.Take(5));
+            return Task.FromResult(results);
+        }
+
+        // Filter chord names based on search
+        var filtered = AvailableChordNames
+            .Where(name => name.Contains(value, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        // Include recent searches that match
+        var recentMatches = RecentSearches
+            .Where(s => s.Contains(value, StringComparison.OrdinalIgnoreCase) && !filtered.Contains(s))
+            .Take(3);
+
+        var results2 = recentMatches.Concat(filtered).Take(10);
+        return Task.FromResult(results2);
+    }
+
+    private async Task OnSearchValueChanged(string value)
+    {
+        SearchText = value ?? "";
+        await SearchTextChanged.InvokeAsync(SearchText);
+        await OnFiltersChanged.InvokeAsync();
+    }
+}

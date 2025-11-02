@@ -1,0 +1,22 @@
+[package]
+name = "guitar-audio-synth"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+web-sys = { version = "0.3", features = ["AudioWorkletProcessor", "AudioWorkletGlobalScope", "MessageEvent", "MessagePort"] }
+js-sys = "0.3"
+
+[dependencies.wasm-bindgen-futures]
+version = "0.4"
+
+[profile.release]
+opt-level = "z"
+lto = true
+
+[package.metadata.wasm-pack]
+"wasm-opt" = ["-Oz", "--enable-simd"]

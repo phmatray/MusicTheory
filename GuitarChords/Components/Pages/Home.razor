@@ -1,0 +1,133 @@
+@page "/"
+@using GuitarChords.Services
+@using GuitarChords.Models
+@inject GuitarChordService ChordService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Guitar Chords Dictionary</PageTitle>
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h2" Align="Align.Center" Class="mb-4">
+            Guitar Chords Dictionary
+        </MudText>
+        <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-6" Color="Color.Secondary">
+            Powered by MusicTheory Library
+        </MudText>
+    </MudItem>
+</MudGrid>
+
+<MudGrid>
+    <MudItem xs="12" md="6">
+        <MudCard>
+            <MudCardContent>
+                <MudIcon Icon="@Icons.Material.Filled.MusicNote" Size="Size.Large" Color="Color.Primary" />
+                <MudText Typo="Typo.h5" Class="mt-2">Explore Chords</MudText>
+                <MudText Typo="Typo.body2" Class="mt-2">
+                    Browse our comprehensive collection of guitar chords with interactive diagrams.
+                    Learn fingerings, positions, and variations for all common chords.
+                </MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NavigateToChords">
+                    Explore Chords
+                </MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+    
+    <MudItem xs="12" md="6">
+        <MudCard>
+            <MudCardContent>
+                <MudIcon Icon="@Icons.Material.Filled.School" Size="Size.Large" Color="Color.Secondary" />
+                <MudText Typo="Typo.h5" Class="mt-2">Learn Music Theory</MudText>
+                <MudText Typo="Typo.body2" Class="mt-2">
+                    Understand the theory behind chords. Learn about intervals, scales, and how chords are constructed
+                    using the comprehensive MusicTheory library.
+                </MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Disabled="true">
+                    Coming Soon
+                </MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+<MudDivider Class="my-6" />
+
+<MudText Typo="Typo.h4" Class="mb-4">Featured Chords</MudText>
+
+<MudGrid>
+    @foreach (var chord in featuredChords)
+    {
+        <MudItem xs="6" sm="4" md="3" lg="2">
+            <div @onclick="() => NavigateToChordDetail(chord)" style="cursor: pointer;">
+                <ChordDiagram Chord="chord" Width="180" Height="220" />
+            </div>
+        </MudItem>
+    }
+</MudGrid>
+
+<MudDivider Class="my-6" />
+
+<MudGrid>
+    <MudItem xs="12" md="4">
+        <MudPaper Class="pa-4" Elevation="2">
+            <MudIcon Icon="@Icons.Material.Filled.TouchApp" Size="Size.Large" Color="Color.Info" />
+            <MudText Typo="Typo.h6" Class="mt-2">Interactive Diagrams</MudText>
+            <MudText Typo="Typo.body2">
+                Click on any chord diagram to see detailed fingering information and hear how it sounds.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+    
+    <MudItem xs="12" md="4">
+        <MudPaper Class="pa-4" Elevation="2">
+            <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Large" Color="Color.Success" />
+            <MudText Typo="Typo.h6" Class="mt-2">Search & Filter</MudText>
+            <MudText Typo="Typo.body2">
+                Find chords by root note, type, or difficulty. Filter results to match your skill level.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+    
+    <MudItem xs="12" md="4">
+        <MudPaper Class="pa-4" Elevation="2">
+            <MudIcon Icon="@Icons.Material.Filled.QueueMusic" Size="Size.Large" Color="Color.Warning" />
+            <MudText Typo="Typo.h6" Class="mt-2">Chord Progressions</MudText>
+            <MudText Typo="Typo.body2">
+                Learn common chord progressions and how to transition smoothly between chords.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private List<GuitarChord> featuredChords = new();
+
+    protected override void OnInitialized()
+    {
+        // Get some featured chords to display
+        var chordSymbols = new[] { "C", "G", "Am", "F", "D", "Em" };
+        foreach (var symbol in chordSymbols)
+        {
+            var chord = ChordService.GetChord(symbol);
+            if (chord != null)
+            {
+                featuredChords.Add(chord);
+            }
+        }
+    }
+
+    private void NavigateToChords()
+    {
+        NavigationManager.NavigateTo("/chords");
+    }
+
+    private void NavigateToChordDetail(GuitarChord chord)
+    {
+        NavigationManager.NavigateTo($"/chords?chord={chord.Name}");
+    }
+}

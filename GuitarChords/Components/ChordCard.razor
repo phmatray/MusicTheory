@@ -1,0 +1,66 @@
+@using GuitarChords.Models
+@using GuitarChords.Services
+@inject GuitarAudioService AudioService
+
+<div class="chord-container" @onclick="() => OnClick.InvokeAsync(Chord)">
+    <div class="chord-header">
+        <MudText Typo="Typo.h6" Class="chord-name">@Chord.Name</MudText>
+        <div class="chord-actions">
+            <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" 
+                         Color="Color.Primary" 
+                         Size="Size.Small"
+                         Tooltip="Play chord"
+                         OnClick="@(async (e) => await PlayChord(e))" />
+            @if (ShowProgressionButton)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Add" 
+                             Color="Color.Primary" 
+                             Size="Size.Small"
+                             OnClick="@(async (e) => await OnAddToProgressionHandler(e))" />
+            }
+            <MudIconButton Icon="@(IsFavorite ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)" 
+                         Color="@(IsFavorite ? Color.Error : Color.Default)"
+                         Size="Size.Small"
+                         OnClick="@(async (e) => await OnToggleFavoriteHandler(e))" />
+        </div>
+    </div>
+    <ChordDiagram Chord="Chord" Width="200" Height="240" />
+    <MudChip T="string" Text="@Difficulty" Size="Size.Small" Color="@DifficultyColor" Class="difficulty-chip" />
+</div>
+
+@code {
+    [Parameter] public GuitarChord Chord { get; set; } = null!;
+    [Parameter] public bool ShowProgressionButton { get; set; }
+    [Parameter] public bool IsFavorite { get; set; }
+    [Parameter] public string Difficulty { get; set; } = "Beginner";
+    [Parameter] public Color DifficultyColor { get; set; } = Color.Success;
+    [Parameter] public EventCallback<GuitarChord> OnClick { get; set; }
+    [Parameter] public EventCallback<GuitarChord> OnAddToProgression { get; set; }
+    [Parameter] public EventCallback<GuitarChord> OnToggleFavorite { get; set; }
+
+    private async Task PlayChord(MouseEventArgs e)
+    {
+        try
+        {
+            Console.WriteLine($"Playing chord: {Chord.Name}");
+            Console.WriteLine($"Fret positions: {string.Join(", ", Chord.FretPositions)}");
+            
+            await AudioService.PlayChordAsync(Chord);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error playing chord: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        }
+    }
+
+    private async Task OnAddToProgressionHandler(MouseEventArgs e)
+    {
+        await OnAddToProgression.InvokeAsync(Chord);
+    }
+
+    private async Task OnToggleFavoriteHandler(MouseEventArgs e)
+    {
+        await OnToggleFavorite.InvokeAsync(Chord);
+    }
+}

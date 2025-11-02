@@ -1,0 +1,196 @@
+@using GuitarChords.Models
+
+<div class="chord-diagram">
+    <svg width="@Width" height="@Height" viewBox="0 0 @Width @Height" class="chord-svg">
+            <!-- Definitions for gradients and filters -->
+            <defs>
+                <linearGradient id="fretboard-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#A0522D;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#8B4513;stop-opacity:1" />
+                </linearGradient>
+                <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                    <feOffset dx="1" dy="1" result="offsetblur"/>
+                    <feComponentTransfer>
+                        <feFuncA type="linear" slope="0.3"/>
+                    </feComponentTransfer>
+                    <feMerge>
+                        <feMergeNode/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+                <radialGradient id="dot-gradient">
+                    <stop offset="0%" style="stop-color:#333;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#000;stop-opacity:1" />
+                </radialGradient>
+            </defs>
+            
+            <!-- Fretboard -->
+            <rect x="@(FretboardX - 10)" y="@FretboardY" width="@(FretboardWidth + 20)" height="@FretboardHeight" 
+                  fill="url(#fretboard-gradient)" stroke="#654321" stroke-width="2" rx="4" ry="4"/>
+            
+            <!-- Fret markers (dots) -->
+            @if (Chord.BaseFret <= 3 && Chord.BaseFret + VisibleFrets >= 3)
+            {
+                var dotFret = 3 - Chord.BaseFret;
+                if (dotFret > 0 && dotFret <= VisibleFrets)
+                {
+                    var dotY = FretboardY + ((Chord.BaseFret == 0 ? dotFret - 1 : dotFret) * FretHeight) + (FretHeight / 2);
+                    <circle cx="@(FretboardX + FretboardWidth / 2)" cy="@dotY" r="6" fill="#E6D7C3" opacity="0.6"/>
+                }
+            }
+            @if (Chord.BaseFret <= 5 && Chord.BaseFret + VisibleFrets >= 5)
+            {
+                var dotFret = 5 - Chord.BaseFret;
+                if (dotFret > 0 && dotFret <= VisibleFrets)
+                {
+                    var dotY = FretboardY + ((Chord.BaseFret == 0 ? dotFret - 1 : dotFret) * FretHeight) + (FretHeight / 2);
+                    <circle cx="@(FretboardX + FretboardWidth / 2)" cy="@dotY" r="6" fill="#E6D7C3" opacity="0.6"/>
+                }
+            }
+            
+            <!-- Nut (only visible when showing from first fret) -->
+            @if (Chord.BaseFret == 0)
+            {
+                <rect x="@(FretboardX - 10)" y="@(FretboardY - 6)" width="@(FretboardWidth + 20)" height="6" 
+                      fill="#E8D4B0" stroke="#666" stroke-width="0.5" class="guitar-nut"/>
+            }
+            
+            <!-- Frets -->
+            @for (int fret = 0; fret <= VisibleFrets; fret++)
+            {
+                var y = FretboardY + (fret * FretHeight);
+                <line x1="@(FretboardX - 10)" y1="@y" x2="@(FretboardX + FretboardWidth + 10)" y2="@y" 
+                      stroke="#C0C0C0" stroke-width="2"/>
+            }
+            
+            <!-- Strings (reversed order - low E on left, high E on right) -->
+            @for (int str = 0; str < 6; str++)
+            {
+                var x = FretboardX + (str * StringSpacing);
+                // More realistic string thickness progression
+                string thickness = str switch
+                {
+                    0 => "5.0",  // Low E (6th string) - wound
+                    1 => "4.2",  // A (5th string) - wound
+                    2 => "3.4",  // D (4th string) - wound
+                    3 => "2.2",  // G (3rd string) - wound or plain
+                    4 => "1.6",  // B (2nd string) - plain
+                    5 => "1.2",  // High E (1st string) - plain
+                    _ => "2.0"
+                };
+                // Wound strings are darker
+                var color = str <= 2 ? "#999" : "#C0C0C0";
+                <line x1="@x" y1="@FretboardY" x2="@x" y2="@(FretboardY + FretboardHeight)" 
+                      stroke="@color" stroke-width="@thickness" class="guitar-string"/>
+            }
+            
+            <!-- String labels (corrected order) -->
+            @for (int str = 0; str < 6; str++)
+            {
+                var x = FretboardX + (str * StringSpacing);
+                var note = GuitarTuning.StandardTuning[str]; // Direct order - no reversal
+                var noteText = note.Name.ToString() + (note.Alteration == Alteration.Sharp ? "♯" : (note.Alteration == Alteration.Flat ? "♭" : ""));
+                <g>
+                    <text x="@x" y="@(Height - 5)" style="text-anchor: middle; font-size: 14px; font-weight: bold; fill: #333" class="string-label">@noteText</text>
+                </g>
+            }
+            
+            <!-- Fret numbers (if not starting from the first fret) -->
+            @if (Chord.BaseFret > 0)
+            {
+                var fretText = Chord.BaseFret.ToString();
+                <g>
+                    <text x="@(FretboardX - 25)" y="@(FretboardY + FretHeight / 2 + 5)" style="text-anchor: middle; font-size: 16px; font-weight: bold; fill: #333">@fretText</text>
+                    <text x="@(FretboardX - 25)" y="@(FretboardY + FretHeight / 2 + 20)" style="text-anchor: middle; font-size: 12px; fill: #666">fr</text>
+                </g>
+            }
+            
+            <!-- Finger positions (corrected order) -->
+            @for (int str = 0; str < 6; str++)
+            {
+                var fret = Chord.FretPositions[str]; // Direct order - no reversal
+                var x = FretboardX + (str * StringSpacing);
+                var stringNote = GuitarTuning.StandardTuning[str];
+                
+                if (fret == -1)
+                {
+                    // Muted string (X)
+                    <g class="muted-string">
+                        <line x1="@(x - 7)" y1="@(FretboardY - 26)" x2="@(x + 7)" y2="@(FretboardY - 12)" 
+                              stroke="#D32F2F" stroke-width="2.5" stroke-linecap="round"/>
+                        <line x1="@(x - 7)" y1="@(FretboardY - 12)" x2="@(x + 7)" y2="@(FretboardY - 26)" 
+                              stroke="#D32F2F" stroke-width="2.5" stroke-linecap="round"/>
+                    </g>
+                }
+                else if (fret == 0)
+                {
+                    // Open string (O)
+                    <g class="open-string">
+                        <circle cx="@x" cy="@(FretboardY - 19)" r="9" 
+                                fill="none" stroke="#4CAF50" stroke-width="2"/>
+                        @{
+                            var openNote = stringNote;
+                            var noteTooltip = $"{openNote.Name}{(openNote.Alteration == Alteration.Sharp ? "♯" : (openNote.Alteration == Alteration.Flat ? "♭" : ""))}";
+                        }
+                        <title>@noteTooltip</title>
+                    </g>
+                }
+                else
+                {
+                    // Fretted note
+                    var displayFret = fret - Chord.BaseFret;
+                    if (displayFret >= 0 && displayFret < VisibleFrets)
+                    {
+                        var y = FretboardY + ((Chord.BaseFret == 0 ? displayFret - 1 : displayFret) * FretHeight) + (FretHeight / 2);
+                        var finger = Chord.Fingerings[str];
+                        
+                        var frettedNote = GuitarTuning.GetNoteAtFret(str, fret);
+                        var noteTooltip = $"{frettedNote.Name}{(frettedNote.Alteration == Alteration.Sharp ? "♯" : (frettedNote.Alteration == Alteration.Flat ? "♭" : ""))}";
+                        
+                        <g class="finger-position">
+                            <circle cx="@x" cy="@y" r="12" fill="url(#dot-gradient)" filter="url(#shadow)"/>
+                            
+                            @if (finger > 0)
+                            {
+                                <g>
+                                    <text x="@x" y="@(y + 5)" style="text-anchor: middle; font-size: 14px; fill: #FFF; font-weight: bold">@finger</text>
+                                </g>
+                            }
+                            <title>@noteTooltip (Finger @(finger > 0 ? finger.ToString() : "N/A"))</title>
+                        </g>
+                    }
+                }
+            }
+            
+            <!-- Barre indication (corrected for new string order) -->
+            @if (Chord is { IsBarreChord: true, BarreFret: not null, BarredStrings.Count: > 1 })
+            {
+                var minString = Chord.BarredStrings.Min();
+                var maxString = Chord.BarredStrings.Max();
+                var x1 = FretboardX + (minString * StringSpacing);
+                var x2 = FretboardX + (maxString * StringSpacing);
+                var barreFret = Chord.BarreFret.Value - Chord.BaseFret;
+                if (barreFret >= 0 && barreFret < VisibleFrets)
+                {
+                    var y = FretboardY + ((Chord.BaseFret == 0 ? barreFret - 1 : barreFret) * FretHeight) + (FretHeight / 2);
+                    <rect x="@(x1 - 12)" y="@(y - 12)" width="@(x2 - x1 + 24)" height="24" 
+                          rx="12" ry="12" fill="url(#dot-gradient)" opacity="0.9" filter="url(#shadow)"/>
+                }
+            }
+        </svg>
+</div>
+
+@code {
+    [Parameter] public GuitarChord Chord { get; set; } = null!;
+    [Parameter] public int Width { get; set; } = 200;
+    [Parameter] public int Height { get; set; } = 250;
+    
+    private int FretboardX => 30;
+    private int FretboardY => 40;
+    private int FretboardWidth => Width - 60;
+    private int FretboardHeight => Height - 80;
+    private int StringSpacing => FretboardWidth / 5; // 5 spaces between 6 strings
+    private int VisibleFrets => 4;
+    private int FretHeight => FretboardHeight / VisibleFrets;
+}

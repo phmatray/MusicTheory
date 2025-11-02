@@ -10,26 +10,32 @@ MusicTheory is a powerful .NET library that models music theory concepts as code
 
 <tabs>
     <tab title="Core Components">
-        - **Notes**: Create and manipulate musical notes with support for all alterations
-        - **Intervals**: Calculate musical intervals with proper quality handling
-        - **Scales**: Generate scales with 15+ scale types including modal and exotic scales
-        - **Chords**: Build chords with 40+ types including triads, seventh chords, extended, altered, and suspended chords
-        - **Key Signatures**: Handle key signatures with circle of fifths navigation
+        <list>
+            <li><p><control>Notes</control>: Create and manipulate musical notes with support for all alterations</p></li>
+            <li><p><control>Intervals</control>: Calculate musical intervals with proper quality handling</p></li>
+            <li><p><control>Scales</control>: Generate scales with 15+ scale types including modal and exotic scales</p></li>
+            <li><p><control>Chords</control>: Build chords with 40+ types including triads, seventh chords, extended, altered, and suspended chords</p></li>
+            <li><p><control>Key Signatures</control>: Handle key signatures with circle of fifths navigation</p></li>
+        </list>
     </tab>
     <tab title="Advanced Features">
-        - **Transposition**: Transpose notes, chords, and scales by intervals
-        - **Chord Progressions**: Roman numeral analysis and common progressions
-        - **MIDI Integration**: Convert between notes and MIDI numbers
-        - **Enharmonic Equivalence**: Handle enharmonic relationships (C# ↔ Db)
-        - **Time & Rhythm**: Time signatures and note duration calculations
-    </tab>
+        <list>
+            <li><p><control>Transposition</control>: Transpose notes, chords, and scales by intervals</p></li>
+            <li><p><control>Chord Progressions</control>: Roman numeral analysis and common progressions</p></li>
+            <li><p><control>MIDI Integration</control>: Convert between notes and MIDI numbers</p></li>
+            <li><p><control>Enharmonic Equivalence</control>: Handle enharmonic relationships (C# ↔ Db)</p></li>
+            <li><p><control>Time &amp; Rhythm</control>: Time signatures and note duration calculations</p></li>
+        </list>
+     </tab>
     <tab title="Design Principles">
-        - **Immutable Objects**: Thread-safe, predictable behavior
-        - **Fluent API**: Chainable method calls for readable code
-        - **Type Safety**: Strong typing prevents invalid music theory constructs
-        - **Performance**: Lazy evaluation and calculated properties
-        - **Comprehensive Testing**: 479+ unit tests ensure reliability
-    </tab>
+        <list>
+            <li><p><control>Immutable Objects</control>: Thread-safe, predictable behavior</p></li>
+            <li><p><control>Fluent API</control>: Chainable method calls for readable code</p></li>
+            <li><p><control>Type Safety</control>: Strong typing prevents invalid music theory constructs</p></li>
+            <li><p><control>Performance</control>: Lazy evaluation and calculated properties</p></li>
+            <li><p><control>Comprehensive Testing</control>: 479+ unit tests ensure reliability</p></li>
+        </list>
+     </tab>
 </tabs>
 
 ## Quick Example

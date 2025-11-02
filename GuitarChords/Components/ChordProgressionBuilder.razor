@@ -1,0 +1,110 @@
+@using GuitarChords.Models
+
+<MudPaper Class="pa-4 mb-4" Elevation="2">
+    <MudGrid>
+        <MudItem xs="12" md="8">
+            <MudText Typo="Typo.h6" Class="mb-3">
+                <MudIcon Icon="@Icons.Material.Filled.QueueMusic" Class="mr-2" />
+                Chord Progression Builder
+            </MudText>
+        </MudItem>
+        <MudItem xs="12" md="4" Class="text-right">
+            <MudButtonGroup Variant="Variant.Text" Size="Size.Small">
+                <MudButton StartIcon="@Icons.Material.Filled.LibraryMusic" 
+                          Color="Color.Secondary"
+                          OnClick="OnShowTemplates">
+                    Templates
+                </MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.History" 
+                          Color="Color.Secondary"
+                          OnClick="OnShowSavedProgressions">
+                    Saved
+                </MudButton>
+            </MudButtonGroup>
+        </MudItem>
+        <MudItem xs="12">
+            @if (Chords.Any())
+            {
+                <div class="progression-container">
+                    @for (int i = 0; i < Chords.Count; i++)
+                    {
+                        var index = i;
+                        var chord = Chords[i];
+                        <div class="progression-chord @(CurrentChordIndex == index && IsPlaying ? "playing" : "")">
+                            <MudChip T="string"
+                                    Text="@chord.Name"
+                                    OnClose="() => OnRemoveChord.InvokeAsync(chord)"
+                                    Color="@(CurrentChordIndex == index && IsPlaying ? Color.Success : Color.Primary)"
+                                    Variant="@(CurrentChordIndex == index && IsPlaying ? Variant.Filled : Variant.Outlined)" />
+                            @if (i < Chords.Count - 1)
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Color="Color.Secondary" Size="Size.Small" />
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Click on chords below to add them to your progression, or load a template
+                </MudText>
+            }
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudButtonGroup Variant="Variant.Text" Size="Size.Small">
+                <MudButton StartIcon="@(IsPlaying ? Icons.Material.Filled.Stop : Icons.Material.Filled.PlayArrow)" 
+                          Color="@(IsPlaying ? Color.Warning : Color.Success)" 
+                          Disabled="@(!Chords.Any())"
+                          OnClick="OnTogglePlayback">
+                    @(IsPlaying ? "Stop" : "Play")
+                </MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Clear" 
+                          Color="Color.Error"
+                          OnClick="OnClearProgression"
+                          Disabled="@(!Chords.Any() || IsPlaying)">
+                    Clear
+                </MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Save" 
+                          Color="Color.Info"
+                          Disabled="@(!Chords.Any() || IsPlaying)"
+                          OnClick="OnSaveProgression">
+                    Save
+                </MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Share" 
+                          Color="Color.Secondary"
+                          Disabled="@(!Chords.Any())"
+                          OnClick="OnExportProgression">
+                    Export
+                </MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Shuffle" 
+                          Color="Color.Secondary"
+                          Disabled="@(Chords.Count < 2 || IsPlaying)"
+                          OnClick="OnShuffleProgression">
+                    Shuffle
+                </MudButton>
+            </MudButtonGroup>
+        </MudItem>
+        <MudItem xs="12" md="6" Class="text-right">
+            <MudSlider T="int" @bind-Value="Tempo" Min="60" Max="200" Step="10" Color="Color.Primary">
+                Tempo: @Tempo BPM
+            </MudSlider>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@code {
+    [Parameter] public List<GuitarChord> Chords { get; set; } = new();
+    [Parameter] public int Tempo { get; set; } = 120;
+    [Parameter] public EventCallback<int> TempoChanged { get; set; }
+    [Parameter] public bool IsPlaying { get; set; }
+    [Parameter] public int CurrentChordIndex { get; set; } = -1;
+    [Parameter] public EventCallback OnTogglePlayback { get; set; }
+    [Parameter] public EventCallback OnClearProgression { get; set; }
+    [Parameter] public EventCallback OnSaveProgression { get; set; }
+    [Parameter] public EventCallback OnShuffleProgression { get; set; }
+    [Parameter] public EventCallback OnExportProgression { get; set; }
+    [Parameter] public EventCallback OnShowTemplates { get; set; }
+    [Parameter] public EventCallback OnShowSavedProgressions { get; set; }
+    [Parameter] public EventCallback<GuitarChord> OnRemoveChord { get; set; }
+}

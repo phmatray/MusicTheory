@@ -1,45 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    
     <!-- Package Information -->
     <PackageId>MusicTheory</PackageId>
     <Version>1.0.0</Version>
-    <Authors>phmatray</Authors>
-    <Company>phmatray</Company>
     <Product>MusicTheory</Product>
     <Description>A comprehensive .NET library for music theory operations including notes, intervals, scales, chords, and chord progressions. Provides immutable domain objects with calculated properties for frequency, semitones, and musical relationships.</Description>
-    <Copyright>Copyright © 2025 phmatray</Copyright>
-    <PackageProjectUrl>https://github.com/phmatray/MusicTheory</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/phmatray/MusicTheory</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
     <PackageTags>music;theory;notes;scales;chords;intervals;music-theory;dotnet;csharp</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReleaseNotes>Initial release with core music theory concepts: Note, Interval, Scale, Chord, TimeSignature, and Duration.</PackageReleaseNotes>
-    
+
     <!-- Build Configuration -->
+    <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <Deterministic>true</Deterministic>
-    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\icon.png" Pack="true" PackagePath="" />
     <None Include="..\README.md" Pack="true" PackagePath="" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

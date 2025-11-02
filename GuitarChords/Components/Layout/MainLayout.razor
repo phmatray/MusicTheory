@@ -1,0 +1,49 @@
+@inherits LayoutComponentBase
+
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle" />
+        <MudText Typo="Typo.h5" Class="ml-3">Guitar Chords Dictionary</MudText>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" Edge="Edge.End" OnClick="ShowSettings" />
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">Navigation</MudText>
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+            <MudNavLink Href="/chords" Icon="@Icons.Material.Filled.MusicNote">Explore Chords</MudNavLink>
+            <MudNavLink Href="/progressions" Icon="@Icons.Material.Filled.Queue">Chord Progressions</MudNavLink>
+            <MudNavLink Href="/tunings" Icon="@Icons.Material.Filled.Tune">Guitar Tunings</MudNavLink>
+            <MudNavLink Href="/audio-test" Icon="@Icons.Material.Filled.VolumeUp">Audio Test</MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-4 pt-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+<UserSettings @bind-IsVisible="_showSettings" />
+
+@code {
+    private bool _drawerOpen = true;
+    private bool _showSettings;
+
+    private void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+    
+    private void ShowSettings()
+    {
+        _showSettings = true;
+    }
+}
