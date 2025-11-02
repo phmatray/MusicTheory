@@ -1,4 +1,3 @@
-using GuitarChords.Models;
 using System.Text.Json;
 
 namespace GuitarChords.Services;

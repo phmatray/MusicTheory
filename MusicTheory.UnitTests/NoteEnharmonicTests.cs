@@ -108,7 +108,7 @@ public class NoteEnharmonicTests
         
         // Assert
         equivalent.ShouldNotBeNull();
-        equivalent!.Name.ShouldBe(expectedName);
+        equivalent.Name.ShouldBe(expectedName);
         equivalent.Alteration.ShouldBe(expectedAlteration);
     }
 
