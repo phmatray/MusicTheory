@@ -40,7 +40,19 @@ public enum ScaleType
     /// <summary>Major pentatonic scale (1-2-3-5-6)</summary>
     PentatonicMajor,
     /// <summary>Minor pentatonic scale (1-b3-4-5-b7)</summary>
-    PentatonicMinor
+    PentatonicMinor,
+
+    // Jazz scales
+    /// <summary>Diminished scale starting with whole step (W-H-W-H-W-H-W-H)</summary>
+    DiminishedWholeHalf,
+    /// <summary>Diminished scale starting with half step (H-W-H-W-H-W-H-W)</summary>
+    DiminishedHalfWhole,
+    /// <summary>Altered scale / Super Locrian (H-W-H-W-W-W-W) - 7th mode of melodic minor</summary>
+    Altered,
+    /// <summary>Lydian dominant scale (W-W-W-H-W-H-W) - 4th mode of melodic minor</summary>
+    LydianDominant,
+    /// <summary>Locrian #2 scale (W-H-W-H-W-W-W) - 6th mode of melodic minor</summary>
+    LocrianSharp2
 }
 
 /// <summary>
@@ -88,6 +100,9 @@ public class Scale
                 return GetPentatonicMajorNotes();
             case ScaleType.PentatonicMinor:
                 return GetPentatonicMinorNotes();
+            case ScaleType.DiminishedWholeHalf:
+            case ScaleType.DiminishedHalfWhole:
+                return GetDiminishedNotes();
             default:
                 return GetDiatonicNotes();
         }
@@ -169,22 +184,39 @@ public class Scale
     private IEnumerable<Note> GetPentatonicMinorNotes()
     {
         yield return Root; // 1
-        
+
         // b3 - minor third
         var minorThird = Root.Transpose(new Interval(IntervalQuality.Minor, 3));
         yield return minorThird;
-        
+
         // 4 - perfect fourth
         var fourth = Root.Transpose(new Interval(IntervalQuality.Perfect, 4));
         yield return fourth;
-        
+
         // 5 - perfect fifth
         var fifth = Root.Transpose(new Interval(IntervalQuality.Perfect, 5));
         yield return fifth;
-        
+
         // b7 - minor seventh
         var minorSeventh = Root.Transpose(new Interval(IntervalQuality.Minor, 7));
         yield return minorSeventh;
+    }
+
+    private IEnumerable<Note> GetDiminishedNotes()
+    {
+        // Diminished scale is 8 notes (octatonic)
+        var currentNote = Root;
+        yield return currentNote;
+
+        // Determine step pattern based on scale type
+        var startWithWhole = Type == ScaleType.DiminishedWholeHalf;
+
+        for (int i = 0; i < 7; i++)
+        {
+            var step = (i % 2 == 0) == startWithWhole ? 2 : 1;
+            currentNote = currentNote.TransposeBySemitones(step);
+            yield return currentNote;
+        }
     }
 
     /// <summary>
@@ -237,6 +269,21 @@ public class Scale
             ScaleType.Locrian =>
             [
                 IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole,
+                IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole
+            ],
+            ScaleType.Altered =>
+            [
+                IntervalStep.Half, IntervalStep.Whole, IntervalStep.Half,
+                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole
+            ],
+            ScaleType.LydianDominant =>
+            [
+                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole,
+                IntervalStep.Half, IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole
+            ],
+            ScaleType.LocrianSharp2 =>
+            [
+                IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole,
                 IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole
             ],
             _ => throw new ArgumentOutOfRangeException()
