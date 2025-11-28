@@ -1,47 +1,127 @@
 @inherits LayoutComponentBase
 
-<MudThemeProvider />
+<MudThemeProvider @ref="_mudThemeProvider" @bind-IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
+<!-- Skip Navigation Link for accessibility -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- Live region for screen reader announcements -->
+<div id="aria-live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle" />
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       OnClick="@DrawerToggle"
+                       aria-label="Toggle navigation menu"
+                       Class="d-sm-none d-md-flex" />
         <MudText Typo="Typo.h5" Class="ml-3">Guitar Chords Dictionary</MudText>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" Edge="Edge.End" OnClick="ShowSettings" />
+        <MudIconButton Icon="@(_isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+                       Color="Color.Inherit"
+                       OnClick="ToggleDarkMode"
+                       aria-label="@(_isDarkMode ? "Switch to light mode" : "Switch to dark mode")" />
+        <MudIconButton Icon="@Icons.Material.Filled.Settings"
+                       Color="Color.Inherit"
+                       Edge="Edge.End"
+                       OnClick="ShowSettings"
+                       aria-label="Open settings" />
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+
+    <!-- Desktop/Tablet Drawer Navigation -->
+    <MudDrawer @bind-Open="_drawerOpen"
+               ClipMode="DrawerClipMode.Always"
+               Elevation="2"
+               Variant="DrawerVariant.Mini"
+               OpenMiniOnHover="true"
+               Class="d-none d-md-flex">
         <MudDrawerHeader>
             <MudText Typo="Typo.h6">Navigation</MudText>
         </MudDrawerHeader>
         <MudNavMenu>
             <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+            <MudNavLink Href="/learn" Icon="@Icons.Material.Filled.School">Learn</MudNavLink>
             <MudNavLink Href="/chords" Icon="@Icons.Material.Filled.MusicNote">Explore Chords</MudNavLink>
+            <MudNavLink Href="/theory" Icon="@Icons.Material.Filled.AutoGraph">Circle of Fifths</MudNavLink>
             <MudNavLink Href="/progressions" Icon="@Icons.Material.Filled.Queue">Chord Progressions</MudNavLink>
             <MudNavLink Href="/tunings" Icon="@Icons.Material.Filled.Tune">Guitar Tunings</MudNavLink>
             <MudNavLink Href="/audio-test" Icon="@Icons.Material.Filled.VolumeUp">Audio Test</MudNavLink>
         </MudNavMenu>
     </MudDrawer>
+
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Large" Class="my-4 pt-4">
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-4 pt-4 main-content-container" id="main-content" tabindex="-1">
             @Body
         </MudContainer>
     </MudMainContent>
+
+    <!-- Mobile Bottom Navigation (shown via CSS on small screens) -->
+    <MudPaper Class="mobile-bottom-nav d-flex d-md-none" Elevation="4">
+        <MudNavMenu Class="d-flex justify-center flex-grow-1">
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home" Class="mobile-nav-item">
+                <span class="mobile-nav-label">Home</span>
+            </MudNavLink>
+            <MudNavLink Href="/chords" Icon="@Icons.Material.Filled.MusicNote" Class="mobile-nav-item">
+                <span class="mobile-nav-label">Chords</span>
+            </MudNavLink>
+            <MudNavLink Href="/theory" Icon="@Icons.Material.Filled.AutoGraph" Class="mobile-nav-item">
+                <span class="mobile-nav-label">Theory</span>
+            </MudNavLink>
+            <MudNavLink Href="/progressions" Icon="@Icons.Material.Filled.Queue" Class="mobile-nav-item">
+                <span class="mobile-nav-label">Build</span>
+            </MudNavLink>
+        </MudNavMenu>
+    </MudPaper>
 </MudLayout>
 
 <UserSettings @bind-IsVisible="_showSettings" />
 
 @code {
+    private MudThemeProvider _mudThemeProvider = null!;
     private bool _drawerOpen = true;
     private bool _showSettings;
+    private bool _isDarkMode;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Check system dark mode preference
+            try
+            {
+#pragma warning disable CS0618 // MudBlazor methods marked obsolete but new versions may not be available
+                _isDarkMode = await _mudThemeProvider.GetSystemPreference();
+                await _mudThemeProvider.WatchSystemPreference(OnSystemPreferenceChanged);
+#pragma warning restore CS0618
+                StateHasChanged();
+            }
+            catch
+            {
+                // During prerendering, this may fail
+            }
+        }
+    }
+
+    private async Task OnSystemPreferenceChanged(bool newValue)
+    {
+        _isDarkMode = newValue;
+        await InvokeAsync(StateHasChanged);
+    }
 
     private void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
     }
-    
+
+    private void ToggleDarkMode()
+    {
+        _isDarkMode = !_isDarkMode;
+    }
+
     private void ShowSettings()
     {
         _showSettings = true;

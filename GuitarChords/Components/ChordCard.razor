@@ -2,31 +2,56 @@
 @using GuitarChords.Services
 @inject GuitarAudioService AudioService
 
-<div class="chord-container" @onclick="() => OnClick.InvokeAsync(Chord)">
+<article class="chord-container"
+         @onclick="HandleCardClick"
+         @onkeydown="HandleKeyDown"
+         tabindex="0"
+         role="button"
+         aria-label="@GetAriaLabel()"
+         aria-pressed="@IsFavorite.ToString().ToLower()">
     <div class="chord-header">
         <MudText Typo="Typo.h6" Class="chord-name">@Chord.Name</MudText>
-        <div class="chord-actions">
-            <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" 
-                         Color="Color.Primary" 
-                         Size="Size.Small"
-                         Tooltip="Play chord"
-                         OnClick="@(async (e) => await PlayChord(e))" />
+        <div class="chord-actions" @onclick:stopPropagation="true">
+            <MudTooltip Text="Play chord (Space)">
+                <MudIconButton Icon="@Icons.Material.Filled.PlayArrow"
+                               Color="Color.Primary"
+                               Size="Size.Medium"
+                               aria-label="@($"Play {Chord.Name} chord")"
+                               Class="touch-target"
+                               OnClick="@(async (e) => await PlayChord(e))"/>
+            </MudTooltip>
             @if (ShowProgressionButton)
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Add" 
-                             Color="Color.Primary" 
-                             Size="Size.Small"
-                             OnClick="@(async (e) => await OnAddToProgressionHandler(e))" />
+                <MudTooltip Text="Add to progression (A)">
+                    <MudIconButton Icon="@Icons.Material.Filled.Add"
+                                   Color="Color.Primary"
+                                   Size="Size.Medium"
+                                   aria-label="@($"Add {Chord.Name} to progression")"
+                                   Class="touch-target"
+                                   OnClick="@(async (e) => await OnAddToProgressionHandler(e))"/>
+                </MudTooltip>
             }
-            <MudIconButton Icon="@(IsFavorite ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)" 
-                         Color="@(IsFavorite ? Color.Error : Color.Default)"
-                         Size="Size.Small"
-                         OnClick="@(async (e) => await OnToggleFavoriteHandler(e))" />
+            <MudTooltip Text="@(IsFavorite ? "Remove from favorites (F)" : "Add to favorites (F)")">
+                <MudIconButton Icon="@(IsFavorite ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)"
+                               Color="@(IsFavorite ? Color.Error : Color.Default)"
+                               Size="Size.Medium"
+                               aria-label="@(IsFavorite ? $"Remove {Chord.Name} from favorites" : $"Add {Chord.Name} to favorites")"
+                               aria-pressed="@IsFavorite.ToString().ToLower()"
+                               Class="touch-target"
+                               OnClick="@(async (e) => await OnToggleFavoriteHandler(e))"/>
+            </MudTooltip>
         </div>
     </div>
-    <ChordDiagram Chord="Chord" Width="200" Height="240" />
-    <MudChip T="string" Text="@Difficulty" Size="Size.Small" Color="@DifficultyColor" Class="difficulty-chip" />
-</div>
+    <ChordDiagram Chord="Chord" Responsive="true" MaxWidth="200px" />
+    <div class="difficulty-container">
+        <MudChip T="string" Text="@Difficulty" Size="Size.Small" Color="@DifficultyColor" Class="difficulty-chip">
+            <ChildContent>
+                <span class="difficulty-icon" aria-hidden="true">@GetDifficultyIcon()</span>
+                @Difficulty
+            </ChildContent>
+        </MudChip>
+    </div>
+</article>
 
 @code {
     [Parameter] public GuitarChord Chord { get; set; } = null!;
@@ -44,7 +69,7 @@
         {
             Console.WriteLine($"Playing chord: {Chord.Name}");
             Console.WriteLine($"Fret positions: {string.Join(", ", Chord.FretPositions)}");
-            
+
             await AudioService.PlayChordAsync(Chord);
         }
         catch (Exception ex)
@@ -63,4 +88,74 @@
     {
         await OnToggleFavorite.InvokeAsync(Chord);
     }
+
+    private async Task HandleCardClick(MouseEventArgs e)
+    {
+        await OnClick.InvokeAsync(Chord);
+    }
+
+    /// <summary>
+    /// Handles keyboard navigation and shortcuts for the chord card.
+    /// </summary>
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case "Enter":
+            case " ": // Space
+                if (e.Key == " ")
+                {
+                    // Space plays the chord
+                    await PlayChord(null!);
+                }
+                else
+                {
+                    // Enter opens details
+                    await OnClick.InvokeAsync(Chord);
+                }
+                break;
+            case "f":
+            case "F":
+                // F toggles favorite
+                await OnToggleFavorite.InvokeAsync(Chord);
+                break;
+            case "a":
+            case "A":
+                // A adds to progression (if available)
+                if (ShowProgressionButton)
+                {
+                    await OnAddToProgression.InvokeAsync(Chord);
+                }
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Generates an accessible label for the chord card.
+    /// </summary>
+    private string GetAriaLabel()
+    {
+        var label = $"{Chord.Name} chord, {Difficulty} difficulty";
+        if (IsFavorite)
+        {
+            label += ", favorited";
+        }
+        label += ". Press Enter to view details, Space to play, F to toggle favorite";
+        if (ShowProgressionButton)
+        {
+            label += ", A to add to progression";
+        }
+        return label;
+    }
+
+    /// <summary>
+    /// Returns an icon representing the difficulty level.
+    /// </summary>
+    private string GetDifficultyIcon() => Difficulty switch
+    {
+        "Beginner" => "●",
+        "Intermediate" => "●●",
+        "Advanced" => "●●●",
+        _ => "●"
+    };
 }

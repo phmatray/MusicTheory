@@ -10,8 +10,12 @@ builder.Services.AddRazorComponents()
 // Add MudBlazor services
 builder.Services.AddMudServices();
 
-// Add application services
+// Add application services - Core chord generation
+builder.Services.AddSingleton<GuitarChords.Services.IPlayabilityScorer, GuitarChords.Services.PlayabilityScorer>();
+builder.Services.AddSingleton<GuitarChords.Services.IFingeringGenerator, GuitarChords.Services.FingeringGenerator>();
 builder.Services.AddSingleton<GuitarChords.Services.GuitarChordService>();
+
+// Add application services - Chord features
 builder.Services.AddSingleton<GuitarChords.Services.ChordProgressionService>();
 builder.Services.AddSingleton<GuitarChords.Services.ChordTransitionService>();
 builder.Services.AddScoped<GuitarChords.Services.ChordPlayerService>();

@@ -1,0 +1,456 @@
+@page "/learn"
+@using GuitarChords.Services
+@using GuitarChords.Models
+@inject GuitarChordService ChordService
+@inject GuitarAudioService AudioService
+@inject ISnackbar Snackbar
+
+<PageTitle>Learn Guitar - Beginner Path</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+    <MudText Typo="Typo.h3" Class="mb-2">Learn Guitar Chords</MudText>
+    <MudText Typo="Typo.subtitle1" Class="mb-4" Color="Color.Secondary">
+        Start your guitar journey with structured lessons
+    </MudText>
+
+    @* Progress Overview *@
+    <MudPaper Class="pa-4 mb-4" Elevation="2">
+        <div class="d-flex justify-space-between align-center mb-3">
+            <MudText Typo="Typo.h6">Your Progress</MudText>
+            <MudChip T="string" Color="Color.Primary" Size="Size.Small">
+                @_completedLessons / @_totalLessons Lessons
+            </MudChip>
+        </div>
+        <MudProgressLinear Value="@GetProgressPercent()" Color="Color.Primary" Rounded="true" Size="Size.Large" />
+        <MudText Typo="Typo.caption" Class="mt-2" Color="Color.Secondary">
+            @if (_completedLessons == 0)
+            {
+                @:Ready to start? Begin with your first chord!
+            }
+            else if (_completedLessons < _totalLessons)
+            {
+                @:Keep going! You're making great progress.
+            }
+            else
+            {
+                @:Congratulations! You've completed all beginner lessons!
+            }
+        </MudText>
+    </MudPaper>
+
+    @* Learning Modules *@
+    <MudGrid>
+        @foreach (var module in _modules)
+        {
+            var isUnlocked = IsModuleUnlocked(module);
+            var moduleProgress = GetModuleProgress(module);
+
+            <MudItem xs="12" md="6">
+                <MudCard Class="@($"learning-module {(isUnlocked ? "" : "locked")}")" Elevation="2">
+                    <MudCardHeader>
+                        <CardHeaderAvatar>
+                            <MudAvatar Color="@(isUnlocked ? Color.Primary : Color.Default)">
+                                @if (moduleProgress >= 100)
+                                {
+                                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" />
+                                }
+                                else
+                                {
+                                    @module.Number
+                                }
+                            </MudAvatar>
+                        </CardHeaderAvatar>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">@module.Title</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@module.Description</MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            @if (!isUnlocked)
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.Lock" Color="Color.Default" />
+                            }
+                        </CardHeaderActions>
+                    </MudCardHeader>
+
+                    <MudCardContent>
+                        <MudProgressLinear Value="@moduleProgress" Color="Color.Secondary" Rounded="true" Size="Size.Small" Class="mb-3" />
+
+                        <MudList T="LearningLesson" Dense="true">
+                            @foreach (var lesson in module.Lessons)
+                            {
+                                var isLessonComplete = _completedLessonIds.Contains(lesson.Id);
+                                var isCurrentLesson = GetCurrentLesson()?.Id == lesson.Id;
+
+                                <MudListItem T="LearningLesson"
+                                            Dense="true"
+                                            OnClick="@(() => isUnlocked ? SelectLesson(lesson) : Task.CompletedTask)"
+                                            Class="@(isCurrentLesson ? "current-lesson" : "")">
+                                    <div class="d-flex align-center">
+                                        @if (isLessonComplete)
+                                        {
+                                            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Small" Class="mr-2" />
+                                        }
+                                        else if (isCurrentLesson)
+                                        {
+                                            <MudIcon Icon="@Icons.Material.Filled.PlayCircle" Color="Color.Primary" Size="Size.Small" Class="mr-2" />
+                                        }
+                                        else
+                                        {
+                                            <MudIcon Icon="@Icons.Material.Filled.Circle" Color="Color.Default" Size="Size.Small" Class="mr-2" />
+                                        }
+                                        <MudText>@lesson.Title</MudText>
+                                        <MudSpacer />
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Text">@lesson.Duration</MudChip>
+                                    </div>
+                                </MudListItem>
+                            }
+                        </MudList>
+                    </MudCardContent>
+
+                    <MudCardActions>
+                        @if (isUnlocked)
+                        {
+                            <MudButton Variant="Variant.Text"
+                                      Color="Color.Primary"
+                                      OnClick="@(() => StartModule(module))">
+                                @(moduleProgress > 0 && moduleProgress < 100 ? "Continue" : moduleProgress >= 100 ? "Review" : "Start")
+                            </MudButton>
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                Complete previous module to unlock
+                            </MudText>
+                        }
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+
+    @* Active Lesson Dialog *@
+    <MudDialog @bind-Visible="_showLessonDialog" Options="_dialogOptions">
+        <TitleContent>
+            <MudText Typo="Typo.h6">@_activeLesson?.Title</MudText>
+        </TitleContent>
+        <DialogContent>
+            @if (_activeLesson != null)
+            {
+                <MudText Typo="Typo.body1" Class="mb-4">@_activeLesson.Content</MudText>
+
+                @if (_activeLesson.Chords.Any())
+                {
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">Chords to Learn:</MudText>
+                    <MudGrid>
+                        @foreach (var chordName in _activeLesson.Chords)
+                        {
+                            var chord = ChordService.GetChord(chordName);
+                            @if (chord != null)
+                            {
+                                <MudItem xs="6" sm="4">
+                                    <MudCard Outlined="true" Class="text-center pa-2">
+                                        <ChordDiagram Chord="chord" Width="120" Height="140" Responsive="false" />
+                                        <MudText Typo="Typo.subtitle1">@chord.Name</MudText>
+                                        <MudButton Size="Size.Small"
+                                                  Variant="Variant.Text"
+                                                  Color="Color.Primary"
+                                                  StartIcon="@Icons.Material.Filled.PlayArrow"
+                                                  OnClick="@(() => PlayChord(chord))">
+                                            Play
+                                        </MudButton>
+                                    </MudCard>
+                                </MudItem>
+                            }
+                        }
+                    </MudGrid>
+                }
+
+                @if (!string.IsNullOrEmpty(_activeLesson.Tip))
+                {
+                    <MudAlert Severity="Severity.Info" Class="mt-4">
+                        <MudText Typo="Typo.subtitle2">Pro Tip:</MudText>
+                        <MudText Typo="Typo.body2">@_activeLesson.Tip</MudText>
+                    </MudAlert>
+                }
+            }
+        </DialogContent>
+        <DialogActions>
+            <MudButton Color="Color.Default" OnClick="@(() => _showLessonDialog = false)">Close</MudButton>
+            @if (_activeLesson != null && !_completedLessonIds.Contains(_activeLesson.Id))
+            {
+                <MudButton Color="Color.Primary"
+                          Variant="Variant.Filled"
+                          OnClick="CompleteLesson">
+                    Mark as Complete
+                </MudButton>
+            }
+        </DialogActions>
+    </MudDialog>
+</MudContainer>
+
+<style>
+    .learning-module.locked {
+        opacity: 0.6;
+    }
+
+    .current-lesson {
+        background-color: rgba(var(--mud-palette-primary-rgb), 0.1);
+        border-radius: 4px;
+    }
+</style>
+
+@code {
+    private List<LearningModule> _modules = new();
+    private HashSet<string> _completedLessonIds = new();
+    private LearningLesson? _activeLesson;
+    private bool _showLessonDialog;
+    private int _totalLessons;
+    private int _completedLessons => _completedLessonIds.Count;
+
+    private DialogOptions _dialogOptions = new()
+    {
+        MaxWidth = MaxWidth.Medium,
+        FullWidth = true,
+        CloseButton = true
+    };
+
+    protected override void OnInitialized()
+    {
+        InitializeLearningPath();
+        _totalLessons = _modules.SelectMany(m => m.Lessons).Count();
+    }
+
+    private void InitializeLearningPath()
+    {
+        _modules = new List<LearningModule>
+        {
+            new()
+            {
+                Number = 1,
+                Title = "Your First Chords",
+                Description = "Learn the essential open chords every guitarist needs",
+                Lessons = new List<LearningLesson>
+                {
+                    new()
+                    {
+                        Id = "1-1",
+                        Title = "The E Minor Chord",
+                        Duration = "5 min",
+                        Content = "E minor is often the first chord guitarists learn because it only requires two fingers. Place your 2nd finger on the 2nd fret of the A string (5th string), and your 3rd finger on the 2nd fret of the D string (4th string). Strum all six strings.",
+                        Chords = new[] { "Em" },
+                        Tip = "Keep your fingers arched and use your fingertips to press the strings cleanly."
+                    },
+                    new()
+                    {
+                        Id = "1-2",
+                        Title = "The A Minor Chord",
+                        Duration = "5 min",
+                        Content = "A minor adds one more finger to E minor. Place your 1st finger on the 1st fret of the B string, 2nd finger on the 2nd fret of the D string, and 3rd finger on the 2nd fret of the G string. Don't strum the low E string.",
+                        Chords = new[] { "Am" },
+                        Tip = "The transition from Em to Am is a great first chord change to practice."
+                    },
+                    new()
+                    {
+                        Id = "1-3",
+                        Title = "The D Major Chord",
+                        Duration = "5 min",
+                        Content = "D major uses three fingers in a triangle shape. Place your 1st finger on the 2nd fret of the G string, 2nd finger on the 2nd fret of the high E string, and 3rd finger on the 3rd fret of the B string. Only strum the top four strings.",
+                        Chords = new[] { "D" },
+                        Tip = "Keep your thumb behind the neck for better finger reach."
+                    },
+                    new()
+                    {
+                        Id = "1-4",
+                        Title = "Practice: Em - Am - D",
+                        Duration = "10 min",
+                        Content = "Now practice switching between these three chords. Start slowly, making sure each chord sounds clean before moving to the next. Count '1-2-3-4' on each chord before switching.",
+                        Chords = new[] { "Em", "Am", "D" },
+                        Tip = "Practice the chord changes in different orders: Em-Am, Am-D, D-Em."
+                    }
+                }
+            },
+            new()
+            {
+                Number = 2,
+                Title = "Essential Major Chords",
+                Description = "Master the G, C, and E major chords",
+                Lessons = new List<LearningLesson>
+                {
+                    new()
+                    {
+                        Id = "2-1",
+                        Title = "The G Major Chord",
+                        Duration = "5 min",
+                        Content = "G major spans the entire fretboard. Place your 2nd finger on the 3rd fret of the low E string, 1st finger on the 2nd fret of the A string, and your 3rd and 4th fingers on the 3rd fret of the B and high E strings. Strum all six strings.",
+                        Chords = new[] { "G" },
+                        Tip = "There are multiple ways to finger G. Find what's comfortable for you."
+                    },
+                    new()
+                    {
+                        Id = "2-2",
+                        Title = "The C Major Chord",
+                        Duration = "5 min",
+                        Content = "C major is one of the most important chords. Place your 1st finger on the 1st fret of the B string, 2nd finger on the 2nd fret of the D string, and 3rd finger on the 3rd fret of the A string. Avoid the low E string.",
+                        Chords = new[] { "C" },
+                        Tip = "The C to G transition is common in songs. Practice it until smooth."
+                    },
+                    new()
+                    {
+                        Id = "2-3",
+                        Title = "The E Major Chord",
+                        Duration = "5 min",
+                        Content = "E major is similar to E minor but adds one more note. Place your 1st finger on the 1st fret of the G string, 2nd finger on the 2nd fret of the A string, and 3rd finger on the 2nd fret of the D string.",
+                        Chords = new[] { "E" },
+                        Tip = "Compare E major and E minor - they only differ by one note!"
+                    },
+                    new()
+                    {
+                        Id = "2-4",
+                        Title = "Practice: G - C - D",
+                        Duration = "10 min",
+                        Content = "G-C-D is one of the most common chord progressions in music! Practice switching between these chords smoothly. This progression is used in thousands of songs.",
+                        Chords = new[] { "G", "C", "D" },
+                        Tip = "Try playing 4 strums on each chord, then switch."
+                    }
+                }
+            },
+            new()
+            {
+                Number = 3,
+                Title = "Seventh Chords",
+                Description = "Add color to your playing with seventh chords",
+                Lessons = new List<LearningLesson>
+                {
+                    new()
+                    {
+                        Id = "3-1",
+                        Title = "The E7 Chord",
+                        Duration = "5 min",
+                        Content = "E7 adds a bluesy feel. It's like E major but lift your 3rd finger off. Place your 1st finger on the 1st fret of the G string and 2nd finger on the 2nd fret of the A string.",
+                        Chords = new[] { "E7" },
+                        Tip = "E7 often leads to A or Am - try this transition!"
+                    },
+                    new()
+                    {
+                        Id = "3-2",
+                        Title = "The A7 Chord",
+                        Duration = "5 min",
+                        Content = "A7 is an easy chord with just two fingers. Place your 1st finger on the 2nd fret of the D string and 2nd finger on the 2nd fret of the B string. Leave all other strings open.",
+                        Chords = new[] { "A7" },
+                        Tip = "A7 wants to resolve to D major - a classic blues move!"
+                    },
+                    new()
+                    {
+                        Id = "3-3",
+                        Title = "The G7 Chord",
+                        Duration = "5 min",
+                        Content = "G7 adds tension that resolves beautifully to C. Place your 1st finger on the 1st fret of the high E string, 2nd finger on the 2nd fret of the A string, and 3rd finger on the 3rd fret of the low E string.",
+                        Chords = new[] { "G7" },
+                        Tip = "G7 to C is one of the strongest chord movements in music!"
+                    },
+                    new()
+                    {
+                        Id = "3-4",
+                        Title = "12-Bar Blues",
+                        Duration = "15 min",
+                        Content = "Now you know enough chords for the 12-bar blues! The pattern is: E7 (4 bars), A7 (2 bars), E7 (2 bars), B7 (1 bar), A7 (1 bar), E7 (2 bars). This is the foundation of rock and blues music!",
+                        Chords = new[] { "E7", "A7", "B7" },
+                        Tip = "Start slow with just down strums on each beat."
+                    }
+                }
+            }
+        };
+    }
+
+    private bool IsModuleUnlocked(LearningModule module)
+    {
+        if (module.Number == 1) return true;
+
+        var previousModule = _modules.FirstOrDefault(m => m.Number == module.Number - 1);
+        if (previousModule == null) return true;
+
+        return previousModule.Lessons.All(l => _completedLessonIds.Contains(l.Id));
+    }
+
+    private double GetModuleProgress(LearningModule module)
+    {
+        if (!module.Lessons.Any()) return 0;
+        var completed = module.Lessons.Count(l => _completedLessonIds.Contains(l.Id));
+        return (completed * 100.0) / module.Lessons.Count;
+    }
+
+    private double GetProgressPercent()
+    {
+        if (_totalLessons == 0) return 0;
+        return (_completedLessons * 100.0) / _totalLessons;
+    }
+
+    private LearningLesson? GetCurrentLesson()
+    {
+        foreach (var module in _modules)
+        {
+            if (!IsModuleUnlocked(module)) continue;
+
+            var nextLesson = module.Lessons.FirstOrDefault(l => !_completedLessonIds.Contains(l.Id));
+            if (nextLesson != null) return nextLesson;
+        }
+        return null;
+    }
+
+    private void StartModule(LearningModule module)
+    {
+        var nextLesson = module.Lessons.FirstOrDefault(l => !_completedLessonIds.Contains(l.Id))
+                        ?? module.Lessons.FirstOrDefault();
+        if (nextLesson != null)
+        {
+            SelectLesson(nextLesson);
+        }
+    }
+
+    private Task SelectLesson(LearningLesson lesson)
+    {
+        _activeLesson = lesson;
+        _showLessonDialog = true;
+        return Task.CompletedTask;
+    }
+
+    private void CompleteLesson()
+    {
+        if (_activeLesson != null)
+        {
+            _completedLessonIds.Add(_activeLesson.Id);
+            Snackbar.Add($"Completed: {_activeLesson.Title}", Severity.Success);
+            _showLessonDialog = false;
+        }
+    }
+
+    private async Task PlayChord(GuitarChord chord)
+    {
+        try
+        {
+            await AudioService.PlayChordAsync(chord);
+        }
+        catch
+        {
+            // Audio not initialized
+        }
+    }
+
+    private record LearningModule
+    {
+        public int Number { get; init; }
+        public string Title { get; init; } = "";
+        public string Description { get; init; } = "";
+        public List<LearningLesson> Lessons { get; init; } = new();
+    }
+
+    private record LearningLesson
+    {
+        public string Id { get; init; } = "";
+        public string Title { get; init; } = "";
+        public string Duration { get; init; } = "";
+        public string Content { get; init; } = "";
+        public string[] Chords { get; init; } = Array.Empty<string>();
+        public string Tip { get; init; } = "";
+    }
+}

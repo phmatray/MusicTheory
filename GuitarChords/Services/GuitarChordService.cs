@@ -3,14 +3,30 @@ using MusicTheory;
 
 namespace GuitarChords.Services;
 
+/// <summary>
+/// Service for managing guitar chords, combining pre-defined common chords
+/// with algorithmically generated voicings.
+/// </summary>
 public class GuitarChordService
 {
-    // Common open chord shapes
+    private readonly IFingeringGenerator _fingeringGenerator;
+    private readonly IPlayabilityScorer _scorer;
+
+    // Common open chord shapes (verified, hand-crafted fingerings)
     private static readonly Dictionary<string, GuitarChord> CommonChords = new();
+
+    // Cache for algorithmically generated voicings
+    private readonly Dictionary<string, List<GuitarVoicing>> _voicingCache = new();
 
     static GuitarChordService()
     {
         InitializeCommonChords();
+    }
+
+    public GuitarChordService(IFingeringGenerator? fingeringGenerator = null, IPlayabilityScorer? scorer = null)
+    {
+        _fingeringGenerator = fingeringGenerator ?? new FingeringGenerator();
+        _scorer = scorer ?? new PlayabilityScorer();
     }
 
     private static void InitializeCommonChords()
@@ -199,51 +215,154 @@ public class GuitarChordService
         CommonChords["B7"] = b7;
     }
 
+    /// <summary>
+    /// Gets a pre-defined common chord by its symbol.
+    /// </summary>
     public GuitarChord? GetChord(string chordSymbol)
     {
         return CommonChords.TryGetValue(chordSymbol, out var chord) ? chord : null;
     }
 
+    /// <summary>
+    /// Gets all pre-defined common chords.
+    /// </summary>
     public IEnumerable<GuitarChord> GetAllChords()
     {
         return CommonChords.Values;
     }
 
+    /// <summary>
+    /// Gets all pre-defined chords for a specific root note.
+    /// </summary>
     public IEnumerable<GuitarChord> GetChordsForRoot(Note root)
     {
-        return CommonChords.Values.Where(c => c.Chord.Root.Name == root.Name && 
+        return CommonChords.Values.Where(c => c.Chord.Root.Name == root.Name &&
                                              c.Chord.Root.Alteration == root.Alteration);
     }
 
+    /// <summary>
+    /// Gets all pre-defined chords of a specific type.
+    /// </summary>
     public IEnumerable<GuitarChord> GetChordsOfType(ChordType type)
     {
         return CommonChords.Values.Where(c => c.Chord.Type == type);
     }
 
     /// <summary>
-    /// Calculates possible fingerings for a given chord.
-    /// This is a simplified version - a full implementation would be much more complex.
+    /// Gets multiple voicings for a chord, using both pre-defined and generated fingerings.
+    /// </summary>
+    /// <param name="chord">The chord to get voicings for.</param>
+    /// <param name="options">Options controlling voicing generation.</param>
+    /// <returns>A collection of voicings, sorted by playability.</returns>
+    public IEnumerable<GuitarVoicing> GetVoicings(Chord chord, FingeringOptions? options = null)
+    {
+        var cacheKey = GetCacheKey(chord, options);
+
+        if (!_voicingCache.TryGetValue(cacheKey, out var voicings))
+        {
+            voicings = new List<GuitarVoicing>();
+
+            // First, check if we have a pre-defined chord
+            var symbol = chord.GetSymbol();
+            if (CommonChords.TryGetValue(symbol, out var commonChord))
+            {
+                // Convert to GuitarVoicing for consistent API
+                var commonVoicing = new GuitarVoicing(commonChord.Chord, commonChord.FretPositions, commonChord.Fingerings);
+                voicings.Add(commonVoicing);
+            }
+
+            // Then generate additional voicings algorithmically
+            var generatedVoicings = _fingeringGenerator.GenerateVoicings(chord, options);
+            foreach (var voicing in generatedVoicings)
+            {
+                // Avoid duplicates
+                if (!voicings.Any(v => string.Join(",", v.FretPositions) == string.Join(",", voicing.FretPositions)))
+                {
+                    voicings.Add(voicing);
+                }
+            }
+
+            // Sort by playability
+            voicings = voicings
+                .Select(v => (Voicing: v, Score: _scorer.Score(v)))
+                .OrderByDescending(x => x.Score.TotalScore)
+                .Select(x => x.Voicing)
+                .Take(options?.MaxResults ?? 10)
+                .ToList();
+
+            _voicingCache[cacheKey] = voicings;
+        }
+
+        return voicings;
+    }
+
+    /// <summary>
+    /// Gets the best (easiest to play) voicing for a chord.
+    /// </summary>
+    public GuitarVoicing? GetBestVoicing(Chord chord, FingeringOptions? options = null)
+    {
+        return GetVoicings(chord, options).FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Gets a GuitarChord (for compatibility with existing code) from a Chord.
+    /// </summary>
+    public GuitarChord? GetGuitarChord(Chord chord, FingeringOptions? options = null)
+    {
+        var voicing = GetBestVoicing(chord, options);
+        return voicing?.ToGuitarChord();
+    }
+
+    /// <summary>
+    /// Generates voicings for a chord (uses algorithmic generation).
+    /// This replaces the old CalculateChordFingerings method.
     /// </summary>
     public List<GuitarChord> CalculateChordFingerings(Chord chord, int maxFret = 5)
     {
-        var fingerings = new List<GuitarChord>();
-        
-        // Get the notes in the chord
-        var chordNotes = chord.GetNotes().ToList();
-        
-        // For now, just return the pre-defined chord if it exists
+        var options = new FingeringOptions { MaxFret = maxFret };
+        return GetVoicings(chord, options)
+            .Select(v => v.ToGuitarChord())
+            .ToList();
+    }
+
+    /// <summary>
+    /// Gets all voicings for a chord within a specific fret range.
+    /// </summary>
+    public IEnumerable<GuitarVoicing> GetVoicingsInRange(Chord chord, int minFret, int maxFret)
+    {
+        return _fingeringGenerator.GenerateVoicingsInRange(chord, minFret, maxFret);
+    }
+
+    /// <summary>
+    /// Gets the playability score for a voicing.
+    /// </summary>
+    public PlayabilityScore GetPlayabilityScore(GuitarVoicing voicing)
+    {
+        return _scorer.Score(voicing);
+    }
+
+    /// <summary>
+    /// Gets the playability score for a GuitarChord.
+    /// </summary>
+    public PlayabilityScore GetPlayabilityScore(GuitarChord guitarChord)
+    {
+        var voicing = new GuitarVoicing(guitarChord.Chord, guitarChord.FretPositions, guitarChord.Fingerings);
+        return _scorer.Score(voicing);
+    }
+
+    /// <summary>
+    /// Clears the voicing cache (useful if options change).
+    /// </summary>
+    public void ClearCache()
+    {
+        _voicingCache.Clear();
+    }
+
+    private static string GetCacheKey(Chord chord, FingeringOptions? options)
+    {
         var symbol = chord.GetSymbol();
-        if (CommonChords.TryGetValue(symbol, out var commonChord))
-        {
-            fingerings.Add(commonChord);
-        }
-        
-        // TODO: Implement algorithm to calculate possible fingerings
-        // This would involve:
-        // 1. Finding all positions of each chord note on the fretboard
-        // 2. Finding combinations that are physically playable
-        // 3. Ranking them by difficulty/commonality
-        
-        return fingerings;
+        var optionsKey = options == null ? "default" :
+            $"{options.MaxFret}_{options.AllowBarreChords}_{options.MaxDifficulty}_{options.RequireRootInBass}";
+        return $"{symbol}_{optionsKey}";
     }
 }

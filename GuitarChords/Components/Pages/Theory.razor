@@ -1,0 +1,451 @@
+@page "/theory"
+@using GuitarChords.Services
+@using GuitarChords.Models
+@using MusicTheory
+@inject GuitarChordService ChordService
+@inject GuitarAudioService AudioService
+@inject ISnackbar Snackbar
+
+<PageTitle>Music Theory - Circle of Fifths</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+    <MudText Typo="Typo.h3" Class="mb-2">Circle of Fifths</MudText>
+    <MudText Typo="Typo.subtitle1" Class="mb-4" Color="Color.Secondary">
+        Explore key relationships and discover chords in any key
+    </MudText>
+
+    <MudGrid>
+        @* Circle of Fifths *@
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4" Elevation="2">
+                <CircleOfFifths @bind-SelectedKey="_selectedKey"
+                               OnKeySelected="OnKeySelected"
+                               OnChordSelected="OnChordSelected"
+                               Size="350" />
+
+                <div class="mt-4 text-center">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                        <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" Class="mr-1" />
+                        Click a key to explore. Use arrow keys to navigate.
+                    </MudText>
+                </div>
+            </MudPaper>
+        </MudItem>
+
+        @* Key Information Panel *@
+        <MudItem xs="12" md="6">
+            @if (!string.IsNullOrEmpty(_selectedKey))
+            {
+                <MudPaper Class="pa-4" Elevation="2">
+                    <MudText Typo="Typo.h5" Class="mb-3">
+                        <MudIcon Icon="@Icons.Material.Filled.MusicNote" Class="mr-2" />
+                        Key of @_selectedKey
+                    </MudText>
+
+                    @* Key Signature *@
+                    <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="mb-2">Key Signature</MudText>
+                    <MudText Typo="Typo.body1" Class="mb-4">@GetKeySignature(_selectedKey)</MudText>
+
+                    @* Relative Key *@
+                    <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="mb-2">Relative Key</MudText>
+                    <MudChip T="string"
+                            Text="@GetRelativeKey(_selectedKey)"
+                            Color="Color.Secondary"
+                            OnClick="@(() => SelectRelativeKey())"
+                            Class="mb-4" />
+
+                    @* Parallel Key *@
+                    <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="mb-2">Parallel Key</MudText>
+                    <MudChip T="string"
+                            Text="@GetParallelKey(_selectedKey)"
+                            Color="Color.Tertiary"
+                            OnClick="@(() => SelectParallelKey())"
+                            Class="mb-4" />
+
+                    @* Adjacent Keys *@
+                    <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="mb-2">Adjacent Keys (Circle)</MudText>
+                    <div class="d-flex gap-2 mb-4">
+                        <MudChip T="string"
+                                Text="@($"← {GetAdjacentKey(_selectedKey, -1)}")"
+                                OnClick="@(() => SelectAdjacentKey(-1))" />
+                        <MudChip T="string"
+                                Text="@($"{GetAdjacentKey(_selectedKey, 1)} →")"
+                                OnClick="@(() => SelectAdjacentKey(1))" />
+                    </div>
+                </MudPaper>
+
+                @* Chords in Key *@
+                <MudPaper Class="pa-4 mt-4" Elevation="2">
+                    <MudText Typo="Typo.h6" Class="mb-3">
+                        <MudIcon Icon="@Icons.Material.Filled.Piano" Class="mr-2" />
+                        Diatonic Chords in @_selectedKey
+                    </MudText>
+
+                    <MudGrid>
+                        @foreach (var chordInfo in GetChordsInKey(_selectedKey))
+                        {
+                            var chord = ChordService.GetChord(chordInfo.Symbol);
+                            var cardClass = chord != null ? "chord-in-key-card clickable" : "chord-in-key-card";
+                            <MudItem xs="6" sm="4">
+                                <MudCard Outlined="true"
+                                        Class="@cardClass"
+                                        @onclick="@(() => chord != null ? PlayChord(chord) : Task.CompletedTask)">
+                                    <MudCardContent Class="pa-2 text-center">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@chordInfo.Numeral</MudText>
+                                        <MudText Typo="Typo.subtitle1">@chordInfo.Symbol</MudText>
+                                        <MudText Typo="Typo.caption">@chordInfo.Function</MudText>
+                                    </MudCardContent>
+                                </MudCard>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudPaper>
+
+                @* Common Progressions *@
+                <MudPaper Class="pa-4 mt-4" Elevation="2">
+                    <MudText Typo="Typo.h6" Class="mb-3">
+                        <MudIcon Icon="@Icons.Material.Filled.QueueMusic" Class="mr-2" />
+                        Common Progressions in @_selectedKey
+                    </MudText>
+
+                    <MudList T="string" Dense="true">
+                        @foreach (var progression in GetCommonProgressions(_selectedKey))
+                        {
+                            <MudListItem T="string">
+                                <div class="d-flex justify-space-between align-center">
+                                    <div>
+                                        <MudText Typo="Typo.subtitle2">@progression.Name</MudText>
+                                        <MudText Typo="Typo.body2" Color="Color.Secondary">@progression.Chords</MudText>
+                                    </div>
+                                    <MudIconButton Icon="@Icons.Material.Filled.PlayArrow"
+                                                  Size="Size.Small"
+                                                  Color="Color.Primary"
+                                                  OnClick="@(() => PlayProgression(progression.ChordList))" />
+                                </div>
+                            </MudListItem>
+                        }
+                    </MudList>
+                </MudPaper>
+            }
+            else
+            {
+                <MudPaper Class="pa-6 text-center" Elevation="2">
+                    <MudIcon Icon="@Icons.Material.Filled.TouchApp" Size="Size.Large" Color="Color.Secondary" />
+                    <MudText Typo="Typo.h6" Class="mt-3">Select a Key</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-2">
+                        Click on any key in the Circle of Fifths to explore its chords, progressions, and relationships.
+                    </MudText>
+
+                    <MudDivider Class="my-4" />
+
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">Quick Start</MudText>
+                    <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small">
+                        <MudButton OnClick="@(() => SelectKey("C"))">C Major</MudButton>
+                        <MudButton OnClick="@(() => SelectKey("G"))">G Major</MudButton>
+                        <MudButton OnClick="@(() => SelectKey("Am"))">A Minor</MudButton>
+                    </MudButtonGroup>
+                </MudPaper>
+
+                @* Circle of Fifths explanation *@
+                <MudPaper Class="pa-4 mt-4" Elevation="1">
+                    <MudText Typo="Typo.h6" Class="mb-3">
+                        <MudIcon Icon="@Icons.Material.Filled.School" Class="mr-2" />
+                        Understanding the Circle
+                    </MudText>
+
+                    <MudText Typo="Typo.body2" Class="mb-3">
+                        The Circle of Fifths is a visual representation of the relationships between the 12 tones of the chromatic scale.
+                    </MudText>
+
+                    <MudList T="string" Dense="true">
+                        <MudListItem T="string" Icon="@Icons.Material.Filled.ArrowForward">
+                            Moving clockwise adds one sharp to the key signature
+                        </MudListItem>
+                        <MudListItem T="string" Icon="@Icons.Material.Filled.ArrowBack">
+                            Moving counter-clockwise adds one flat
+                        </MudListItem>
+                        <MudListItem T="string" Icon="@Icons.Material.Filled.SwapHoriz">
+                            Adjacent keys sound harmonically similar
+                        </MudListItem>
+                        <MudListItem T="string" Icon="@Icons.Material.Filled.Layers">
+                            Inner ring shows relative minor keys
+                        </MudListItem>
+                    </MudList>
+                </MudPaper>
+            }
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+<style>
+    .chord-in-key-card.clickable {
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .chord-in-key-card.clickable:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+</style>
+
+@code {
+    private string? _selectedKey;
+
+    private static readonly string[] MajorKeys = { "C", "G", "D", "A", "E", "B", "F#", "Db", "Ab", "Eb", "Bb", "F" };
+    private static readonly string[] MinorKeys = { "Am", "Em", "Bm", "F#m", "C#m", "G#m", "D#m", "Bbm", "Fm", "Cm", "Gm", "Dm" };
+
+    private void OnKeySelected(string key)
+    {
+        _selectedKey = key;
+    }
+
+    private async Task OnChordSelected(GuitarChord chord)
+    {
+        await PlayChord(chord);
+    }
+
+    private async Task SelectKey(string key)
+    {
+        _selectedKey = key;
+        await Task.CompletedTask;
+    }
+
+    private async Task PlayChord(GuitarChord chord)
+    {
+        try
+        {
+            await AudioService.PlayChordAsync(chord);
+            Snackbar.Add($"Playing {chord.Name}", Severity.Info, config => config.VisibleStateDuration = 1000);
+        }
+        catch
+        {
+            // Audio may not be initialized
+        }
+    }
+
+    private async Task PlayProgression(List<string> chordNames)
+    {
+        foreach (var chordName in chordNames)
+        {
+            var chord = ChordService.GetChord(chordName);
+            if (chord != null)
+            {
+                await AudioService.PlayChordAsync(chord);
+                await Task.Delay(800);
+            }
+        }
+    }
+
+    private string GetKeySignature(string key)
+    {
+        var signatures = new Dictionary<string, string>
+        {
+            { "C", "No sharps or flats" },
+            { "G", "1 sharp (F#)" },
+            { "D", "2 sharps (F#, C#)" },
+            { "A", "3 sharps (F#, C#, G#)" },
+            { "E", "4 sharps (F#, C#, G#, D#)" },
+            { "B", "5 sharps (F#, C#, G#, D#, A#)" },
+            { "F#", "6 sharps (F#, C#, G#, D#, A#, E#)" },
+            { "Db", "5 flats (Bb, Eb, Ab, Db, Gb)" },
+            { "Ab", "4 flats (Bb, Eb, Ab, Db)" },
+            { "Eb", "3 flats (Bb, Eb, Ab)" },
+            { "Bb", "2 flats (Bb, Eb)" },
+            { "F", "1 flat (Bb)" },
+            { "Am", "No sharps or flats (relative to C)" },
+            { "Em", "1 sharp (relative to G)" },
+            { "Bm", "2 sharps (relative to D)" },
+            { "F#m", "3 sharps (relative to A)" },
+            { "C#m", "4 sharps (relative to E)" },
+            { "G#m", "5 sharps (relative to B)" },
+            { "D#m", "6 sharps (relative to F#)" },
+            { "Bbm", "5 flats (relative to Db)" },
+            { "Fm", "4 flats (relative to Ab)" },
+            { "Cm", "3 flats (relative to Eb)" },
+            { "Gm", "2 flats (relative to Bb)" },
+            { "Dm", "1 flat (relative to F)" }
+        };
+
+        return signatures.TryGetValue(key, out var sig) ? sig : "Unknown";
+    }
+
+    private string GetRelativeKey(string key)
+    {
+        var majorIndex = Array.IndexOf(MajorKeys, key);
+        if (majorIndex >= 0)
+        {
+            return MinorKeys[majorIndex];
+        }
+
+        var minorIndex = Array.IndexOf(MinorKeys, key);
+        if (minorIndex >= 0)
+        {
+            return MajorKeys[minorIndex];
+        }
+
+        return key;
+    }
+
+    private string GetParallelKey(string key)
+    {
+        if (key.EndsWith("m"))
+        {
+            return key.TrimEnd('m');
+        }
+        return key + "m";
+    }
+
+    private string GetAdjacentKey(string key, int direction)
+    {
+        var majorIndex = Array.IndexOf(MajorKeys, key);
+        if (majorIndex >= 0)
+        {
+            var newIndex = (majorIndex + direction + 12) % 12;
+            return MajorKeys[newIndex];
+        }
+
+        var minorIndex = Array.IndexOf(MinorKeys, key);
+        if (minorIndex >= 0)
+        {
+            var newIndex = (minorIndex + direction + 12) % 12;
+            return MinorKeys[newIndex];
+        }
+
+        return key;
+    }
+
+    private void SelectRelativeKey()
+    {
+        if (!string.IsNullOrEmpty(_selectedKey))
+        {
+            _selectedKey = GetRelativeKey(_selectedKey);
+        }
+    }
+
+    private void SelectParallelKey()
+    {
+        if (!string.IsNullOrEmpty(_selectedKey))
+        {
+            _selectedKey = GetParallelKey(_selectedKey);
+        }
+    }
+
+    private void SelectAdjacentKey(int direction)
+    {
+        if (!string.IsNullOrEmpty(_selectedKey))
+        {
+            _selectedKey = GetAdjacentKey(_selectedKey, direction);
+        }
+    }
+
+    private record ChordInKey(string Numeral, string Symbol, string Function);
+
+    private List<ChordInKey> GetChordsInKey(string key)
+    {
+        var isMajor = !key.EndsWith("m");
+        var rootNote = key.TrimEnd('m');
+
+        if (isMajor)
+        {
+            // Major key diatonic chords
+            var intervals = GetMajorScaleChords(rootNote);
+            return
+            [
+                new ChordInKey("I", intervals[0], "Tonic"),
+                new ChordInKey("ii", intervals[1] + "m", "Supertonic"),
+                new ChordInKey("iii", intervals[2] + "m", "Mediant"),
+                new ChordInKey("IV", intervals[3], "Subdominant"),
+                new ChordInKey("V", intervals[4], "Dominant"),
+                new ChordInKey("vi", intervals[5] + "m", "Submediant"),
+                new ChordInKey("vii°", intervals[6] + "dim", "Leading Tone")
+            ];
+        }
+        else
+        {
+            // Minor key diatonic chords (natural minor)
+            var intervals = GetMinorScaleChords(rootNote);
+            return
+            [
+                new ChordInKey("i", intervals[0] + "m", "Tonic"),
+                new ChordInKey("ii°", intervals[1] + "dim", "Supertonic"),
+                new ChordInKey("III", intervals[2], "Mediant"),
+                new ChordInKey("iv", intervals[3] + "m", "Subdominant"),
+                new ChordInKey("v", intervals[4] + "m", "Dominant"),
+                new ChordInKey("VI", intervals[5], "Submediant"),
+                new ChordInKey("VII", intervals[6], "Subtonic")
+            ];
+        }
+    }
+
+    private static readonly string[] ChromaticNotes = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+    private static readonly string[] ChromaticNotesFlats = { "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" };
+
+    private string[] GetMajorScaleChords(string root)
+    {
+        // Major scale intervals in semitones: 0, 2, 4, 5, 7, 9, 11
+        int[] intervals = { 0, 2, 4, 5, 7, 9, 11 };
+
+        var useFlats = root.Contains('b') || root == "F";
+        var notes = useFlats ? ChromaticNotesFlats : ChromaticNotes;
+        var rootIndex = Array.IndexOf(notes, root);
+        if (rootIndex < 0) rootIndex = Array.IndexOf(ChromaticNotes, root);
+
+        return intervals.Select(i => notes[(rootIndex + i) % 12]).ToArray();
+    }
+
+    private string[] GetMinorScaleChords(string root)
+    {
+        // Natural minor scale intervals: 0, 2, 3, 5, 7, 8, 10
+        int[] intervals = { 0, 2, 3, 5, 7, 8, 10 };
+
+        var useFlats = root.Contains('b');
+        var notes = useFlats ? ChromaticNotesFlats : ChromaticNotes;
+        var rootIndex = Array.IndexOf(notes, root);
+        if (rootIndex < 0) rootIndex = Array.IndexOf(ChromaticNotes, root);
+
+        return intervals.Select(i => notes[(rootIndex + i) % 12]).ToArray();
+    }
+
+    private record ProgressionInfo(string Name, string Chords, List<string> ChordList);
+
+    private List<ProgressionInfo> GetCommonProgressions(string key)
+    {
+        var chords = GetChordsInKey(key);
+        var isMajor = !key.EndsWith("m");
+
+        if (isMajor)
+        {
+            var I = chords[0].Symbol;
+            var ii = chords[1].Symbol;
+            var IV = chords[3].Symbol;
+            var V = chords[4].Symbol;
+            var vi = chords[5].Symbol;
+
+            return
+            [
+                new ProgressionInfo("I - IV - V - I", $"{I} - {IV} - {V} - {I}", [I, IV, V, I]),
+                new ProgressionInfo("I - V - vi - IV", $"{I} - {V} - {vi} - {IV}", [I, V, vi, IV]),
+                new ProgressionInfo("I - vi - IV - V", $"{I} - {vi} - {IV} - {V}", [I, vi, IV, V]),
+                new ProgressionInfo("ii - V - I", $"{ii} - {V} - {I}", [ii, V, I]),
+                new ProgressionInfo("I - IV - ii - V", $"{I} - {IV} - {ii} - {V}", [I, IV, ii, V])
+            ];
+        }
+        else
+        {
+            var i = chords[0].Symbol;
+            var iv = chords[3].Symbol;
+            var v = chords[4].Symbol;
+            var VI = chords[5].Symbol;
+            var VII = chords[6].Symbol;
+
+            return
+            [
+                new ProgressionInfo("i - iv - v - i", $"{i} - {iv} - {v} - {i}", [i, iv, v, i]),
+                new ProgressionInfo("i - VI - III - VII", $"{i} - {VI} - {chords[2].Symbol} - {VII}", [i, VI, chords[2].Symbol, VII]),
+                new ProgressionInfo("i - iv - VII - III", $"{i} - {iv} - {VII} - {chords[2].Symbol}", [i, iv, VII, chords[2].Symbol]),
+                new ProgressionInfo("i - VII - VI - VII", $"{i} - {VII} - {VI} - {VII}", [i, VII, VI, VII])
+            ];
+        }
+    }
+}

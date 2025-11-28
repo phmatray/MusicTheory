@@ -6,11 +6,30 @@
     transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     position: relative;
+    outline: none;
 }
 
 .chord-container:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+/* Focus indicators for keyboard navigation (WCAG 2.1 AA compliant - 3:1 contrast) */
+.chord-container:focus {
+    outline: 3px solid #1976d2;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px rgba(25, 118, 210, 0.2);
+}
+
+.chord-container:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chord-container:focus-visible {
+    outline: 3px solid #1976d2;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px rgba(25, 118, 210, 0.2);
 }
 
 .chord-header {
@@ -30,10 +49,26 @@
     gap: 4px;
 }
 
+/* Touch-friendly targets (WCAG 2.5.5 - minimum 44x44px) */
+.touch-target {
+    min-width: 44px !important;
+    min-height: 44px !important;
+}
+
+.difficulty-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+.difficulty-icon {
+    margin-right: 4px;
+    font-size: 8px;
+    letter-spacing: 2px;
+}
+
 .difficulty-chip {
-    position: absolute;
-    bottom: 16px;
-    right: 16px;
+    /* No longer absolute positioned - container handles layout */
 }
 
 ::deep .mud-dialog {
@@ -134,17 +169,54 @@
     min-height: 120px;
 }
 
+/* Responsive styles for mobile devices */
 @media (max-width: 600px) {
-    .chord-card {
-        margin: 4px;
+    .chord-container {
+        padding: 12px;
     }
-    
-    .chord-card .add-to-progression,
-    .chord-card .favorite-button {
-        top: 4px;
+
+    .chord-header {
+        flex-wrap: wrap;
+        gap: 8px;
     }
-    
+
+    .chord-actions {
+        gap: 8px;
+    }
+
     .progression-container {
         padding: 12px;
+    }
+}
+
+/* Tablet and small desktop */
+@media (min-width: 601px) and (max-width: 960px) {
+    .chord-container {
+        padding: 14px;
+    }
+}
+
+/* Respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .chord-container,
+    .chord-container:hover,
+    .progression-chord,
+    ::deep .mud-chip-set .mud-chip,
+    ::deep .mud-chip-set .mud-chip:hover {
+        transition: none;
+        animation: none;
+        transform: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .chord-container {
+        border: 2px solid currentColor;
+    }
+
+    .chord-container:focus,
+    .chord-container:focus-visible {
+        outline-width: 4px;
     }
 }

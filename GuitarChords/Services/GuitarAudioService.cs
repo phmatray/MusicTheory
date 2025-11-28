@@ -81,6 +81,44 @@ public class GuitarAudioService : IAsyncDisposable
         await _jsRuntime.InvokeVoidAsync("GuitarAudio.setStringDamping", damping);
     }
 
+    /// <summary>
+    /// Plays a metronome click sound.
+    /// </summary>
+    /// <param name="isDownbeat">True for the first beat of a measure (higher pitch), false for other beats.</param>
+    public async Task PlayMetronomeClickAsync(bool isDownbeat = false)
+    {
+        await EnsureInitializedAsync();
+        try
+        {
+            await _jsRuntime.InvokeVoidAsync("GuitarAudio.playMetronomeClick", isDownbeat);
+        }
+        catch (InvalidOperationException)
+        {
+            // During prerendering, JavaScript is not available
+        }
+    }
+
+    /// <summary>
+    /// Plays a chord with strumming effect (strings played in sequence).
+    /// </summary>
+    /// <param name="chord">The chord to play.</param>
+    /// <param name="direction">"down" for low to high, "up" for high to low.</param>
+    /// <param name="speed">Milliseconds between each string (default 30ms).</param>
+    public async Task PlayChordStrummedAsync(GuitarChord chord, string direction = "down", int speed = 30)
+    {
+        await EnsureInitializedAsync();
+        await _jsRuntime.InvokeVoidAsync("GuitarAudio.playChordStrummed", chord.FretPositions, direction, speed);
+    }
+
+    /// <summary>
+    /// Plays a chord with strumming effect using fret positions array.
+    /// </summary>
+    public async Task PlayChordStrummedAsync(int[] fretPositions, string direction = "down", int speed = 30)
+    {
+        await EnsureInitializedAsync();
+        await _jsRuntime.InvokeVoidAsync("GuitarAudio.playChordStrummed", fretPositions, direction, speed);
+    }
+
     public async Task<AudioState> GetStateAsync()
     {
         try
@@ -100,6 +138,55 @@ public class GuitarAudioService : IAsyncDisposable
                 ContextState = "error"
             };
         }
+    }
+
+    /// <summary>
+    /// Sets the master volume (0.0 to 1.0).
+    /// </summary>
+    public async Task SetMasterVolumeAsync(double volume)
+    {
+        await EnsureInitializedAsync();
+        await _jsRuntime.InvokeVoidAsync("GuitarAudio.setMasterVolume", Math.Clamp(volume, 0.0, 1.0));
+    }
+
+    /// <summary>
+    /// Gets the current master volume.
+    /// </summary>
+    public async Task<double> GetMasterVolumeAsync()
+    {
+        await EnsureInitializedAsync();
+        return await _jsRuntime.InvokeAsync<double>("GuitarAudio.getMasterVolume");
+    }
+
+    /// <summary>
+    /// Gets available strumming patterns.
+    /// </summary>
+    public async Task<List<StrummingPattern>> GetStrummingPatternsAsync()
+    {
+        await EnsureInitializedAsync();
+        return await _jsRuntime.InvokeAsync<List<StrummingPattern>>("GuitarAudio.getStrummingPatterns");
+    }
+
+    /// <summary>
+    /// Plays a chord with a strumming pattern.
+    /// </summary>
+    /// <param name="chord">The chord to play.</param>
+    /// <param name="patternId">The strumming pattern ID.</param>
+    /// <param name="bpm">Beats per minute.</param>
+    /// <param name="measures">Number of measures to play.</param>
+    public async Task PlayStrummingPatternAsync(GuitarChord chord, string patternId, int bpm = 120, int measures = 1)
+    {
+        await EnsureInitializedAsync();
+        await _jsRuntime.InvokeVoidAsync("GuitarAudio.playStrummingPattern", chord.FretPositions, patternId, bpm, measures);
+    }
+
+    /// <summary>
+    /// Plays a chord with a strumming pattern using fret positions.
+    /// </summary>
+    public async Task PlayStrummingPatternAsync(int[] fretPositions, string patternId, int bpm = 120, int measures = 1)
+    {
+        await EnsureInitializedAsync();
+        await _jsRuntime.InvokeVoidAsync("GuitarAudio.playStrummingPattern", fretPositions, patternId, bpm, measures);
     }
 
     private async Task EnsureInitializedAsync()
@@ -130,4 +217,12 @@ public class AudioState
 {
     public bool IsInitialized { get; set; }
     public string ContextState { get; set; } = string.Empty;
+}
+
+public class StrummingPattern
+{
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Pattern { get; set; } = string.Empty;
+    public int BeatsPerMeasure { get; set; }
 }

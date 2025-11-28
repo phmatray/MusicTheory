@@ -1,14 +1,21 @@
 @using GuitarChords.Models
 
-<div class="chord-diagram">
-    <svg width="@Width" height="@Height" viewBox="0 0 @Width @Height" class="chord-svg">
+<div class="chord-diagram" style="@ContainerStyle">
+    <svg width="100%" height="100%" viewBox="0 0 @BaseWidth @BaseHeight"
+         class="chord-svg"
+         role="img"
+         aria-labelledby="chord-title-@UniqueId chord-desc-@UniqueId"
+         focusable="false">
+            <!-- Accessibility: Title and Description -->
+            <title id="chord-title-@UniqueId">@Chord.Name chord diagram</title>
+            <desc id="chord-desc-@UniqueId">@GetAccessibleDescription()</desc>
             <!-- Definitions for gradients and filters -->
             <defs>
-                <linearGradient id="fretboard-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <linearGradient id="fretboard-gradient-@UniqueId" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" style="stop-color:#A0522D;stop-opacity:1" />
                     <stop offset="100%" style="stop-color:#8B4513;stop-opacity:1" />
                 </linearGradient>
-                <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                <filter id="shadow-@UniqueId" x="-50%" y="-50%" width="200%" height="200%">
                     <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
                     <feOffset dx="1" dy="1" result="offsetblur"/>
                     <feComponentTransfer>
@@ -19,15 +26,15 @@
                         <feMergeNode in="SourceGraphic"/>
                     </feMerge>
                 </filter>
-                <radialGradient id="dot-gradient">
+                <radialGradient id="dot-gradient-@UniqueId">
                     <stop offset="0%" style="stop-color:#333;stop-opacity:1" />
                     <stop offset="100%" style="stop-color:#000;stop-opacity:1" />
                 </radialGradient>
             </defs>
             
             <!-- Fretboard -->
-            <rect x="@(FretboardX - 10)" y="@FretboardY" width="@(FretboardWidth + 20)" height="@FretboardHeight" 
-                  fill="url(#fretboard-gradient)" stroke="#654321" stroke-width="2" rx="4" ry="4"/>
+            <rect x="@(FretboardX - 10)" y="@FretboardY" width="@(FretboardWidth + 20)" height="@FretboardHeight"
+                  fill="url(#fretboard-gradient-@UniqueId)" stroke="#654321" stroke-width="2" rx="4" ry="4"/>
             
             <!-- Fret markers (dots) -->
             @if (Chord.BaseFret <= 3 && Chord.BaseFret + VisibleFrets >= 3)
@@ -149,7 +156,7 @@
                         var noteTooltip = $"{frettedNote.Name}{(frettedNote.Alteration == Alteration.Sharp ? "♯" : (frettedNote.Alteration == Alteration.Flat ? "♭" : ""))}";
                         
                         <g class="finger-position">
-                            <circle cx="@x" cy="@y" r="12" fill="url(#dot-gradient)" filter="url(#shadow)"/>
+                            <circle cx="@x" cy="@y" r="12" fill="url(#dot-gradient-@UniqueId)" filter="url(#shadow-@UniqueId)"/>
                             
                             @if (finger > 0)
                             {
@@ -174,8 +181,8 @@
                 if (barreFret >= 0 && barreFret < VisibleFrets)
                 {
                     var y = FretboardY + ((Chord.BaseFret == 0 ? barreFret - 1 : barreFret) * FretHeight) + (FretHeight / 2);
-                    <rect x="@(x1 - 12)" y="@(y - 12)" width="@(x2 - x1 + 24)" height="24" 
-                          rx="12" ry="12" fill="url(#dot-gradient)" opacity="0.9" filter="url(#shadow)"/>
+                    <rect x="@(x1 - 12)" y="@(y - 12)" width="@(x2 - x1 + 24)" height="24"
+                          rx="12" ry="12" fill="url(#dot-gradient-@UniqueId)" opacity="0.9" filter="url(#shadow-@UniqueId)"/>
                 }
             }
         </svg>
@@ -185,12 +192,84 @@
     [Parameter] public GuitarChord Chord { get; set; } = null!;
     [Parameter] public int Width { get; set; } = 200;
     [Parameter] public int Height { get; set; } = 250;
-    
+    [Parameter] public bool Responsive { get; set; } = false;
+    [Parameter] public string? MaxWidth { get; set; }
+    [Parameter] public string? MinWidth { get; set; } = "120px";
+
+    // Unique ID for SVG element IDs to avoid conflicts with multiple diagrams
+    private string UniqueId { get; } = Guid.NewGuid().ToString("N")[..8];
+
+    // Base dimensions for viewBox (maintains aspect ratio)
+    private int BaseWidth => 200;
+    private int BaseHeight => 250;
+
+    // Container style for responsive behavior
+    private string ContainerStyle => Responsive
+        ? $"width: 100%; max-width: {MaxWidth ?? "200px"}; min-width: {MinWidth}; aspect-ratio: {BaseWidth} / {BaseHeight};"
+        : $"width: {Width}px; height: {Height}px;";
+
     private int FretboardX => 30;
     private int FretboardY => 40;
-    private int FretboardWidth => Width - 60;
-    private int FretboardHeight => Height - 80;
+    private int FretboardWidth => BaseWidth - 60;
+    private int FretboardHeight => BaseHeight - 80;
     private int StringSpacing => FretboardWidth / 5; // 5 spaces between 6 strings
     private int VisibleFrets => 4;
     private int FretHeight => FretboardHeight / VisibleFrets;
+
+    /// <summary>
+    /// Generates an accessible description of the chord for screen readers.
+    /// </summary>
+    private string GetAccessibleDescription()
+    {
+        var description = new System.Text.StringBuilder();
+        description.Append($"Guitar chord diagram for {Chord.Name}. ");
+
+        var fingerPositions = new List<string>();
+        var openStrings = new List<string>();
+        var mutedStrings = new List<string>();
+
+        string[] stringNames = ["low E", "A", "D", "G", "B", "high E"];
+
+        for (int i = 0; i < 6; i++)
+        {
+            var fret = Chord.FretPositions[i];
+            var stringName = stringNames[i];
+
+            if (fret == -1)
+            {
+                mutedStrings.Add(stringName);
+            }
+            else if (fret == 0)
+            {
+                openStrings.Add(stringName);
+            }
+            else
+            {
+                var finger = Chord.Fingerings[i];
+                var fingerName = finger switch
+                {
+                    1 => "index finger",
+                    2 => "middle finger",
+                    3 => "ring finger",
+                    4 => "pinky",
+                    _ => ""
+                };
+                fingerPositions.Add($"{stringName} string at fret {fret}{(finger > 0 ? $" with {fingerName}" : "")}");
+            }
+        }
+
+        if (mutedStrings.Count > 0)
+            description.Append($"Muted strings: {string.Join(", ", mutedStrings)}. ");
+
+        if (openStrings.Count > 0)
+            description.Append($"Open strings: {string.Join(", ", openStrings)}. ");
+
+        if (fingerPositions.Count > 0)
+            description.Append($"Finger positions: {string.Join("; ", fingerPositions)}. ");
+
+        if (Chord.IsBarreChord)
+            description.Append($"This is a barre chord at fret {Chord.BarreFret}. ");
+
+        return description.ToString();
+    }
 }

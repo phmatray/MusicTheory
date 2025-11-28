@@ -1,5 +1,7 @@
 @using GuitarChords.Models
+@using GuitarChords.Services
 @using System.Timers
+@inject GuitarAudioService AudioService
 @implements IDisposable
 
 <MudDialog @bind-Visible="IsVisible" Options="DialogOptions">
@@ -335,10 +337,11 @@
             NextChord();
         }
         
-        // Play metronome sound (placeholder)
+        // Play metronome sound
         if (_playMetronome)
         {
-            // In a real app, play audio here
+            var isDownbeat = _currentBeat == 0;
+            _ = InvokeAsync(async () => await AudioService.PlayMetronomeClickAsync(isDownbeat));
         }
         
         InvokeAsync(StateHasChanged);
