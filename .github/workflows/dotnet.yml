@@ -32,7 +32,7 @@ jobs:
       run: dotnet test --no-build --verbosity normal --configuration Release --logger "trx;LogFileName=test-results.trx"
       
     - name: Upload test results
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       if: always()
       with:
         name: test-results-${{ matrix.os }}
@@ -91,7 +91,7 @@ jobs:
       run: dotnet pack --configuration Release --no-build --output ./artifacts
       
     - name: Upload artifacts
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: nuget-packages
         path: ./artifacts/*.nupkg
