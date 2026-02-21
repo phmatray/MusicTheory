@@ -1,6 +1,7 @@
 # MusicTheory
 
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue)](https://dotnet.microsoft.com/)
+[![Build](https://github.com/phmatray/MusicTheory/actions/workflows/dotnet.yml/badge.svg)](https://github.com/phmatray/MusicTheory/actions/workflows/dotnet.yml)
 [![Tests](https://img.shields.io/badge/tests-504%20passing-brightgreen)](#testing)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
