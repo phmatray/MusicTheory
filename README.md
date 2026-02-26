@@ -1,11 +1,15 @@
 # MusicTheory
 
+[![NuGet](https://img.shields.io/nuget/v/MusicTheory.svg)](https://www.nuget.org/packages/MusicTheory/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/MusicTheory.svg)](https://www.nuget.org/packages/MusicTheory/)
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue)](https://dotnet.microsoft.com/)
 [![Build](https://github.com/phmatray/MusicTheory/actions/workflows/dotnet.yml/badge.svg)](https://github.com/phmatray/MusicTheory/actions/workflows/dotnet.yml)
 [![Tests](https://img.shields.io/badge/tests-504%20passing-brightgreen)](#testing)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A comprehensive C# library for music theory concepts, providing immutable domain objects for notes, intervals, scales, chords, and more. Built with modern .NET practices and extensive test coverage.
+
+> 📦 **Install:** `dotnet add package MusicTheory` | [NuGet Gallery](https://www.nuget.org/packages/MusicTheory/)
 
 ## ✨ Features
 
@@ -29,21 +33,55 @@ A comprehensive C# library for music theory concepts, providing immutable domain
 - **Type Safety**: Strong typing prevents invalid music theory constructs
 - **Performance**: Lazy evaluation and calculated properties
 
-## 🚀 Quick Start
+---
 
-### Installation
+## 🎯 Why MusicTheory?
+
+| Feature | MusicTheory | Other Libraries |
+|---------|-------------|-----------------|
+| **Immutability** | ✅ All objects immutable | ❌ Often mutable |
+| **Type Safety** | ✅ Compile-time validation | ⚠️ Runtime errors |
+| **Chord Types** | ✅ 40+ types (jazz, altered, exotic) | ⚠️ 10-20 basic types |
+| **Scale Types** | ✅ 15+ (modal, pentatonic, exotic) | ⚠️ 5-10 types |
+| **MIDI Support** | ✅ Bidirectional conversion | ⚠️ Limited or none |
+| **Enharmonics** | ✅ Full support (C# ↔ Db) | ⚠️ Partial or none |
+| **Progressions** | ✅ Roman numeral + common patterns | ❌ Not supported |
+| **Test Coverage** | ✅ 504 tests (comprehensive) | ⚠️ Varies |
+| **.NET Version** | ✅ .NET 9.0 (modern) | ⚠️ Often older frameworks |
+| **Documentation** | ✅ XML docs + examples | ⚠️ Varies |
+
+**Perfect for:**
+- 🎼 Music composition tools and DAWs
+- 🎓 Educational software and theory trainers
+- 🎸 Guitar/piano chord generators
+- 🎹 MIDI processors and synthesizers
+- 📊 Music analysis applications
+
+---
+
+## 📦 Installation
+
+### Via NuGet Package Manager
 
 ```bash
-# Clone the repository
-git clone https://github.com/phmatray/MusicTheory.git
-cd MusicTheory
-
-# Build the solution
-dotnet build
-
-# Run tests
-dotnet test
+dotnet add package MusicTheory
 ```
+
+### Via Package Manager Console
+
+```powershell
+Install-Package MusicTheory
+```
+
+### Via .csproj
+
+```xml
+<ItemGroup>
+  <PackageReference Include="MusicTheory" Version="1.5.1" />
+</ItemGroup>
+```
+
+## 🚀 Quick Start
 
 ### Basic Usage
 
@@ -289,16 +327,123 @@ dotnet run --project MusicTheory.UnitTests -- --coverage
 - **Calculated Properties**: Lazy evaluation for performance
 
 ### Domain Model
+
 ```
-Note ─────────┐
-              ├─── Interval ─── Scale
-              │                   │
-              ├─── Chord ─────────┤
-              │     │             │
-KeySignature ─┴─────┴─ ChordProgression
+┌─────────────────────────────────────────────────────────────┐
+│                     MusicTheory Library                      │
+└─────────────────────────────────────────────────────────────┘
+
+┌──────────┐      ┌──────────┐      ┌──────────┐
+│   Note   │──┬──▶│ Interval │──┬──▶│  Scale   │
+│          │  │   │          │  │   │          │
+│ • Name   │  │   │ • Quality│  │   │ • Type   │
+│ • Alter  │  │   │ • Number │  │   │ • Degree │
+│ • Octave │  │   │ • Invert │  │   │ • Notes  │
+│ • MIDI   │  │   └──────────┘  │   └──────────┘
+└──────────┘  │                 │
+              │   ┌──────────┐  │   ┌──────────────────┐
+              ├──▶│  Chord   │──┴──▶│ ChordProgression │
+              │   │          │      │                  │
+              │   │ • Root   │      │ • Diatonic       │
+              │   │ • Type   │      │ • Roman Num.     │
+              │   │ • Invert │      │ • Common Prog.   │
+              │   │ • Symbol │      └──────────────────┘
+              │   └──────────┘
               │
-TimeSignature ┴─── Duration
+              │   ┌──────────────┐
+              └──▶│ KeySignature │
+                  │              │
+                  │ • Key        │
+                  │ • Mode       │
+                  │ • Sharps/♭s  │
+                  │ • Circle 5th │
+                  └──────────────┘
+
+┌──────────────┐      ┌──────────┐
+│ TimeSignature│─────▶│ Duration │
+│              │      │          │
+│ • Numerator  │      │ • Type   │
+│ • Denominator│      │ • Dots   │
+│ • Beat/Measure│      │ • Tuplet │
+└──────────────┘      └──────────┘
 ```
+
+**Core Relationships:**
+- **Note** → **Interval**: Calculate distance between notes
+- **Note** + **Interval** → **Note**: Transpose notes
+- **Note** + **Chord Type** → **Chord**: Build chords from root notes
+- **Note** + **Scale Type** → **Scale**: Generate scales from root notes
+- **KeySignature** → **ChordProgression**: Generate diatonic chords and progressions
+- **TimeSignature** + **Duration** → Calculate time in seconds, measures
+
+## 💡 Real-World Examples
+
+### Example 1: Chord Progression Generator
+
+```csharp
+var key = new KeySignature(new Note(NoteName.C), KeyMode.Major);
+var progression = new ChordProgression(key);
+
+// Generate a I-V-vi-IV progression (very common in pop music)
+var chords = progression.ParseProgression("I - V - vi - IV");
+// Result: C major - G major - A minor - F major
+
+foreach (var chord in chords)
+{
+    Console.WriteLine($"{chord.GetSymbol()}: {string.Join(", ", chord.GetNotes().Select(n => n.Name))}");
+}
+// Output:
+// C: C, E, G
+// G: G, B, D
+// Am: A, C, E
+// F: F, A, C
+```
+
+### Example 2: MIDI Note Converter
+
+```csharp
+// Convert MIDI note numbers to musical notes
+var midiNotes = new[] { 60, 64, 67 }; // C major triad
+var notes = midiNotes.Select(midi => Note.FromMidiNumber(midi));
+
+Console.WriteLine(string.Join(" - ", notes.Select(n => $"{n.Name}{n.Octave}")));
+// Output: C4 - E4 - G4
+
+// Convert back to MIDI
+var midiNumbers = notes.Select(n => n.MidiNumber);
+```
+
+### Example 3: Scale Explorer
+
+```csharp
+var root = new Note(NoteName.D);
+
+// Compare major and minor scales
+var major = new Scale(root, ScaleType.Major);
+var minor = new Scale(root, ScaleType.NaturalMinor);
+
+Console.WriteLine("D Major: " + string.Join(", ", major.GetNotes().Select(n => n.Name)));
+Console.WriteLine("D Minor: " + string.Join(", ", minor.GetNotes().Select(n => n.Name)));
+
+// Output:
+// D Major: D, E, F♯, G, A, B, C♯, D
+// D Minor: D, E, F, G, A, B♭, C, D
+```
+
+### Example 4: Frequency Calculator
+
+```csharp
+// Calculate frequencies for equal temperament tuning (A4 = 440 Hz)
+var a4 = new Note(NoteName.A, Alteration.Natural, 4);
+var c5 = new Note(NoteName.C, Alteration.Natural, 5);
+
+Console.WriteLine($"A4 frequency: {a4.Frequency:F2} Hz");  // 440.00 Hz
+Console.WriteLine($"C5 frequency: {c5.Frequency:F2} Hz");  // 523.25 Hz
+
+// Perfect for synthesizers and audio applications
+```
+
+---
 
 ## 🔧 Development
 
@@ -359,20 +504,34 @@ The library is optimized for performance:
 
 ## 📖 Documentation
 
-Comprehensive documentation is available at [GitHub Pages](https://phmatray.github.io/MusicTheory/) (once deployed).
+### Quick Reference
 
-The documentation includes:
-- Getting Started Guide
-- Core Concepts (Notes, Intervals, Scales, Chords)
-- Advanced Topics (Transposition, MIDI, Enharmonics)
-- API Reference
-- Code Examples
-- Tutorials
+| Resource | Description | Link |
+|----------|-------------|------|
+| **API Reference** | Auto-generated XML docs | IntelliSense in your IDE |
+| **NuGet Package** | Package page with README | [nuget.org/packages/MusicTheory](https://www.nuget.org/packages/MusicTheory/) |
+| **Source Code** | Explore implementation | [GitHub Repository](https://github.com/phmatray/MusicTheory) |
+| **Examples** | Code samples | See README sections above |
+| **Tests** | 504 test cases as documentation | [MusicTheory.UnitTests](https://github.com/phmatray/MusicTheory/tree/main/MusicTheory.UnitTests) |
 
-To build the documentation locally:
+### Documentation Topics
+
+The library includes comprehensive XML documentation for IntelliSense:
+
+- **Getting Started**: Installation and basic usage
+- **Core Concepts**: Notes, Intervals, Scales, Chords
+- **Advanced Topics**: Transposition, MIDI, Enharmonics, Progressions
+- **Best Practices**: Immutability, fluent APIs, performance
+- **Examples**: Real-world use cases for each component
+
+### Building Documentation Locally
+
+To build comprehensive HTML documentation:
 1. Install [Writerside](https://www.jetbrains.com/writerside/)
 2. Open the project in Writerside
 3. Build the documentation
+
+> 📚 **GitHub Pages deployment coming soon** at [phmatray.github.io/MusicTheory](https://phmatray.github.io/MusicTheory/)
 
 ## 📄 License
 
