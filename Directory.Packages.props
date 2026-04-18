@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <!-- Build and SourceLink -->
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.201" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.202" />
 
     <!-- Testing - Using 17.x line for stable MTP v1 compatibility with xunit.v3 -->
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
