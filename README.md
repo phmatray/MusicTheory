@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> **This repository has moved.** The code now lives in **[phmatray/music-dotnet](https://github.com/phmatray/music-dotnet)** under [`theory`](https://github.com/phmatray/music-dotnet/tree/main/theory) — full git history preserved. This repository is archived (read-only).
+
 ![MusicTheory banner](.github/banner.png)
 
 # MusicTheory
