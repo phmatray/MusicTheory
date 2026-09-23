@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <!-- Lib publiee sur NuGet : net10.0 uniquement. TargetFramework vient de la
+         Directory.Build.props a la racine du depot. -->
+
     <!-- Package Information -->
     <PackageId>MusicTheory</PackageId>
     <Version>1.0.0</Version>

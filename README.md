@@ -74,7 +74,7 @@ A comprehensive C# library for music theory concepts, providing immutable domain
 | **Enharmonics** | ✅ Full support (C# ↔ Db) | ⚠️ Partial or none |
 | **Progressions** | ✅ Roman numeral + common patterns | ❌ Not supported |
 | **Test Coverage** | ✅ 504 tests (comprehensive) | ⚠️ Varies |
-| **.NET Version** | ✅ .NET 9.0 (modern) | ⚠️ Often older frameworks |
+| **.NET Version** | ✅ .NET 10.0 (modern) | ⚠️ Often older frameworks |
 | **Documentation** | ✅ XML docs + examples | ⚠️ Varies |
 
 **Perfect for:**
@@ -334,8 +334,6 @@ dotnet test --logger "console;verbosity=detailed"
 # Run specific test class
 dotnet test --filter "ClassName=NoteTests"
 
-# Generate code coverage
-dotnet run --project MusicTheory.UnitTests -- --coverage
 ```
 
 ### Test Categories
@@ -475,7 +473,7 @@ Console.WriteLine($"C5 frequency: {c5.Frequency:F2} Hz");  // 523.25 Hz
 ## 🔧 Development
 
 ### Prerequisites
-- .NET 9.0 SDK
+- .NET 10.0 SDK
 - Any IDE with C# support (Visual Studio, Rider, VS Code)
 
 ### Building
