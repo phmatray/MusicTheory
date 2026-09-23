@@ -6,18 +6,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Build and SourceLink -->
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.202" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.301" />
+    <!-- Testing. All suites run on xunit.v3 under the native Microsoft.Testing.Platform
+         runner. xunit 2.x is deliberately absent: do not reintroduce it.
 
-    <!-- Testing - Using 17.x line for stable MTP v1 compatibility with xunit.v3 -->
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.4.0" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.6.2" />
+         Microsoft.Testing.Extensions.CodeCoverage is also deliberately absent. xunit.v3
+         3.2.2 is built against MTP v1 (see its xunit.v3.core.mtp-v1 dependency) and pins
+         Microsoft.Testing.Platform.MSBuild to 1.9.1, while every current CodeCoverage
+         release (18.6.2 through 18.9.0) requires MTP 2.x. NuGet unifies the platform
+         assembly upward, the v1 MSBuild hook then cannot find IDataConsumer in
+         Microsoft.Testing.Platform.Extensions.TestHost, and every test run dies with a
+         TypeLoadException. Re-add it only once xunit.v3 ships an mtp-v2 build; until
+         then it forces the whole repo back onto the classic VSTest bridge. -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="Shouldly" Version="4.3.0" />
-
-    <!-- UI Framework -->
-    <PackageVersion Include="MudBlazor" Version="9.3.0" />
+    <PackageVersion Include="MudBlazor" Version="9.7.0" />
   </ItemGroup>
 
 </Project>

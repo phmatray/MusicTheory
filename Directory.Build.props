@@ -1,8 +1,10 @@
 <Project>
 
   <PropertyGroup>
-    <!-- Common Build Settings -->
-    <TargetFramework>net9.0</TargetFramework>
+    <!-- Default TFM for every project in the repo.
+         net9.0 is out of support since 2026-05-12 and must not be reintroduced. -->
+    <TargetFramework>net10.0</TargetFramework>
+
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
@@ -10,7 +12,7 @@
     <!-- Common Package Metadata -->
     <Authors>phmatray</Authors>
     <Company>phmatray</Company>
-    <Copyright>Copyright © 2025 phmatray</Copyright>
+    <Copyright>Copyright © 2026 phmatray</Copyright>
     <PackageProjectUrl>https://github.com/phmatray/MusicTheory</PackageProjectUrl>
     <RepositoryUrl>https://github.com/phmatray/MusicTheory</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -23,7 +25,7 @@
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
-  <!-- SourceLink for all projects -->
+  <!-- SourceLink for all packable projects -->
   <ItemGroup Condition="'$(IsPackable)' == 'true'">
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>
