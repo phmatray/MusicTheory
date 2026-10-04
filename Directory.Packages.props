@@ -18,7 +18,7 @@
          Microsoft.Testing.Platform.Extensions.TestHost, and every test run dies with a
          TypeLoadException. Re-add it only once xunit.v3 ships an mtp-v2 build; until
          then it forces the whole repo back onto the classic VSTest bridge. -->
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="Shouldly" Version="4.3.0" />
