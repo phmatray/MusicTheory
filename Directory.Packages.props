@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.301" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.401" />
     <!-- Testing. All suites run on xunit.v3 under the native Microsoft.Testing.Platform
          runner. xunit 2.x is deliberately absent: do not reintroduce it.
 
