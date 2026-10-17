@@ -9,6 +9,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
 
+    <!-- One version for every package. Release CI overrides it with -p:Version=<semver>. -->
+    <Version>1.0.0</Version>
+
     <!-- Common Package Metadata -->
     <Authors>phmatray</Authors>
     <Company>phmatray</Company>

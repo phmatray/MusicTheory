@@ -28,4 +28,15 @@ public static class MusicTheoryUtilities
     {
         return GetTotalSemitones(note.Name, note.Alteration, note.Octave);
     }
+
+    /// <summary>
+    /// Gets the pitch class of a note: 0 for C, 1 for C#/Db, ... 11 for B (octave ignored).
+    /// </summary>
+    /// <param name="note">The note.</param>
+    /// <returns>A value in 0..11.</returns>
+    public static int GetPitchClass(Note note)
+    {
+        int pc = MusicTheoryConstants.SemitonesFromC[(int)note.Name] + (int)note.Alteration;
+        return ((pc % MusicTheoryConstants.SemitonesPerOctave) + MusicTheoryConstants.SemitonesPerOctave) % MusicTheoryConstants.SemitonesPerOctave;
+    }
 }
