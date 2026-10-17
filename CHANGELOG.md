@@ -2,6 +2,18 @@
 
 Entries are written by release-please from the Conventional Commits merged into `dev`.
 
+## [1.7.0](https://github.com/phmatray/MusicTheory/compare/v1.6.0...v1.7.0) (2026-10-17)
+
+
+### Features
+
+* **guitar:** chord playback via a dependency-free JS module ([#97](https://github.com/phmatray/MusicTheory/issues/97)) ([b25ad28](https://github.com/phmatray/MusicTheory/commit/b25ad28a79416fbfc93e051a7c10f075472e5a34))
+
+
+### Refactor
+
+* **guitarchords:** replace MudBlazor with DaisyBlazor ([#95](https://github.com/phmatray/MusicTheory/issues/95)) ([efff0ae](https://github.com/phmatray/MusicTheory/commit/efff0ae279bce69d15a1053df1fc5f26582cf1df))
+
 ## [1.6.0](https://github.com/phmatray/MusicTheory/releases/tag/v1.6.0) (2026-10-17)
 
 ### Features
