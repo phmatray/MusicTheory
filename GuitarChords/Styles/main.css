@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@import "../obj/daisyblazor/preset.css";
+
+@source "./Components/**/*.razor";
+@source "./Components/**/*.cs";

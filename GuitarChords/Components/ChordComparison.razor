@@ -1,31 +1,31 @@
 @using GuitarChords.Models
 
-<MudDialog @bind-Visible="IsVisible" Options="DialogOptions">
+<Modal @bind-Open="IsVisible" CloseButton="true" Class="w-11/12 max-w-7xl">
     <TitleContent>
-        <MudText Typo="Typo.h5">
-            <MudIcon Icon="@Icons.Material.Filled.Compare" Class="mr-2" />
+        <Typography Typo="Typo.h5">
+            <Icon Name="@Icons.Material.Filled.Compare" Class="mr-2" />
             Compare Chords
-        </MudText>
+        </Typography>
     </TitleContent>
     <DialogContent>
-        <MudGrid>
-            <MudItem xs="12">
-                <MudText Typo="Typo.body1" Class="mb-3">
+        <Grid>
+            <Item xs="12">
+                <Typography Typo="Typo.body1" Class="mb-3">
                     Select up to 4 chords to compare side by side. Great for learning chord variations and transitions!
-                </MudText>
-            </MudItem>
+                </Typography>
+            </Item>
             
             @for (int i = 0; i < MaxChords; i++)
             {
                 var index = i;
-                <MudItem xs="12" sm="6" md="3">
-                    <MudPaper Class="pa-3" Elevation="1">
+                <Item xs="12" sm="6" md="3">
+                    <Paper Class="p-3" Elevation="1">
                         @if (SelectedChords.Count > index && SelectedChords[index] != null)
                         {
                             <div class="text-center">
-                                <MudText Typo="Typo.h6" Class="mb-2">@SelectedChords[index].Name</MudText>
+                                <Typography Typo="Typo.h6" Class="mb-2">@SelectedChords[index].Name</Typography>
                                 <ChordDiagram Chord="SelectedChords[index]" Width="180" Height="220" />
-                                <MudIconButton Icon="@Icons.Material.Filled.Close" 
+                                <IconButton Icon="@Icons.Material.Filled.Close" 
                                              Color="Color.Error" 
                                              Size="Size.Small"
                                              OnClick="@(() => RemoveChord(index))" />
@@ -34,93 +34,93 @@
                         else
                         {
                             <div class="text-center" style="height: 280px; display: flex; align-items: center; justify-content: center;">
-                                <MudButton Variant="Variant.Outlined" 
+                                <Button Variant="Variant.Outlined" 
                                          Color="Color.Primary"
                                          StartIcon="@Icons.Material.Filled.Add"
                                          OnClick="@(() => OpenChordSelector(index))">
                                     Add Chord
-                                </MudButton>
+                                </Button>
                             </div>
                         }
-                    </MudPaper>
-                </MudItem>
+                    </Paper>
+                </Item>
             }
             
             @if (SelectedChords.Count >= 2)
             {
-                <MudItem xs="12">
-                    <MudDivider Class="my-4" />
-                    <MudText Typo="Typo.h6" Class="mb-3">
-                        <MudIcon Icon="@Icons.Material.Filled.Insights" Class="mr-2" />
+                <Item xs="12">
+                    <Divider Class="my-4" />
+                    <Typography Typo="Typo.h6" Class="mb-3">
+                        <Icon Name="@Icons.Material.Filled.Insights" Class="mr-2" />
                         Comparison Insights
-                    </MudText>
+                    </Typography>
                     
-                    <MudGrid>
-                        <MudItem xs="12" md="6">
-                            <MudPaper Class="pa-3" Elevation="1">
-                                <MudText Typo="Typo.subtitle1" Class="mb-2">Common Notes</MudText>
-                                <MudChipSet T="string">
+                    <Grid>
+                        <Item xs="12" md="6">
+                            <Paper Class="p-3" Elevation="1">
+                                <Typography Typo="Typo.subtitle1" Class="mb-2">Common Notes</Typography>
+                                <div class="flex flex-wrap gap-2">
                                     @foreach (var note in GetCommonNotes())
                                     {
-                                        <MudChip T="string" Text="@note" Color="Color.Success" Size="Size.Small" />
+                                        <Chip Text="@note" Color="Color.Success" Size="Size.Small" />
                                     }
-                                </MudChipSet>
-                            </MudPaper>
-                        </MudItem>
+                                </div>
+                            </Paper>
+                        </Item>
                         
-                        <MudItem xs="12" md="6">
-                            <MudPaper Class="pa-3" Elevation="1">
-                                <MudText Typo="Typo.subtitle1" Class="mb-2">Finger Movement</MudText>
-                                <MudList T="string" Dense="true">
+                        <Item xs="12" md="6">
+                            <Paper Class="p-3" Elevation="1">
+                                <Typography Typo="Typo.subtitle1" Class="mb-2">Finger Movement</Typography>
+                                <List>
                                     @foreach (var movement in GetFingerMovements())
                                     {
-                                        <MudListItem T="string">
-                                            <MudText Typo="Typo.body2">@movement</MudText>
-                                        </MudListItem>
+                                        <ListItem>
+                                            <Typography Typo="Typo.body2">@movement</Typography>
+                                        </ListItem>
                                     }
-                                </MudList>
-                            </MudPaper>
-                        </MudItem>
+                                </List>
+                            </Paper>
+                        </Item>
                         
-                        <MudItem xs="12">
-                            <MudPaper Class="pa-3" Elevation="1">
-                                <MudText Typo="Typo.subtitle1" Class="mb-2">Difficulty Progression</MudText>
-                                <div class="d-flex align-center gap-2">
+                        <Item xs="12">
+                            <Paper Class="p-3" Elevation="1">
+                                <Typography Typo="Typo.subtitle1" Class="mb-2">Difficulty Progression</Typography>
+                                <div class="flex items-center gap-2">
                                     @foreach (var chord in SelectedChords)
                                     {
-                                        <MudChip T="string" Text="@chord.Name" Color="@GetDifficultyColor(chord)" />
+                                        <Chip Text="@chord.Name" Color="@GetDifficultyColor(chord)" />
                                         @if (SelectedChords.IndexOf(chord) < SelectedChords.Count - 1)
                                         {
-                                            <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Color="Color.Secondary" />
+                                            <Icon Name="@Icons.Material.Filled.ArrowForward" Color="Color.Secondary" />
                                         }
                                     }
                                 </div>
-                            </MudPaper>
-                        </MudItem>
-                    </MudGrid>
-                </MudItem>
+                            </Paper>
+                        </Item>
+                    </Grid>
+                </Item>
             }
-        </MudGrid>
+        </Grid>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="@(() => IsVisible = false)">Close</MudButton>
+        <Button Color="Color.Default" OnClick="@(() => IsVisible = false)">Close</Button>
         @if (SelectedChords.Count >= 2)
         {
-            <MudButton Color="Color.Primary" 
+            <Button Color="Color.Primary" 
                      StartIcon="@Icons.Material.Filled.PlaylistAdd"
                      OnClick="AddToProgression">
                 Add to Progression
-            </MudButton>
+            </Button>
         }
     </DialogActions>
-</MudDialog>
+</Modal>
 
-<MudDialog @bind-Visible="_showChordSelector" Options="_selectorDialogOptions">
+<Modal @bind-Open="_showChordSelector" Class="w-11/12 max-w-xl">
     <TitleContent>
-        <MudText Typo="Typo.h6">Select a Chord</MudText>
+        <Typography Typo="Typo.h6">Select a Chord</Typography>
     </TitleContent>
     <DialogContent>
-        <MudTextField @bind-Value="_searchText" 
+        <TextField @bind-Value="_searchText" 
                      Label="Search chords" 
                      Variant="Variant.Outlined"
                      Adornment="Adornment.Start"
@@ -128,23 +128,23 @@
                      Immediate="true" 
                      Class="mb-3" />
         
-        <MudList T="GuitarChord" Style="max-height: 400px; overflow-y: auto;">
+        <List Style="max-height: 400px; overflow-y: auto;">
             @foreach (var chord in GetFilteredChords())
             {
-                <MudListItem T="GuitarChord" Value="chord" OnClick="() => SelectChord(chord)">
-                    <div class="d-flex justify-space-between align-center">
-                        <MudText>@chord.Name</MudText>
-                        <MudChip T="string" Text="@GetDifficulty(chord)" Size="Size.Small" Color="@GetDifficultyColor(chord)" />
+                <ListItem Value="chord" OnClick="() => SelectChord(chord)">
+                    <div class="flex justify-between items-center">
+                        <Typography>@chord.Name</Typography>
+                        <Chip Text="@GetDifficulty(chord)" Size="Size.Small" Color="@GetDifficultyColor(chord)" />
                     </div>
-                </MudListItem>
-                <MudDivider />
+                </ListItem>
+                <Divider />
             }
-        </MudList>
+        </List>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="@(() => _showChordSelector = false)">Cancel</MudButton>
+        <Button Color="Color.Default" OnClick="@(() => _showChordSelector = false)">Cancel</Button>
     </DialogActions>
-</MudDialog>
+</Modal>
 
 @code {
     [Parameter] public bool IsVisible { get; set; }
@@ -158,20 +158,7 @@
     private int _currentSlotIndex;
     private string _searchText = "";
     
-    private DialogOptions DialogOptions = new()
-    {
-        MaxWidth = MaxWidth.ExtraLarge,
-        FullWidth = true,
-        CloseButton = true,
-        Position = DialogPosition.Center
-    };
     
-    private DialogOptions _selectorDialogOptions = new()
-    {
-        MaxWidth = MaxWidth.Small,
-        FullWidth = true,
-        Position = DialogPosition.Center
-    };
     
     private void OpenChordSelector(int slotIndex)
     {

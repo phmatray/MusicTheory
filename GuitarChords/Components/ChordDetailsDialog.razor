@@ -2,63 +2,63 @@
 
 @if (Chord != null)
 {
-    <MudDialog @bind-Visible="IsVisible" Options="DialogOptions">
+    <Modal @bind-Open="IsVisible" CloseButton="true" Class="w-11/12 max-w-4xl">
         <TitleContent>
-            <MudText Typo="Typo.h5">
+            <Typography Typo="Typo.h5">
                 @Chord.Name
-                <MudIconButton Icon="@(IsFavorite ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)" 
+                <IconButton Icon="@(IsFavorite ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)" 
                              Color="@(IsFavorite ? Color.Error : Color.Default)"
                              Size="Size.Small"
                              OnClick="@(() => OnToggleFavorite.InvokeAsync(Chord))" />
-            </MudText>
+            </Typography>
         </TitleContent>
         <DialogContent>
-            <MudTabs Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
-                <MudTabPanel Text="Diagram" Icon="@Icons.Material.Filled.GridOn">
-                    <div class="d-flex justify-center">
+            <Tabs>
+                <Tab Title="Diagram">
+                    <div class="flex justify-center">
                         <ChordDiagram Chord="Chord" Width="300" Height="350" />
                     </div>
-                </MudTabPanel>
-                <MudTabPanel Text="Details" Icon="@Icons.Material.Filled.Info">
-                    <MudGrid>
-                        <MudItem xs="12">
-                            <MudList T="string" Dense="true">
-                                <MudListItem T="string" Icon="@Icons.Material.Filled.MusicNote">
-                                    <div class="d-flex justify-space-between">
-                                        <MudText>Root Note:</MudText>
-                                        <MudText>@Chord.Chord.Root</MudText>
+                </Tab>
+                <Tab Title="Details">
+                    <Grid>
+                        <Item xs="12">
+                            <List>
+                                <ListItem Icon="@Icons.Material.Filled.MusicNote">
+                                    <div class="flex justify-between">
+                                        <Typography>Root Note:</Typography>
+                                        <Typography>@Chord.Chord.Root</Typography>
                                     </div>
-                                </MudListItem>
-                                <MudListItem T="string" Icon="@Icons.Material.Filled.Category">
-                                    <div class="d-flex justify-space-between">
-                                        <MudText>Type:</MudText>
-                                        <MudText>@Chord.Chord.Type</MudText>
+                                </ListItem>
+                                <ListItem Icon="@Icons.Material.Filled.Category">
+                                    <div class="flex justify-between">
+                                        <Typography>Type:</Typography>
+                                        <Typography>@Chord.Chord.Type</Typography>
                                     </div>
-                                </MudListItem>
-                                <MudListItem T="string" Icon="@Icons.Material.Filled.QueueMusic">
-                                    <div class="d-flex justify-space-between">
-                                        <MudText>Notes:</MudText>
-                                        <MudText>@string.Join(" - ", Chord.Chord.GetNotes().Select(n => n.ToString()))</MudText>
+                                </ListItem>
+                                <ListItem Icon="@Icons.Material.Filled.QueueMusic">
+                                    <div class="flex justify-between">
+                                        <Typography>Notes:</Typography>
+                                        <Typography>@string.Join(" - ", Chord.Chord.GetNotes().Select(n => n.ToString()))</Typography>
                                     </div>
-                                </MudListItem>
-                                <MudListItem T="string" Icon="@Icons.Material.Filled.Straighten">
-                                    <div class="d-flex justify-space-between">
-                                        <MudText>Barre:</MudText>
-                                        <MudText>@(Chord.IsBarreChord ? "Yes" : "No")</MudText>
+                                </ListItem>
+                                <ListItem Icon="@Icons.Material.Filled.Straighten">
+                                    <div class="flex justify-between">
+                                        <Typography>Barre:</Typography>
+                                        <Typography>@(Chord.IsBarreChord ? "Yes" : "No")</Typography>
                                     </div>
-                                </MudListItem>
-                                <MudListItem T="string" Icon="@Icons.Material.Filled.SignalCellularAlt">
-                                    <div class="d-flex justify-space-between">
-                                        <MudText>Difficulty:</MudText>
-                                        <MudChip T="string" Text="@Difficulty" Size="Size.Small" Color="@DifficultyColor" />
+                                </ListItem>
+                                <ListItem Icon="@Icons.Material.Filled.SignalCellularAlt">
+                                    <div class="flex justify-between">
+                                        <Typography>Difficulty:</Typography>
+                                        <Chip Text="@Difficulty" Size="Size.Small" Color="@DifficultyColor" />
                                     </div>
-                                </MudListItem>
-                            </MudList>
-                        </MudItem>
-                    </MudGrid>
-                </MudTabPanel>
-                <MudTabPanel Text="Fingering" Icon="@Icons.Material.Filled.PanTool">
-                    <MudSimpleTable Dense="true" Hover="true" Bordered="true">
+                                </ListItem>
+                            </List>
+                        </Item>
+                    </Grid>
+                </Tab>
+                <Tab Title="Fingering">
+                    <SimpleTable Dense="true" Hover="true" Bordered="true">
                         <thead>
                             <tr>
                                 <th>String</th>
@@ -78,7 +78,7 @@
                                 <tr>
                                     <td>@(i + 1) (@openNote.Name@(openNote.Octave))</td>
                                     <td>
-                                        @if (fret == -1) { <MudChip T="string" Text="Muted" Size="Size.Small" Color="Color.Error" /> }
+                                        @if (fret == -1) { <Chip Text="Muted" Size="Size.Small" Color="Color.Error" /> }
                                         else if (fret == 0) { <text>@openNote</text> }
                                         else { <text>@GuitarTuning.GetNoteAtFret(stringIndex, fret)</text> }
                                     </td>
@@ -87,27 +87,27 @@
                                         else { <text>-</text> }
                                     </td>
                                     <td>
-                                        @if (finger > 0) { <MudAvatar Size="Size.Small" Color="Color.Primary">@finger</MudAvatar> }
-                                        else if (fret == 0) { <MudChip T="string" Text="Open" Size="Size.Small" Color="Color.Success" /> }
+                                        @if (finger > 0) { <Avatar Size="Size.Small" Color="Color.Primary">@finger</Avatar> }
+                                        else if (fret == 0) { <Chip Text="Open" Size="Size.Small" Color="Color.Success" /> }
                                         else { <text>-</text> }
                                     </td>
                                 </tr>
                             }
                         </tbody>
-                    </MudSimpleTable>
-                </MudTabPanel>
-            </MudTabs>
+                    </SimpleTable>
+                </Tab>
+            </Tabs>
         </DialogContent>
         <DialogActions>
             @if (ShowProgressionButton)
             {
-                <MudButton Color="Color.Primary" Variant="Variant.Text" OnClick="@(() => OnAddToProgression.InvokeAsync(Chord))">
+                <Button Color="Color.Primary" Variant="Variant.Text" OnClick="@(() => OnAddToProgression.InvokeAsync(Chord))">
                     Add to Progression
-                </MudButton>
+                </Button>
             }
-            <MudButton Color="Color.Default" OnClick="@(() => IsVisible = false)">Close</MudButton>
+            <Button Color="Color.Default" OnClick="@(() => IsVisible = false)">Close</Button>
         </DialogActions>
-    </MudDialog>
+    </Modal>
 }
 
 @code {
@@ -121,13 +121,6 @@
     [Parameter] public EventCallback<GuitarChord> OnAddToProgression { get; set; }
     [Parameter] public EventCallback<GuitarChord> OnToggleFavorite { get; set; }
 
-    private DialogOptions DialogOptions = new()
-    {
-        MaxWidth = MaxWidth.Medium,
-        FullWidth = true,
-        CloseButton = true,
-        Position = DialogPosition.Center
-    };
 
     protected override void OnParametersSet()
     {

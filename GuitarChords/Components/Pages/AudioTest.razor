@@ -3,65 +3,65 @@
 @inject GuitarAudioService AudioService
 @inject IJSRuntime JS
 
-<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
-    <MudPaper Class="pa-4">
-        <MudText Typo="Typo.h4">Audio System Test</MudText>
+<Container MaxWidth="MaxWidth.Medium" Class="mt-4">
+    <Paper Class="p-4">
+        <Typography Typo="Typo.h4">Audio System Test</Typography>
         
-        <MudGrid Class="mt-4">
-            <MudItem xs="12">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="PlayTestTone">
+        <Grid Class="mt-4">
+            <Item xs="12">
+                <Button Variant="Variant.Filled" Color="Color.Primary" OnClick="PlayTestTone">
                     Play Test Tone (440Hz)
-                </MudButton>
-            </MudItem>
+                </Button>
+            </Item>
             
-            <MudItem xs="12">
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="PlaySimpleChord">
+            <Item xs="12">
+                <Button Variant="Variant.Filled" Color="Color.Secondary" OnClick="PlaySimpleChord">
                     Play C Major Chord
-                </MudButton>
-            </MudItem>
+                </Button>
+            </Item>
             
-            <MudItem xs="12">
-                <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="CheckAudioState">
+            <Item xs="12">
+                <Button Variant="Variant.Filled" Color="Color.Info" OnClick="CheckAudioState">
                     Check Audio State
-                </MudButton>
-            </MudItem>
+                </Button>
+            </Item>
             
-            <MudItem xs="12">
-                <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="InitializeAudio">
+            <Item xs="12">
+                <Button Variant="Variant.Filled" Color="Color.Warning" OnClick="InitializeAudio">
                     Initialize Audio
-                </MudButton>
-            </MudItem>
+                </Button>
+            </Item>
             
-            <MudItem xs="12">
-                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="PlayWorkletTestTone">
+            <Item xs="12">
+                <Button Variant="Variant.Filled" Color="Color.Success" OnClick="PlayWorkletTestTone">
                     Play Worklet Test Tone
-                </MudButton>
-            </MudItem>
+                </Button>
+            </Item>
             
-            <MudItem xs="12">
-                <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="TestSimpleOscillator">
+            <Item xs="12">
+                <Button Variant="Variant.Filled" Color="Color.Error" OnClick="TestSimpleOscillator">
                     Test Simple Oscillator (No Worklet)
-                </MudButton>
-            </MudItem>
+                </Button>
+            </Item>
             
-            <MudItem xs="12">
-                <MudButton Variant="Variant.Filled" Color="Color.Dark" OnClick="TestMinimalWorklet">
+            <Item xs="12">
+                <Button Variant="Variant.Filled" Color="Color.Dark" OnClick="TestMinimalWorklet">
                     Test Minimal Worklet (White Noise)
-                </MudButton>
-            </MudItem>
-        </MudGrid>
+                </Button>
+            </Item>
+        </Grid>
         
-        <MudDivider Class="my-4" />
+        <Divider Class="my-4" />
         
-        <MudText Typo="Typo.h6">Console Output:</MudText>
-        <MudPaper Class="pa-2 mt-2" Style="background-color: #f5f5f5; font-family: monospace;">
+        <Typography Typo="Typo.h6">Console Output:</Typography>
+        <Paper Class="p-2 mt-2" Style="background-color: #f5f5f5; font-family: monospace;">
             @foreach (var log in _logs)
             {
                 <div>@log</div>
             }
-        </MudPaper>
-    </MudPaper>
-</MudContainer>
+        </Paper>
+    </Paper>
+</Container>
 
 @code {
     private List<string> _logs = new();

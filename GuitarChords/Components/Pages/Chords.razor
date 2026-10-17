@@ -12,9 +12,9 @@
 
 <PageTitle>Explore Chords</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
-    <MudText Typo="Typo.h3" Class="mb-2">Guitar Chord Dictionary</MudText>
-    <MudText Typo="Typo.subtitle1" Class="mb-4" Color="Color.Secondary">Explore, learn, and master guitar chords</MudText>
+<Container MaxWidth="MaxWidth.Large" Class="py-4">
+    <Typography Typo="Typo.h3" Class="mb-2">Guitar Chord Dictionary</Typography>
+    <Typography Typo="Typo.subtitle1" Class="mb-4" Color="Color.Secondary">Explore, learn, and master guitar chords</Typography>
 
     <ChordFilters @bind-SearchText="_searchText"
                   @bind-ShowFilters="_showFilters"
@@ -28,19 +28,19 @@
                   OnFiltersChanged="ApplyFilters" />
     
     <div class="mb-3">
-        <MudButton StartIcon="@Icons.Material.Filled.Compare" 
+        <Button StartIcon="@Icons.Material.Filled.Compare" 
                    Color="Color.Secondary" 
                    Variant="Variant.Outlined"
                    OnClick="@(() => _showComparisonDialog = true)"
                    Class="mr-2">
             Compare Chords
-        </MudButton>
-        <MudButton StartIcon="@Icons.Material.Filled.School" 
+        </Button>
+        <Button StartIcon="@Icons.Material.Filled.School" 
                    Color="Color.Tertiary" 
                    Variant="Variant.Outlined"
                    OnClick="@(() => _showPracticeDialog = true)">
             Practice Mode
-        </MudButton>
+        </Button>
     </div>
 
     @if (_showProgression)
@@ -60,58 +60,58 @@
         
         @if (_chordSuggestions.Any())
         {
-            <MudPaper Class="pa-4 mt-4" Elevation="1">
-                <MudText Typo="Typo.h6" Class="mb-3">
-                    <MudIcon Icon="@Icons.Material.Filled.Lightbulb" Class="mr-2" />
+            <Paper Class="p-4 mt-4" Elevation="1">
+                <Typography Typo="Typo.h6" Class="mb-3">
+                    <Icon Name="@Icons.Material.Filled.Lightbulb" Class="mr-2" />
                     Suggested Next Chords
-                </MudText>
-                <MudGrid>
+                </Typography>
+                <Grid>
                     @foreach (var suggestion in _chordSuggestions)
                     {
-                        <MudItem xs="12" sm="6" md="4">
-                            <MudCard Outlined="true" Class="suggestion-card">
-                                <MudCardContent Class="pa-2">
-                                    <div class="d-flex justify-space-between align-center mb-2">
-                                        <MudText Typo="Typo.subtitle1">@suggestion.Chord.Name</MudText>
-                                        <MudChip T="string" 
+                        <Item xs="12" sm="6" md="4">
+                            <Card Outlined="true" Class="suggestion-card">
+                                <CardContent Class="p-2">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <Typography Typo="Typo.subtitle1">@suggestion.Chord.Name</Typography>
+                                        <Chip 
                                                Text="@($"{(int)(suggestion.Confidence * 100)}%")" 
                                                Size="Size.Small" 
                                                Color="@GetConfidenceColor(suggestion.Confidence)" />
                                     </div>
-                                    <MudText Typo="Typo.body2" Class="mb-2">@suggestion.Reason</MudText>
-                                    <div class="d-flex justify-space-between align-center">
-                                        <MudChip T="string" 
+                                    <Typography Typo="Typo.body2" Class="mb-2">@suggestion.Reason</Typography>
+                                    <div class="flex justify-between items-center">
+                                        <Chip 
                                                Text="@suggestion.TransitionDifficulty" 
                                                Size="Size.Small"
                                                Color="@GetDifficultyColor(suggestion.TransitionDifficulty)" />
-                                        <MudIconButton Icon="@Icons.Material.Filled.Add" 
+                                        <IconButton Icon="@Icons.Material.Filled.Add" 
                                                      Size="Size.Small"
                                                      Color="Color.Primary"
                                                      OnClick="@(() => AddToProgression(suggestion.Chord))" />
                                     </div>
-                                </MudCardContent>
-                            </MudCard>
-                        </MudItem>
+                                </CardContent>
+                            </Card>
+                        </Item>
                     }
-                </MudGrid>
-            </MudPaper>
+                </Grid>
+            </Paper>
         }
     }
 
     @if (_recentlyViewedChords.Any() && string.IsNullOrEmpty(_searchText) && string.IsNullOrEmpty(_selectedRoot) && string.IsNullOrEmpty(_selectedType))
     {
-        <MudPaper Class="pa-4 mb-4" Elevation="1">
-            <MudText Typo="Typo.h6" Class="mb-3">
-                <MudIcon Icon="@Icons.Material.Filled.History" Class="mr-2" />
+        <Paper Class="p-4 mb-4" Elevation="1">
+            <Typography Typo="Typo.h6" Class="mb-3">
+                <Icon Name="@Icons.Material.Filled.History" Class="mr-2" />
                 Recently Viewed
-            </MudText>
-            <MudChipSet T="string">
+            </Typography>
+            <div class="flex flex-wrap gap-2">
                 @foreach (var chordName in _recentlyViewedChords.Take(8))
                 {
                     var chord = _allChords.FirstOrDefault(c => c.Name == chordName);
                     if (chord != null)
                     {
-                        <MudChip T="string" 
+                        <Chip 
                                Text="@chord.Name" 
                                Icon="@Icons.Material.Filled.MusicNote"
                                OnClick="@(() => SelectChord(chord))"
@@ -119,38 +119,38 @@
                                Variant="Variant.Outlined" />
                     }
                 }
-            </MudChipSet>
-        </MudPaper>
+            </div>
+        </Paper>
     }
     
     @if (_filteredChords.Any())
     {
-        <div class="d-flex justify-space-between align-center mb-3">
-            <MudText Typo="Typo.h5">
+        <div class="flex justify-between items-center mb-3">
+            <Typography Typo="Typo.h5">
                 @(string.IsNullOrEmpty(_searchText) ? "Popular Chords" : $"Results for \"{_searchText}\"")
-                <MudChip T="string" Text="@_filteredChords.Count.ToString()" Size="Size.Small" Color="Color.Primary" />
-            </MudText>
-            <MudButtonGroup Variant="Variant.Text" Size="Size.Small">
-                <MudIconButton Icon="@Icons.Material.Filled.GridView" 
+                <Chip Text="@_filteredChords.Count.ToString()" Size="Size.Small" Color="Color.Primary" />
+            </Typography>
+            <ButtonGroup Variant="Variant.Text" Size="Size.Small">
+                <IconButton Icon="@Icons.Material.Filled.GridView" 
                              Color="@(_viewMode == "grid" ? Color.Primary : Color.Default)"
                              OnClick="@(() => _viewMode = "grid")" />
-                <MudIconButton Icon="@Icons.Material.Filled.ViewList" 
+                <IconButton Icon="@Icons.Material.Filled.ViewList" 
                              Color="@(_viewMode == "list" ? Color.Primary : Color.Default)"
                              OnClick="@(() => _viewMode = "list")" />
-            </MudButtonGroup>
-            <MudTooltip Text="Keyboard shortcuts (?)">
-                <MudIconButton Icon="@Icons.Material.Filled.Help" 
+            </ButtonGroup>
+            <Tooltip Text="Keyboard shortcuts (?)">
+                <IconButton Icon="@Icons.Material.Filled.Help" 
                              Size="Size.Small"
                              OnClick="@(() => _showHelpDialog = true)" />
-            </MudTooltip>
+            </Tooltip>
         </div>
         
         @if (_viewMode == "grid")
         {
-            <MudGrid>
+            <Grid>
                 @foreach (var chord in _filteredChords)
                 {
-                    <MudItem xs="12" sm="6" md="4" lg="3">
+                    <Item xs="12" sm="6" md="4" lg="3">
                         <ChordCard Chord="chord"
                                   ShowProgressionButton="_showProgression"
                                   IsFavorite="_favoriteChords.Contains(chord.Name)"
@@ -159,42 +159,42 @@
                                   OnClick="@(() => SelectChord(chord))"
                                   OnAddToProgression="AddToProgression"
                                   OnToggleFavorite="ToggleFavorite" />
-                    </MudItem>
+                    </Item>
                 }
-            </MudGrid>
+            </Grid>
         }
         else
         {
-            <MudList T="GuitarChord">
+            <List>
                 @foreach (var chord in _filteredChords)
                 {
-                    <MudListItem T="GuitarChord" Value="chord" OnClick="() => SelectChord(chord)">
-                        <div class="d-flex align-center">
-                            <MudText Class="mr-4">@chord.Name</MudText>
-                            <MudChip T="string" Text="@GetDifficulty(chord)" Size="Size.Small" Color="@(GetDifficultyColor(chord))" />
-                            <MudSpacer />
+                    <ListItem Value="chord" OnClick="() => SelectChord(chord)">
+                        <div class="flex items-center">
+                            <Typography Class="mr-4">@chord.Name</Typography>
+                            <Chip Text="@GetDifficulty(chord)" Size="Size.Small" Color="@(GetDifficultyColor(chord))" />
+                            <Spacer />
                             @if (_showProgression)
                             {
-                                <MudIconButton Icon="@Icons.Material.Filled.Add" 
+                                <IconButton Icon="@Icons.Material.Filled.Add" 
                                              Color="Color.Primary" 
                                              Size="Size.Small"
                                              OnClick="@(() => AddToProgression(chord))" />
                             }
-                            <MudIconButton Icon="@(_favoriteChords.Contains(chord.Name) ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)" 
+                            <IconButton Icon="@(_favoriteChords.Contains(chord.Name) ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)" 
                                          Color="@(_favoriteChords.Contains(chord.Name) ? Color.Error : Color.Default)"
                                          Size="Size.Small"
                                          OnClick="@(() => ToggleFavorite(chord))" />
                         </div>
-                    </MudListItem>
+                    </ListItem>
                 }
-            </MudList>
+            </List>
         }
     }
     else if (!string.IsNullOrEmpty(_searchText))
     {
-        <MudAlert Severity="Severity.Info">
+        <Alert Severity="Severity.Info">
             No chords found matching "@_searchText". Try adjusting your filters or search terms.
-        </MudAlert>
+        </Alert>
     }
 
     <ChordDetailsDialog Chord="_selectedChord"
@@ -207,91 +207,91 @@
                        OnToggleFavorite="ToggleFavorite" />
     
     @* Template Selection Dialog *@
-    <MudDialog @bind-Visible="_showTemplateDialog" Options="_dialogOptions">
+    <Modal @bind-Open="_showTemplateDialog" CloseButton="true" Class="w-11/12 max-w-4xl">
         <TitleContent>
-            <MudText Typo="Typo.h6">Choose a Chord Progression Template</MudText>
+            <Typography Typo="Typo.h6">Choose a Chord Progression Template</Typography>
         </TitleContent>
         <DialogContent>
-            <MudList T="string">
+            <List>
                 @foreach (var template in ProgressionService.GetCommonProgressions())
                 {
-                    <MudListItem T="string" OnClick="() => LoadTemplate(template.Key, template.Value)">
-                        <MudText Typo="Typo.subtitle1">@template.Key</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">@string.Join(" - ", template.Value)</MudText>
-                    </MudListItem>
-                    <MudDivider />
+                    <ListItem OnClick="() => LoadTemplate(template.Key, template.Value)">
+                        <Typography Typo="Typo.subtitle1">@template.Key</Typography>
+                        <Typography Typo="Typo.body2" Color="Color.Secondary">@string.Join(" - ", template.Value)</Typography>
+                    </ListItem>
+                    <Divider />
                 }
-            </MudList>
+            </List>
         </DialogContent>
         <DialogActions>
-            <MudButton Color="Color.Default" OnClick="@(() => _showTemplateDialog = false)">Cancel</MudButton>
+            <Button Color="Color.Default" OnClick="@(() => _showTemplateDialog = false)">Cancel</Button>
         </DialogActions>
-    </MudDialog>
+    </Modal>
     
     @* Save Progression Dialog *@
-    <MudDialog @bind-Visible="_showSaveDialog" Options="_dialogOptions">
+    <Modal @bind-Open="_showSaveDialog" CloseButton="true" Class="w-11/12 max-w-4xl">
         <TitleContent>
-            <MudText Typo="Typo.h6">Save Chord Progression</MudText>
+            <Typography Typo="Typo.h6">Save Chord Progression</Typography>
         </TitleContent>
         <DialogContent>
-            <MudTextField @bind-Value="_progressionName" Label="Progression Name" 
+            <TextField @bind-Value="_progressionName" Label="Progression Name" 
                          Variant="Variant.Outlined" Immediate="true" />
-            <MudText Typo="Typo.body2" Class="mt-2">
+            <Typography Typo="Typo.body2" Class="mt-2">
                 Chords: @string.Join(" - ", _progressionChords.Select(c => c.Name))
-            </MudText>
-            <MudText Typo="Typo.body2">
+            </Typography>
+            <Typography Typo="Typo.body2">
                 Tempo: @_tempo BPM
-            </MudText>
+            </Typography>
         </DialogContent>
         <DialogActions>
-            <MudButton Color="Color.Default" OnClick="@(() => _showSaveDialog = false)">Cancel</MudButton>
-            <MudButton Color="Color.Primary" OnClick="ConfirmSaveProgression">Save</MudButton>
+            <Button Color="Color.Default" OnClick="@(() => _showSaveDialog = false)">Cancel</Button>
+            <Button Color="Color.Primary" OnClick="ConfirmSaveProgression">Save</Button>
         </DialogActions>
-    </MudDialog>
+    </Modal>
     
     @* Saved Progressions Dialog *@
-    <MudDialog @bind-Visible="_showSavedProgressionsDialog" Options="_dialogOptions">
+    <Modal @bind-Open="_showSavedProgressionsDialog" CloseButton="true" Class="w-11/12 max-w-4xl">
         <TitleContent>
-            <MudText Typo="Typo.h6">Saved Progressions</MudText>
+            <Typography Typo="Typo.h6">Saved Progressions</Typography>
         </TitleContent>
         <DialogContent>
             @if (ProgressionService.GetSavedProgressions().Any())
             {
-                <MudList T="Services.ChordProgression">
+                <List>
                     @foreach (var progression in ProgressionService.GetSavedProgressions().OrderByDescending(p => p.CreatedDate))
                     {
-                        <MudListItem T="Services.ChordProgression">
-                            <div class="d-flex justify-space-between align-center">
+                        <ListItem>
+                            <div class="flex justify-between items-center">
                                 <div @onclick="() => LoadSavedProgression(progression)" style="cursor: pointer; flex: 1;">
-                                    <MudText Typo="Typo.subtitle1">@progression.Name</MudText>
-                                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                    <Typography Typo="Typo.subtitle1">@progression.Name</Typography>
+                                    <Typography Typo="Typo.body2" Color="Color.Secondary">
                                         @string.Join(" - ", progression.ChordNames) (@progression.Tempo BPM)
-                                    </MudText>
-                                    <MudText Typo="Typo.caption" Color="Color.Tertiary">
+                                    </Typography>
+                                    <Typography Typo="Typo.caption" Color="Color.Tertiary">
                                         @progression.CreatedDate.ToString("MMM dd, yyyy HH:mm")
-                                    </MudText>
+                                    </Typography>
                                 </div>
-                                <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                <IconButton Icon="@Icons.Material.Filled.Delete" 
                                              Color="Color.Error" 
                                              Size="Size.Small"
                                              OnClick="@(() => DeleteSavedProgression(progression))" />
                             </div>
-                        </MudListItem>
-                        <MudDivider />
+                        </ListItem>
+                        <Divider />
                     }
-                </MudList>
+                </List>
             }
             else
             {
-                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                <Typography Typo="Typo.body2" Color="Color.Secondary">
                     No saved progressions yet. Create and save your first progression!
-                </MudText>
+                </Typography>
             }
         </DialogContent>
         <DialogActions>
-            <MudButton Color="Color.Default" OnClick="@(() => _showSavedProgressionsDialog = false)">Close</MudButton>
+            <Button Color="Color.Default" OnClick="@(() => _showSavedProgressionsDialog = false)">Close</Button>
         </DialogActions>
-    </MudDialog>
+    </Modal>
     
     @* Chord Comparison Dialog *@
     <ChordComparison @bind-IsVisible="_showComparisonDialog"
@@ -309,15 +309,15 @@
                    Chords="_allChords" />
     
     @* Help Dialog *@
-    <MudDialog @bind-Visible="_showHelpDialog" Options="_dialogOptions">
+    <Modal @bind-Open="_showHelpDialog" CloseButton="true" Class="w-11/12 max-w-4xl">
         <TitleContent>
-            <MudText Typo="Typo.h6">
-                <MudIcon Icon="@Icons.Material.Filled.Help" Class="mr-2" />
+            <Typography Typo="Typo.h6">
+                <Icon Name="@Icons.Material.Filled.Help" Class="mr-2" />
                 Keyboard Shortcuts
-            </MudText>
+            </Typography>
         </TitleContent>
         <DialogContent>
-            <MudSimpleTable Dense="true" Hover="true">
+            <SimpleTable Dense="true" Hover="true">
                 <thead>
                     <tr>
                         <th>Shortcut</th>
@@ -326,57 +326,57 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><MudChip T="string" Text="Ctrl+K" Size="Size.Small" /></td>
+                        <td><Chip Text="Ctrl+K" Size="Size.Small" /></td>
                         <td>Focus search</td>
                     </tr>
                     <tr>
-                        <td><MudChip T="string" Text="Ctrl+P" Size="Size.Small" /></td>
+                        <td><Chip Text="Ctrl+P" Size="Size.Small" /></td>
                         <td>Open practice mode</td>
                     </tr>
                     <tr>
-                        <td><MudChip T="string" Text="Ctrl+C" Size="Size.Small" /></td>
+                        <td><Chip Text="Ctrl+C" Size="Size.Small" /></td>
                         <td>Compare chords</td>
                     </tr>
                     <tr>
-                        <td><MudChip T="string" Text="Ctrl+E" Size="Size.Small" /></td>
+                        <td><Chip Text="Ctrl+E" Size="Size.Small" /></td>
                         <td>Export progression</td>
                     </tr>
                     <tr>
-                        <td><MudChip T="string" Text="Space" Size="Size.Small" /></td>
+                        <td><Chip Text="Space" Size="Size.Small" /></td>
                         <td>Play/Pause progression</td>
                     </tr>
                     <tr>
-                        <td><MudChip T="string" Text="Escape" Size="Size.Small" /></td>
+                        <td><Chip Text="Escape" Size="Size.Small" /></td>
                         <td>Close dialog</td>
                     </tr>
                     <tr>
-                        <td><MudChip T="string" Text="G" Size="Size.Small" /></td>
+                        <td><Chip Text="G" Size="Size.Small" /></td>
                         <td>Grid view</td>
                     </tr>
                     <tr>
-                        <td><MudChip T="string" Text="L" Size="Size.Small" /></td>
+                        <td><Chip Text="L" Size="Size.Small" /></td>
                         <td>List view</td>
                     </tr>
                     <tr>
-                        <td><MudChip T="string" Text="F" Size="Size.Small" /></td>
+                        <td><Chip Text="F" Size="Size.Small" /></td>
                         <td>Toggle filters</td>
                     </tr>
                     <tr>
-                        <td><MudChip T="string" Text="P" Size="Size.Small" /></td>
+                        <td><Chip Text="P" Size="Size.Small" /></td>
                         <td>Toggle progression builder</td>
                     </tr>
                     <tr>
-                        <td><MudChip T="string" Text="?" Size="Size.Small" /></td>
+                        <td><Chip Text="?" Size="Size.Small" /></td>
                         <td>Show this help</td>
                     </tr>
                 </tbody>
-            </MudSimpleTable>
+            </SimpleTable>
         </DialogContent>
         <DialogActions>
-            <MudButton Color="Color.Default" OnClick="@(() => _showHelpDialog = false)">Close</MudButton>
+            <Button Color="Color.Default" OnClick="@(() => _showHelpDialog = false)">Close</Button>
         </DialogActions>
-    </MudDialog>
-</MudContainer>
+    </Modal>
+</Container>
 
 @code {
     private List<GuitarChord> _allChords = new();
@@ -407,13 +407,6 @@
     private List<string> _recentlyViewedChords = new();
     private List<ChordSuggestion> _chordSuggestions = new();
     
-    private DialogOptions _dialogOptions = new()
-    {
-        MaxWidth = MaxWidth.Medium,
-        FullWidth = true,
-        CloseButton = true,
-        Position = DialogPosition.Center
-    };
 
     protected override async Task OnInitializedAsync()
     {

@@ -36,7 +36,7 @@
     right: 16px;
 }
 
-::deep .mud-dialog {
+::deep .modal-box {
     animation: slide-in 0.3s ease-out;
 }
 
@@ -51,25 +51,25 @@
     }
 }
 
-::deep .mud-chip-set .mud-chip {
+::deep .badge {
     transition: all 0.2s ease;
 }
 
-::deep .mud-chip-set .mud-chip:hover {
+::deep .badge:hover {
     transform: scale(1.05);
 }
 
-::deep .mud-list-item {
+::deep .list li {
     transition: background-color 0.2s ease;
     border-radius: 4px;
     margin: 4px 0;
 }
 
-::deep .mud-list-item:hover {
+::deep .list li:hover {
     background-color: rgba(0,0,0,0.04);
 }
 
-::deep .mud-tabs .mud-tab {
+::deep .tabs .tab {
     min-width: 120px;
 }
 
@@ -127,10 +127,10 @@
 .suggestion-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-color: var(--mud-palette-primary);
+    border-color: var(--color-primary);
 }
 
-.suggestion-card .mud-card-content {
+.suggestion-card .card-body {
     min-height: 120px;
 }
 
