@@ -4,7 +4,6 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>MusicTheory.UnitTests</RootNamespace>
     <IsPackable>false</IsPackable>
-    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
     <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
     <TestingPlatformCaptureOutput>true</TestingPlatformCaptureOutput>
   </PropertyGroup>
