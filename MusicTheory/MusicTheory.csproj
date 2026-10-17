@@ -6,7 +6,6 @@
 
     <!-- Package Information -->
     <PackageId>MusicTheory</PackageId>
-    <Version>1.0.0</Version>
     <Product>MusicTheory</Product>
     <Description>A comprehensive .NET library for music theory operations including notes, intervals, scales, chords, and chord progressions. Provides immutable domain objects with calculated properties for frequency, semitones, and musical relationships.</Description>
     <PackageTags>music;theory;notes;scales;chords;intervals;music-theory;dotnet;csharp</PackageTags>
@@ -20,6 +19,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <!-- Fail the pack on public API breaks against the last published package. -->
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageValidationBaselineVersion>1.5.3</PackageValidationBaselineVersion>
   </PropertyGroup>
 
   <ItemGroup>
