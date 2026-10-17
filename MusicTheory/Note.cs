@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace MusicTheory;
 
 /// <summary>
@@ -256,6 +258,21 @@ public class Note
     }
 
     /// <summary>
+    /// Transposes the note by a number of semitones and spells the result in <paramref name="targetKey"/>
+    /// (see <see cref="KeySignature.Spell"/>): A +1 in Eb major is Bb, in E major A#.
+    /// </summary>
+    /// <param name="semitones">The number of semitones (positive for up, negative for down).</param>
+    /// <param name="targetKey">The key whose spelling the result follows.</param>
+    /// <returns>A new note, in the octave the transposition reaches.</returns>
+    public Note TransposeBySemitones(int semitones, KeySignature targetKey)
+    {
+        int target = GetTotalSemitones() + semitones;
+        var spelled = targetKey.Spell(target);
+        int offset = MusicTheoryConstants.SemitonesFromC[(int)spelled.Name] + (int)spelled.Alteration;
+        return new Note(spelled.Name, spelled.Alteration, (int)Math.Floor((target - offset) / 12.0));
+    }
+
+    /// <summary>
     /// Gets the total semitones from C0 for this note.
     /// </summary>
     private int GetTotalSemitones()
@@ -351,6 +368,12 @@ public class Note
         
         return $"{Name}{alterationSymbol}{Octave}";
     }
+
+    /// <summary>
+    /// The note name without octave, e.g. <c>Bb</c> or (Unicode) <c>B♭</c>.
+    /// </summary>
+    /// <param name="style">ASCII or Unicode accidentals.</param>
+    public string GetName(AccidentalStyle style = AccidentalStyle.Ascii) => ChordSymbol.Spell(this, style);
 
     /// <summary>
     /// Determines if this note is enharmonically equivalent to another note.
@@ -494,60 +517,88 @@ public class Note
     /// <summary>
     /// Parses a string representation of a note.
     /// </summary>
-    /// <param name="noteString">The string to parse (e.g., "C#4", "Bb3", "F##5").</param>
+    /// <param name="noteString">The string to parse (e.g., "C#4", "Bb3", "F##5", "B♭", "bb"). The letter may be
+    /// lower-case, accidentals may be ASCII (<c>#</c>, <c>b</c>, <c>##</c>, <c>bb</c>) or Unicode (♯ ♭ 𝄪 𝄫),
+    /// and the octave is optional (default 4).</param>
     /// <returns>A new Note instance.</returns>
     /// <exception cref="ArgumentException">Thrown when the string cannot be parsed.</exception>
     public static Note Parse(string noteString)
     {
         if (string.IsNullOrWhiteSpace(noteString))
             throw new ArgumentException("Note string cannot be empty.", nameof(noteString));
-        
-        // Extract note name (first character)
-        if (!Enum.TryParse<NoteName>(noteString[0].ToString(), out var noteName))
+
+        if (!TryParsePitchClass(noteString, out var pitch, out var consumed))
             throw new ArgumentException($"Invalid note name: {noteString[0]}", nameof(noteString));
-        
-        var index = 1;
-        var alteration = Alteration.Natural;
-        
-        // Parse alterations
-        if (index < noteString.Length)
+
+        if (consumed == noteString.Length)
+            return pitch;
+
+        var rest = noteString[consumed..];
+        if (!int.TryParse(rest, out var octave))
+            throw new ArgumentException($"Invalid octave: {rest}", nameof(noteString));
+
+        return new Note(pitch.Name, pitch.Alteration, octave);
+    }
+
+    /// <summary>
+    /// Tries to parse a note; see <see cref="Parse"/> for the accepted syntax.
+    /// </summary>
+    /// <param name="text">The string to parse.</param>
+    /// <param name="note">The parsed note, or null.</param>
+    /// <returns>True when <paramref name="text"/> is a valid note.</returns>
+    public static bool TryParse(string? text, [NotNullWhen(true)] out Note? note)
+    {
+        note = null;
+        if (string.IsNullOrWhiteSpace(text) || !TryParsePitchClass(text, out var pitch, out var consumed))
+            return false;
+        if (consumed == text.Length)
         {
-            if (noteString[index] == '#')
-            {
-                alteration = Alteration.Sharp;
-                index++;
-                if (index < noteString.Length && noteString[index] == '#')
-                {
-                    alteration = Alteration.DoubleSharp;
-                    index++;
-                }
-            }
-            else if (noteString[index] == 'b')
-            {
-                alteration = Alteration.Flat;
-                index++;
-                if (index < noteString.Length && noteString[index] == 'b')
-                {
-                    alteration = Alteration.DoubleFlat;
-                    index++;
-                }
-            }
+            note = pitch;
+            return true;
         }
-        
-        // Parse octave (remaining part)
-        var octave = 4; // Default octave
-        if (index < noteString.Length)
+        if (!int.TryParse(text.AsSpan(consumed), out var octave))
+            return false;
+        note = new Note(pitch.Name, pitch.Alteration, octave);
+        return true;
+    }
+
+    /// <summary>
+    /// Reads a note letter (any case) and up to two accidentals at the start of <paramref name="s"/>.
+    /// </summary>
+    /// <param name="s">The text to read from; anything after the note is ignored.</param>
+    /// <param name="note">The note read, in octave 4.</param>
+    /// <param name="consumed">How many characters the note used.</param>
+    /// <returns>True when <paramref name="s"/> starts with a note letter.</returns>
+    public static bool TryParsePitchClass(ReadOnlySpan<char> s, out Note note, out int consumed)
+    {
+        note = null!;
+        consumed = 0;
+        if (s.IsEmpty)
+            return false;
+
+        int letter = "CDEFGAB".IndexOf(char.ToUpperInvariant(s[0]));
+        if (letter < 0)
+            return false;
+
+        int i = 1, alteration = 0, count = 0;
+        while (i < s.Length && count < 2)
         {
-            if (int.TryParse(noteString.Substring(index), out var parsedOctave))
-            {
-                octave = parsedOctave;
-            }
-            else if (noteString.Length > index)
-            {
-                throw new ArgumentException($"Invalid octave: {noteString.Substring(index)}", nameof(noteString));
-            }
+            int step, width = 1;
+            if (s[i] is '#' or '♯') step = 1;
+            else if (s[i] is 'b' or '♭') step = -1;
+            else if (s[i..].StartsWith("𝄪")) { step = 2; width = 2; }
+            else if (s[i..].StartsWith("𝄫")) { step = -2; width = 2; }
+            else break;
+
+            if (alteration != 0 && Math.Sign(step) != Math.Sign(alteration) || Math.Abs(alteration + step) > 2)
+                break;
+            alteration += step;
+            i += width;
+            count++;
         }
-        
-        return new Note(noteName, alteration, octave);
+
+        note = new Note((NoteName)letter, (Alteration)alteration);
+        consumed = i;
+        return true;
     }
 }

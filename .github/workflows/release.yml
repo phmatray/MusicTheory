@@ -1,8 +1,8 @@
 name: Release
 
+# Releases are cut from the default branch (dev) on demand: Actions > Release > Run workflow.
+# The next version comes from the conventional commits since the last v* tag.
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -13,11 +13,11 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/dev'
     
     steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -38,8 +38,7 @@ jobs:
       uses: mathieudutour/github-tag-action@v7.0.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        release_branches: main
-        pre_release_branches: develop
+        release_branches: dev
         dry_run: true
         default_bump: ${{ steps.check_tags.outputs.has_tags == 'false' && 'major' || 'false' }}
         custom_release_rules: |
@@ -71,13 +70,7 @@ jobs:
       if: steps.should_release.outputs.new_release == 'true'
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: '10.x'
-    
-    - name: Update version in csproj
-      if: steps.should_release.outputs.new_release == 'true'
-      run: |
-        VERSION=${{ steps.get_version.outputs.new_version }}
-        sed -i "s|<Version>.*</Version>|<Version>${VERSION}</Version>|g" MusicTheory/MusicTheory.csproj
+        global-json-file: global.json
     
     - name: Restore dependencies
       if: steps.should_release.outputs.new_release == 'true'
@@ -85,7 +78,7 @@ jobs:
     
     - name: Build
       if: steps.should_release.outputs.new_release == 'true'
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration Release --no-restore -p:Version=${{ steps.get_version.outputs.new_version }}
     
     - name: Test
       if: steps.should_release.outputs.new_release == 'true'
@@ -93,7 +86,7 @@ jobs:
     
     - name: Pack
       if: steps.should_release.outputs.new_release == 'true'
-      run: dotnet pack --configuration Release --no-build --output ./artifacts
+      run: dotnet pack --configuration Release --no-build -p:Version=${{ steps.get_version.outputs.new_version }} --output ./artifacts
     
     - name: Generate changelog
       if: steps.should_release.outputs.new_release == 'true'
@@ -101,7 +94,7 @@ jobs:
       uses: TriPSs/conventional-changelog-action@v6
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        version-file: './MusicTheory/MusicTheory.csproj'
+        version-file: './Directory.Build.props'
         version-path: '//Project/PropertyGroup/Version'
         skip-version-file: true
         skip-commit: true
