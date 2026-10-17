@@ -370,6 +370,12 @@ public class Note
     }
 
     /// <summary>
+    /// The note name without octave, e.g. <c>Bb</c> or (Unicode) <c>B♭</c>.
+    /// </summary>
+    /// <param name="style">ASCII or Unicode accidentals.</param>
+    public string GetName(AccidentalStyle style = AccidentalStyle.Ascii) => ChordSymbol.Spell(this, style);
+
+    /// <summary>
     /// Determines if this note is enharmonically equivalent to another note.
     /// Two notes are enharmonic if they represent the same pitch with different names.
     /// </summary>
