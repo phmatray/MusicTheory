@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <!-- Optional Blazor add-on: chord playback (chord-audio.js static web asset + a small interop wrapper). No MudBlazor. -->
+    <PackageId>MusicTheory.Guitar.Blazor</PackageId>
+    <Product>MusicTheory.Guitar.Blazor</Product>
+    <Description>Blazor add-on for MusicTheory.Guitar: light chord playback (plucked-string Web Audio, no WASM) for guitar voicings or any MIDI notes.</Description>
+    <PackageTags>music;guitar;chords;blazor;web-audio;playback;music-theory</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EnablePackageValidation>true</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\icon.png" Pack="true" PackagePath="" />
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MusicTheory.Guitar\MusicTheory.Guitar.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -157,3 +157,22 @@ public class ToMidiTests
         c.ToMidi(capo: 2).ShouldBe([50, 54, 57, 62, 66]);
     }
 }
+
+public class ChordAudioModuleTests
+{
+    // Copied next to the test assembly by the test project (CI builds map source paths to /_/).
+    private static string ModulePath() => Path.Combine(AppContext.BaseDirectory, "chord-audio.js");
+
+    [Fact]
+    public void Module_IsSmallAndQuiet()
+    {
+        var file = new FileInfo(ModulePath());
+        file.Exists.ShouldBeTrue();
+        file.Length.ShouldBeLessThanOrEqualTo(10 * 1024);
+        var text = File.ReadAllText(file.FullName);
+        text.ShouldNotContain("console.");
+        text.ShouldNotContain("import ");
+        text.ShouldContain("export async function playVoicing");
+        text.ShouldContain("export function stop");
+    }
+}
