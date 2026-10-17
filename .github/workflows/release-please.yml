@@ -58,10 +58,10 @@ jobs:
       - name: Test
         run: dotnet test -c Release
 
+      # Every IsPackable project (MusicTheory, MusicTheory.Guitar, ...) at the one shared version.
       - name: Pack
         run: |
-          dotnet pack MusicTheory/MusicTheory.csproj -c Release -o artifacts
-          dotnet pack MusicTheory.Guitar/MusicTheory.Guitar.csproj -c Release -o artifacts
+          dotnet pack -c Release -o artifacts
           ls -1 artifacts
 
       # Pushing a .nupkg also pushes the .snupkg next to it. --skip-duplicate keeps re-runs idempotent.
