@@ -24,6 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="../MusicTheory.Guitar.Blazor/wwwroot/chord-audio.js" Link="chord-audio.js" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../MusicTheory.Guitar/MusicTheory.Guitar.csproj" />
   </ItemGroup>
 

@@ -160,8 +160,8 @@ public class ToMidiTests
 
 public class ChordAudioModuleTests
 {
-    private static string ModulePath([System.Runtime.CompilerServices.CallerFilePath] string here = "") =>
-        Path.Combine(Path.GetDirectoryName(here)!, "..", "MusicTheory.Guitar.Blazor", "wwwroot", "chord-audio.js");
+    // Copied next to the test assembly by the test project (CI builds map source paths to /_/).
+    private static string ModulePath() => Path.Combine(AppContext.BaseDirectory, "chord-audio.js");
 
     [Fact]
     public void Module_IsSmallAndQuiet()
