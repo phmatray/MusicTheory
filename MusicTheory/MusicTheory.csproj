@@ -22,7 +22,7 @@
 
     <!-- Fail the pack on public API breaks against the last published package. -->
     <EnablePackageValidation>true</EnablePackageValidation>
-    <PackageValidationBaselineVersion>1.5.3</PackageValidationBaselineVersion>
+    <PackageValidationBaselineVersion>1.6.0</PackageValidationBaselineVersion>
   </PropertyGroup>
 
   <ItemGroup>

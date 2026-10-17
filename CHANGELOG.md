@@ -1,17 +1,13 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+Entries are written by release-please from the Conventional Commits merged into `dev`.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.6.0](https://github.com/phmatray/MusicTheory/releases/tag/v1.6.0) (2026-10-17)
 
-## [Unreleased]
+### Features
 
-### Added
-- Initial release of MusicTheory library
-- Core domain models: Note, Interval, Scale, Chord
-- Support for musical calculations (frequency, semitones)
-- TimeSignature and Duration classes for rhythm representation
-- Comprehensive unit tests with xUnit and Shouldly
-- GitHub Actions for CI/CD
-- Automated release workflow with semantic versioning
+* **chords:** `ChordSymbol.Parse` for lead-sheet chord symbols, with a canonical round-trip ([#92](https://github.com/phmatray/MusicTheory/pull/92))
+* **transpose:** key-aware chord transposition with correct enharmonic spelling ([#86](https://github.com/phmatray/MusicTheory/pull/86))
+* **analysis:** infer the key of a chord sequence ([#87](https://github.com/phmatray/MusicTheory/pull/87)) and Roman-numeral analysis ([#88](https://github.com/phmatray/MusicTheory/pull/88))
+* **guitar:** new `MusicTheory.Guitar` package: voicings for every chord type ([#89](https://github.com/phmatray/MusicTheory/pull/89)), diagram geometry, accessible labels, piano data ([#90](https://github.com/phmatray/MusicTheory/pull/90)), `ToMidi` ([#91](https://github.com/phmatray/MusicTheory/pull/91))
+* **chords:** `ChordFinder` identifies chords from note sets

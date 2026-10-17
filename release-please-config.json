@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "package-name": "musictheory",
+      "include-component-in-tag": false,
+      "changelog-path": "CHANGELOG.md",
+      "extra-files": [
+        { "type": "generic", "path": "Directory.Build.props" }
+      ],
+      "changelog-sections": [
+        { "type": "feat", "section": "Features" },
+        { "type": "fix", "section": "Bug Fixes" },
+        { "type": "perf", "section": "Performance" },
+        { "type": "refactor", "section": "Refactor" },
+        { "type": "revert", "section": "Revert" },
+        { "type": "docs", "section": "Documentation", "hidden": true },
+        { "type": "style", "section": "Styling", "hidden": true },
+        { "type": "test", "section": "Testing", "hidden": true },
+        { "type": "build", "section": "Miscellaneous Tasks", "hidden": true },
+        { "type": "ci", "section": "Miscellaneous Tasks", "hidden": true },
+        { "type": "chore", "section": "Miscellaneous Tasks", "hidden": true }
+      ]
+    }
+  }
+}
