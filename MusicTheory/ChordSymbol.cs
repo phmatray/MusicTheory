@@ -154,6 +154,18 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null)
         };
     }
 
+    /// <summary>Transposes root and bass by an interval, keeping interval spelling (D/F# up a m2 is Eb/G).</summary>
+    public ChordSymbol Transpose(Interval interval, Direction direction = Direction.Up) =>
+        this with { Root = Root.Transpose(interval, direction), Bass = Bass?.Transpose(interval, direction) };
+
+    /// <summary>Transposes root and bass by semitones and spells them in <paramref name="targetKey"/>.</summary>
+    public ChordSymbol Transpose(int semitones, KeySignature targetKey) =>
+        this with { Root = Root.TransposeBySemitones(semitones, targetKey), Bass = Bass?.TransposeBySemitones(semitones, targetKey) };
+
+    /// <summary>Moves the chord from one key to another (by tonic distance), spelled in <paramref name="to"/>.</summary>
+    public ChordSymbol Transpose(KeySignature from, KeySignature to) =>
+        Transpose(MusicTheoryUtilities.GetPitchClass(to.Tonic) - MusicTheoryUtilities.GetPitchClass(from.Tonic), to);
+
     /// <summary>Renders the symbol in the given style, e.g. <c>Bbmaj7</c>, <c>D/F#</c>, <c>Bø7</c>.</summary>
     public string ToString(ChordSymbolStyle style)
     {
