@@ -433,17 +433,15 @@ public class Chord
     /// <summary>
     /// Gets the slash chord notation for the chord.
     /// </summary>
-    /// <returns>The slash chord notation (e.g., "C/E" for C major first inversion).</returns>
+    /// <returns>The slash chord notation (e.g., "C/E" for C major first inversion, "C" in root position).
+    /// Only the root and bass are written; use <see cref="ChordSymbol"/> for the full symbol.</returns>
     public string GetSlashChordNotation()
     {
-        var rootName = Root.Name.ToString();
-        var bassNote = GetBassNote();
-        var bassName = bassNote.Name.ToString();
-        
+        var rootName = ChordSymbol.Spell(Root, AccidentalStyle.Ascii);
         if (Inversion == ChordInversion.Root)
-            return $"{rootName}/{rootName}";
-        
-        return $"{rootName}/{bassName}";
+            return rootName;
+
+        return $"{rootName}/{ChordSymbol.Spell(GetBassNote(), AccidentalStyle.Ascii)}";
     }
 
     /// <summary>

@@ -93,7 +93,7 @@ public class ChordInversionTests
     }
 
     [Theory]
-    [InlineData(ChordInversion.Root, "C/C")]
+    [InlineData(ChordInversion.Root, "C")]
     [InlineData(ChordInversion.First, "C/E")]
     [InlineData(ChordInversion.Second, "C/G")]
     public void Chord_ShouldGetSlashChordNotation(ChordInversion inversion, string expected)
@@ -230,7 +230,7 @@ public class ChordInversionTests
         var notation = fSharpMinor.GetSlashChordNotation();
         
         // Assert
-        notation.ShouldBe("F/A"); // F#m/A - but the method doesn't include alterations
+        notation.ShouldBe("F#/A");
     }
 
     [Fact]
