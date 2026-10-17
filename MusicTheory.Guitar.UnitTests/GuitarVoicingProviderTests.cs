@@ -146,3 +146,14 @@ public class GuitarVoicingProviderTests
             sound.ShouldContain(MusicTheoryUtilities.GetPitchClass(notes[1]), tab);
     }
 }
+
+public class ToMidiTests
+{
+    [Fact]
+    public void OpenC_ToMidi_WithAndWithoutCapo()
+    {
+        var c = new GuitarVoicingProvider().GetVoicings(ChordSymbol.Parse("C"))[0];
+        c.ToMidi().ShouldBe([48, 52, 55, 60, 64]);
+        c.ToMidi(capo: 2).ShouldBe([50, 54, 57, 62, 66]);
+    }
+}

@@ -47,6 +47,16 @@ public sealed record GuitarVoicing(
         return string.Join(parts.Any(p => p.Length > 1) ? " " : "", parts);
     }
 
+    /// <summary>
+    /// MIDI note numbers to play, low string to high, muted strings skipped: open C (<c>x32010</c>) is
+    /// <c>[48, 52, 55, 60, 64]</c>. Tuning- and capo-aware, so the same call feeds a piano view or a synth.
+    /// </summary>
+    public IReadOnlyList<int> ToMidi(Tuning? tuning = null, int capo = 0)
+    {
+        var strings = (tuning ?? Tuning.Standard).Strings;
+        return Frets.Select((f, s) => f is int fret ? strings[s].MidiNumber + capo + fret : (int?)null).OfType<int>().ToList();
+    }
+
     /// <summary>The sounding note per string (null when muted), spelled after the chord where possible.</summary>
     public IReadOnlyList<Note?> Sound(Tuning tuning, int capo = 0)
     {
