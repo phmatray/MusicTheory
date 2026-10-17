@@ -258,6 +258,21 @@ public class Note
     }
 
     /// <summary>
+    /// Transposes the note by a number of semitones and spells the result in <paramref name="targetKey"/>
+    /// (see <see cref="KeySignature.Spell"/>): A +1 in Eb major is Bb, in E major A#.
+    /// </summary>
+    /// <param name="semitones">The number of semitones (positive for up, negative for down).</param>
+    /// <param name="targetKey">The key whose spelling the result follows.</param>
+    /// <returns>A new note, in the octave the transposition reaches.</returns>
+    public Note TransposeBySemitones(int semitones, KeySignature targetKey)
+    {
+        int target = GetTotalSemitones() + semitones;
+        var spelled = targetKey.Spell(target);
+        int offset = MusicTheoryConstants.SemitonesFromC[(int)spelled.Name] + (int)spelled.Alteration;
+        return new Note(spelled.Name, spelled.Alteration, (int)Math.Floor((target - offset) / 12.0));
+    }
+
+    /// <summary>
     /// Gets the total semitones from C0 for this note.
     /// </summary>
     private int GetTotalSemitones()

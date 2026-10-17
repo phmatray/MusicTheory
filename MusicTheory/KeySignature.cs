@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace MusicTheory;
 
 /// <summary>
@@ -103,15 +105,13 @@ public class KeySignature
     {
         if (Mode == KeyMode.Major)
         {
-            // Major to minor: down a minor third (3 semitones)
-            var relativeNote = Tonic.TransposeBySemitones(-3);
-            return new KeySignature(relativeNote, KeyMode.Minor);
+            // Major to minor: the sixth degree
+            return new KeySignature(Spell(PitchClass(Tonic) + 9), KeyMode.Minor);
         }
         else
         {
-            // Minor to major: up a minor third (3 semitones)
-            var relativeNote = Tonic.TransposeBySemitones(3);
-            return new KeySignature(relativeNote, KeyMode.Major);
+            // Minor to major: the third degree
+            return new KeySignature(Spell(PitchClass(Tonic) + 3), KeyMode.Major);
         }
     }
 
@@ -206,6 +206,102 @@ public class KeySignature
     }
 
     /// <summary>
+    /// Parses a key name: a tonic (any case, ASCII or Unicode accidentals) optionally followed by
+    /// <c>m</c>/<c>min</c>/<c>minor</c> or <c>maj</c>/<c>major</c>/<c>M</c>, e.g. <c>Eb</c>, <c>E♭ minor</c>, <c>F#m</c>, <c>C major</c>.
+    /// </summary>
+    /// <exception cref="FormatException">The text is not a key.</exception>
+    public static KeySignature Parse(string text) =>
+        TryParse(text, out var key) ? key : throw new FormatException($"Not a key: '{text}'.");
+
+    /// <summary>Tries to parse a key name; see <see cref="Parse"/>.</summary>
+    public static bool TryParse(string? text, [NotNullWhen(true)] out KeySignature? key)
+    {
+        key = null;
+        var s = text.AsSpan().Trim();
+        if (!Note.TryParsePitchClass(s, out var tonic, out var consumed))
+            return false;
+
+        var rest = s[consumed..].Trim().ToString();
+        KeyMode? mode = rest == "M" ? KeyMode.Major : rest.ToLowerInvariant() switch
+        {
+            "" or "maj" or "major" => KeyMode.Major,
+            "m" or "min" or "minor" => KeyMode.Minor,
+            _ => null,
+        };
+        if (mode is null || Math.Abs(new KeySignature(tonic, mode.Value).AccidentalCount) > 7)
+            return false;
+
+        key = new KeySignature(tonic, mode.Value);
+        return true;
+    }
+
+    /// <summary>
+    /// The key <paramref name="semitones"/> above (or below) this one, same mode, spelled with the fewest
+    /// accidentals: G +1 is Ab major, not G# major. When both spellings have six accidentals
+    /// (F#/Gb major, D#/Eb minor) the side of this key wins, and flats win from a key with none.
+    /// </summary>
+    public KeySignature TransposeBySemitones(int semitones)
+    {
+        int target = MusicTheoryUtilities.GetPitchClass(Tonic) + semitones;
+        return Spellings(target)
+            .Select(n => new KeySignature(n, Mode))
+            .OrderBy(k => Math.Abs(k.AccidentalCount))
+            .ThenBy(k => AccidentalCount > 0 ? -k.AccidentalCount : k.AccidentalCount)
+            .First();
+    }
+
+    /// <summary>
+    /// Spells a pitch class (0 = C) in this key: scale notes (and, in minor, the raised 6th and 7th) use
+    /// the key's spelling; other black keys are sharps in sharp keys and flats in flat keys; in C major /
+    /// A minor they are Db Eb F# Ab Bb. The returned note is in octave 4.
+    /// </summary>
+    public Note Spell(int pitchClass)
+    {
+        int pc = Mod12(pitchClass);
+        int tonicPc = MusicTheoryUtilities.GetPitchClass(Tonic);
+        int[] steps = Mode == KeyMode.Major ? [0, 2, 4, 5, 7, 9, 11] : [0, 2, 3, 5, 7, 8, 10, 9, 11];
+        for (int i = 0; i < steps.Length; i++)
+        {
+            int degree = i < 7 ? i : i - 2; // minor: 7, 8 are the raised 6th and 7th
+            var letter = (NoteName)(((int)Tonic.Name + degree) % 7);
+            if (Mod12(tonicPc + steps[i]) != pc)
+                continue;
+            int alteration = Mod12(pc - MusicTheoryConstants.SemitonesFromC[(int)letter] + 6) - 6;
+            if (Math.Abs(alteration) <= 2)
+                return new Note(letter, (Alteration)alteration);
+        }
+
+        int natural = Array.IndexOf(MusicTheoryConstants.SemitonesFromC, pc);
+        if (natural >= 0)
+            return new Note((NoteName)natural);
+
+        bool sharp = AccidentalCount > 0 || (AccidentalCount == 0 && pc == 6);
+        return sharp
+            ? new Note((NoteName)Array.IndexOf(MusicTheoryConstants.SemitonesFromC, pc - 1), Alteration.Sharp)
+            : new Note((NoteName)Array.IndexOf(MusicTheoryConstants.SemitonesFromC, pc + 1), Alteration.Flat);
+    }
+
+    /// <summary>The key name, e.g. <c>Ab</c>, <c>F#m</c> or (Unicode) <c>A♭</c>.</summary>
+    public string ToString(AccidentalStyle style) =>
+        ChordSymbol.Spell(Tonic, style) + (Mode == KeyMode.Minor ? "m" : "");
+
+    /// <summary>The key name in ASCII, e.g. <c>Ab</c> or <c>F#m</c>.</summary>
+    public override string ToString() => ToString(AccidentalStyle.Ascii);
+
+    private static IEnumerable<Note> Spellings(int pitchClass)
+    {
+        int pc = Mod12(pitchClass);
+        for (int letter = 0; letter < 7; letter++)
+            for (int alt = -1; alt <= 1; alt++)
+                if (Mod12(MusicTheoryConstants.SemitonesFromC[letter] + alt) == pc)
+                    yield return new Note((NoteName)letter, (Alteration)alt);
+    }
+
+    private static int Mod12(int n) => ((n % 12) + 12) % 12;
+
+    private static int PitchClass(Note note) => MusicTheoryUtilities.GetPitchClass(note);
+
+    /// <summary>
     /// Calculates the key signature based on the circle of fifths.
     /// </summary>
     private (int accidentalCount, IReadOnlyList<NoteName> alteredNotes) CalculateKeySignature()
@@ -237,88 +333,14 @@ public class KeySignature
     }
 
     /// <summary>
-    /// Gets the position in the circle of fifths.
+    /// Gets the position in the circle of fifths (sharps positive, flats negative), from the tonic's
+    /// place on the line of fifths: F=-1 C=0 G=1 D=2 A=3 E=4 B=5, ±7 per sharp/flat, minor keys three
+    /// fifths below their relative major.
     /// </summary>
     private int GetCircleOfFifthsPosition()
     {
-        // For major keys
-        var majorPositions = new Dictionary<NoteName, int>
-        {
-            { NoteName.C, 0 },
-            { NoteName.G, 1 },
-            { NoteName.D, 2 },
-            { NoteName.A, 3 },
-            { NoteName.E, 4 },
-            { NoteName.B, 5 },
-            { NoteName.F, -1 }
-        };
-
-        // For minor keys (relative to major)
-        var minorPositions = new Dictionary<NoteName, int>
-        {
-            { NoteName.A, 0 },  // A minor (relative to C major)
-            { NoteName.E, 1 },  // E minor (relative to G major)
-            { NoteName.B, 2 },  // B minor (relative to D major)
-            { NoteName.F, 3 },  // F# minor (relative to A major)
-            { NoteName.C, 4 },  // C# minor (relative to E major)
-            { NoteName.G, -2 }, // G minor (relative to Bb major)
-            { NoteName.D, -1 }  // D minor (relative to F major)
-        };
-
-        // Handle keys with flats in their name
-        if (Tonic.Alteration == Alteration.Flat)
-        {
-            // Special cases for flat keys
-            if (Tonic.Name == NoteName.B && Mode == KeyMode.Major)
-                return -2; // Bb major
-            if (Tonic.Name == NoteName.E && Mode == KeyMode.Major)
-                return -3; // Eb major
-            if (Tonic.Name == NoteName.A && Mode == KeyMode.Major)
-                return -4; // Ab major
-            if (Tonic.Name == NoteName.D && Mode == KeyMode.Major)
-                return -5; // Db major
-            if (Tonic.Name == NoteName.G && Mode == KeyMode.Major)
-                return -6; // Gb major
-            if (Tonic.Name == NoteName.C && Mode == KeyMode.Major)
-                return -7; // Cb major
-            
-            if (Tonic.Name == NoteName.G && Mode == KeyMode.Minor)
-                return -2; // G minor
-            if (Tonic.Name == NoteName.C && Mode == KeyMode.Minor)
-                return -3; // C minor
-            if (Tonic.Name == NoteName.F && Mode == KeyMode.Minor)
-                return -4; // F minor
-            if (Tonic.Name == NoteName.B && Mode == KeyMode.Minor)
-                return -5; // Bb minor
-            if (Tonic.Name == NoteName.E && Mode == KeyMode.Minor)
-                return -6; // Eb minor
-        }
-
-        // Handle keys with sharps in their name
-        if (Tonic.Alteration == Alteration.Sharp)
-        {
-            // Special cases for sharp keys
-            if (Tonic.Name == NoteName.F && Mode == KeyMode.Major)
-                return 6; // F# major
-            if (Tonic.Name == NoteName.C && Mode == KeyMode.Major)
-                return 7; // C# major
-            
-            if (Tonic.Name == NoteName.F && Mode == KeyMode.Minor)
-                return 3; // F# minor
-            if (Tonic.Name == NoteName.C && Mode == KeyMode.Minor)
-                return 4; // C# minor
-            if (Tonic.Name == NoteName.G && Mode == KeyMode.Minor)
-                return 5; // G# minor
-            if (Tonic.Name == NoteName.D && Mode == KeyMode.Minor)
-                return 6; // D# minor
-            if (Tonic.Name == NoteName.A && Mode == KeyMode.Minor)
-                return 7; // A# minor
-        }
-
-        // Standard keys (natural)
-        return Mode == KeyMode.Major 
-            ? majorPositions.GetValueOrDefault(Tonic.Name, 0)
-            : minorPositions.GetValueOrDefault(Tonic.Name, 0);
+        int[] lineOfFifths = [0, 2, 4, -1, 1, 3, 5]; // C D E F G A B
+        return lineOfFifths[(int)Tonic.Name] + 7 * (int)Tonic.Alteration - (Mode == KeyMode.Minor ? 3 : 0);
     }
 
     /// <summary>
