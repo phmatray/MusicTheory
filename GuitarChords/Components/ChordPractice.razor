@@ -2,116 +2,117 @@
 @using System.Timers
 @implements IDisposable
 
-<MudDialog @bind-Visible="IsVisible" Options="DialogOptions">
+<Modal @bind-Open="IsVisible" Class="w-11/12 max-w-4xl">
     <TitleContent>
-        <MudText Typo="Typo.h5">
-            <MudIcon Icon="@Icons.Material.Filled.School" Class="mr-2" />
+        <Typography Typo="Typo.h5">
+            <Icon Name="@Icons.Material.Filled.School" Class="mr-2" />
             Chord Practice Mode
-        </MudText>
+        </Typography>
     </TitleContent>
     <DialogContent>
-        <MudGrid>
+        <Grid>
             @if (!_practiceStarted)
             {
-                <MudItem xs="12">
-                    <MudText Typo="Typo.h6" Class="mb-3">Setup Your Practice Session</MudText>
-                </MudItem>
+                <Item xs="12">
+                    <Typography Typo="Typo.h6" Class="mb-3">Setup Your Practice Session</Typography>
+                </Item>
                 
-                <MudItem xs="12" md="6">
-                    <MudPaper Class="pa-4" Elevation="1">
-                        <MudText Typo="Typo.subtitle1" Class="mb-2">Practice Type</MudText>
-                        <MudRadioGroup @bind-Value="_practiceMode">
-                            <MudRadio Value="@("single")" Color="Color.Primary">
-                                <MudText Typo="Typo.body2">Single Chord - Master one chord at a time</MudText>
-                            </MudRadio>
-                            <MudRadio Value="@("sequence")" Color="Color.Primary">
-                                <MudText Typo="Typo.body2">Chord Sequence - Practice chord changes</MudText>
-                            </MudRadio>
-                            <MudRadio Value="@("random")" Color="Color.Primary">
-                                <MudText Typo="Typo.body2">Random Chords - Test your knowledge</MudText>
-                            </MudRadio>
-                        </MudRadioGroup>
-                    </MudPaper>
-                </MudItem>
+                <Item xs="12" md="6">
+                    <Paper Class="p-4" Elevation="1">
+                        <Typography Typo="Typo.subtitle1" Class="mb-2">Practice Type</Typography>
+                        <RadioGroup @bind-Value="_practiceMode">
+                            <Radio Value="@("single")" Color="Color.Primary">
+                                <Typography Typo="Typo.body2">Single Chord - Master one chord at a time</Typography>
+                            </Radio>
+                            <Radio Value="@("sequence")" Color="Color.Primary">
+                                <Typography Typo="Typo.body2">Chord Sequence - Practice chord changes</Typography>
+                            </Radio>
+                            <Radio Value="@("random")" Color="Color.Primary">
+                                <Typography Typo="Typo.body2">Random Chords - Test your knowledge</Typography>
+                            </Radio>
+                        </RadioGroup>
+                    </Paper>
+                </Item>
                 
-                <MudItem xs="12" md="6">
-                    <MudPaper Class="pa-4" Elevation="1">
-                        <MudText Typo="Typo.subtitle1" Class="mb-2">Settings</MudText>
+                <Item xs="12" md="6">
+                    <Paper Class="p-4" Elevation="1">
+                        <Typography Typo="Typo.subtitle1" Class="mb-2">Settings</Typography>
                         
-                        <MudSlider @bind-Value="_bpm" Min="40" Max="200" Step="5" Class="mb-3">
-                            <MudText Typo="Typo.body2">Tempo: @_bpm BPM</MudText>
-                        </MudSlider>
+                        <Typography Typo="Typo.body2">Tempo: @_bpm BPM</Typography>
+                        <Range Value="_bpm" ValueChanged="@((double v) => _bpm = (int)v)" Min="40" Max="200" Step="5" Label="Tempo" Class="mb-3" />
                         
-                        <MudSlider @bind-Value="_beatsPerChord" Min="1" Max="8" Step="1" Class="mb-3">
-                            <MudText Typo="Typo.body2">Beats per chord: @_beatsPerChord</MudText>
-                        </MudSlider>
+                        <Typography Typo="Typo.body2">Beats per chord: @_beatsPerChord</Typography>
+                        <Range Value="_beatsPerChord" ValueChanged="@((double v) => _beatsPerChord = (int)v)" Min="1" Max="8" Step="1" Label="Beats per chord" Class="mb-3" />
                         
-                        <MudSwitch @bind-Value="_showDiagram" Color="Color.Primary">
+                        <Switch @bind-Value="_showDiagram" Color="Color.Primary">
                             Show chord diagram
-                        </MudSwitch>
+                        </Switch>
                         
-                        <MudSwitch @bind-Value="_playMetronome" Color="Color.Primary">
+                        <Switch @bind-Value="_playMetronome" Color="Color.Primary">
                             Play metronome sound
-                        </MudSwitch>
-                    </MudPaper>
-                </MudItem>
+                        </Switch>
+                    </Paper>
+                </Item>
                 
                 @if (_practiceMode == "single")
                 {
-                    <MudItem xs="12">
-                        <MudPaper Class="pa-4" Elevation="1">
-                            <MudText Typo="Typo.subtitle1" Class="mb-2">Select Chord to Practice</MudText>
-                            <MudSelect T="GuitarChord" @bind-Value="_selectedChord" Label="Choose a chord">
+                    <Item xs="12">
+                        <Paper Class="p-4" Elevation="1">
+                            <Typography Typo="Typo.subtitle1" Class="mb-2">Select Chord to Practice</Typography>
+                            <Select T="GuitarChord" @bind-Value="_selectedChord" Label="Choose a chord">
                                 @foreach (var chord in Chords)
                                 {
-                                    <MudSelectItem Value="chord">@chord.Name</MudSelectItem>
+                                    <SelectItem Value="chord">@chord.Name</SelectItem>
                                 }
-                            </MudSelect>
-                        </MudPaper>
-                    </MudItem>
+                            </Select>
+                        </Paper>
+                    </Item>
                 }
                 else if (_practiceMode == "sequence")
                 {
-                    <MudItem xs="12">
-                        <MudPaper Class="pa-4" Elevation="1">
-                            <MudText Typo="Typo.subtitle1" Class="mb-2">Chord Sequence</MudText>
-                            <MudChipSet T="string">
+                    <Item xs="12">
+                        <Paper Class="p-4" Elevation="1">
+                            <Typography Typo="Typo.subtitle1" Class="mb-2">Chord Sequence</Typography>
+                            <div class="flex flex-wrap gap-2">
                                 @foreach (var chord in _practiceChords)
                                 {
-                                    <MudChip T="string" 
+                                    <Chip 
                                            Text="@chord.Name" 
                                            OnClose="() => RemoveFromPractice(chord)"
                                            Color="Color.Primary" />
                                 }
-                            </MudChipSet>
-                            <MudButton StartIcon="@Icons.Material.Filled.Add" 
+                            </div>
+                            <Button StartIcon="@Icons.Material.Filled.Add" 
                                      Variant="Variant.Outlined"
                                      OnClick="ShowChordSelector"
                                      Class="mt-2">
                                 Add Chord
-                            </MudButton>
-                        </MudPaper>
-                    </MudItem>
+                            </Button>
+                        </Paper>
+                    </Item>
                 }
                 else if (_practiceMode == "random")
                 {
-                    <MudItem xs="12">
-                        <MudPaper Class="pa-4" Elevation="1">
-                            <MudText Typo="Typo.subtitle1" Class="mb-2">Difficulty Filter</MudText>
-                            <MudChipSet T="string" SelectionMode="SelectionMode.MultiSelection" @bind-SelectedValues="_selectedDifficulties">
-                                <MudChip T="string" Text="Beginner" Value="@("Beginner")" Color="Color.Success" />
-                                <MudChip T="string" Text="Intermediate" Value="@("Intermediate")" Color="Color.Warning" />
-                                <MudChip T="string" Text="Advanced" Value="@("Advanced")" Color="Color.Error" />
-                            </MudChipSet>
-                        </MudPaper>
-                    </MudItem>
+                    <Item xs="12">
+                        <Paper Class="p-4" Elevation="1">
+                            <Typography Typo="Typo.subtitle1" Class="mb-2">Difficulty Filter</Typography>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach (var (level, color) in new[] { ("Beginner", Color.Success), ("Intermediate", Color.Warning), ("Advanced", Color.Error) })
+                                {
+                                    var selected = _selectedDifficulties.Contains(level);
+                                    <Chip Text="@level" Color="color" Variant="@(selected ? Variant.Filled : Variant.Outlined)"
+                                          aria-pressed="@(selected ? "true" : "false")" OnClick="@(() => ToggleDifficulty(level))" />
+                                }
+                            </div>
+                        </Paper>
+                    </Item>
                 }
             }
             else
             {
-                <MudItem xs="12">
+                <Item xs="12">
                     <div class="practice-display">
-                        <MudText Typo="Typo.h3" Align="Align.Center" Class="mb-4">
+                        <Typography Typo="Typo.h3" Align="center" Class="mb-4">
                             @if (_currentChord != null)
                             {
                                 @_currentChord.Name
@@ -120,121 +121,108 @@
                             {
                                 <text>Get Ready...</text>
                             }
-                        </MudText>
+                        </Typography>
                         
                         @if (_showDiagram && _currentChord != null)
                         {
-                            <div class="d-flex justify-center mb-4">
+                            <div class="flex justify-center mb-4">
                                 <ChordDiagram Chord="_currentChord" Width="300" Height="350" />
                             </div>
                         }
                         
                         <div class="metronome-display">
-                            <MudGrid Justify="Justify.Center">
+                            <Grid Justify="Justify.Center">
                                 @for (int i = 0; i < 4; i++)
                                 {
                                     var beat = i;
-                                    <MudItem xs="3" Class="text-center">
-                                        <MudIcon Icon="@Icons.Material.Filled.Circle" 
+                                    <Item xs="3" Class="text-center">
+                                        <Icon Name="@Icons.Material.Filled.Circle" 
                                                Size="Size.Large"
                                                Color="@(_currentBeat == beat ? Color.Primary : Color.Default)" />
-                                    </MudItem>
+                                    </Item>
                                 }
-                            </MudGrid>
+                            </Grid>
                         </div>
                         
-                        <MudPaper Class="pa-3 mt-4" Elevation="1">
-                            <MudGrid>
-                                <MudItem xs="6">
-                                    <MudText Typo="Typo.body2">Time: @FormatTime(_elapsedSeconds)</MudText>
-                                </MudItem>
-                                <MudItem xs="6" Class="text-right">
-                                    <MudText Typo="Typo.body2">Changes: @_chordChangeCount</MudText>
-                                </MudItem>
-                            </MudGrid>
+                        <Paper Class="p-3 mt-4" Elevation="1">
+                            <Grid>
+                                <Item xs="6">
+                                    <Typography Typo="Typo.body2">Time: @FormatTime(_elapsedSeconds)</Typography>
+                                </Item>
+                                <Item xs="6" Class="text-right">
+                                    <Typography Typo="Typo.body2">Changes: @_chordChangeCount</Typography>
+                                </Item>
+                            </Grid>
                             
                             @if (_practiceMode == "sequence" && _practiceChords.Any())
                             {
-                                <MudProgressLinear Value="@GetProgressValue()" Color="Color.Primary" Class="mt-2" />
+                                <ProgressLinear Value="@GetProgressValue()" Color="Color.Primary" Class="mt-2" />
                             }
-                        </MudPaper>
+                        </Paper>
                         
-                        <div class="d-flex justify-center gap-2 mt-4">
-                            <MudButton Variant="Variant.Filled" 
+                        <div class="flex justify-center gap-2 mt-4">
+                            <Button Variant="Variant.Filled" 
                                      Color="@(_isPaused ? Color.Success : Color.Warning)"
                                      StartIcon="@(_isPaused ? Icons.Material.Filled.PlayArrow : Icons.Material.Filled.Pause)"
                                      OnClick="TogglePause">
                                 @(_isPaused ? "Resume" : "Pause")
-                            </MudButton>
-                            <MudButton Variant="Variant.Outlined" 
+                            </Button>
+                            <Button Variant="Variant.Outlined" 
                                      Color="Color.Error"
                                      StartIcon="@Icons.Material.Filled.Stop"
                                      OnClick="StopPractice">
                                 Stop
-                            </MudButton>
+                            </Button>
                         </div>
                     </div>
-                </MudItem>
+                </Item>
             }
-        </MudGrid>
+        </Grid>
     </DialogContent>
     <DialogActions>
         @if (!_practiceStarted)
         {
-            <MudButton Color="Color.Default" OnClick="@(() => IsVisible = false)">Cancel</MudButton>
-            <MudButton Color="Color.Primary" 
+            <Button Color="Color.Default" OnClick="@(() => IsVisible = false)">Cancel</Button>
+            <Button Color="Color.Primary" 
                      Variant="Variant.Filled"
                      Disabled="@(!CanStartPractice())"
                      OnClick="StartPractice">
                 Start Practice
-            </MudButton>
+            </Button>
         }
         else
         {
-            <MudButton Color="Color.Default" OnClick="@(() => { StopPractice(); IsVisible = false; })">Close</MudButton>
+            <Button Color="Color.Default" OnClick="@(() => { StopPractice(); IsVisible = false; })">Close</Button>
         }
     </DialogActions>
-</MudDialog>
+</Modal>
 
-<MudDialog @bind-Visible="_showChordSelectorDialog" Options="_selectorDialogOptions">
+<Modal @bind-Open="_showChordSelectorDialog" Class="w-11/12 max-w-xl">
     <TitleContent>
-        <MudText Typo="Typo.h6">Add Chord to Sequence</MudText>
+        <Typography Typo="Typo.h6">Add Chord to Sequence</Typography>
     </TitleContent>
     <DialogContent>
-        <MudList T="GuitarChord">
+        <List>
             @foreach (var chord in Chords.Where(c => !_practiceChords.Contains(c)))
             {
-                <MudListItem T="GuitarChord" Value="chord" OnClick="() => AddToPractice(chord)">
-                    <MudText>@chord.Name</MudText>
-                </MudListItem>
-                <MudDivider />
+                <ListItem Value="chord" OnClick="() => AddToPractice(chord)">
+                    <Typography>@chord.Name</Typography>
+                </ListItem>
+                <Divider />
             }
-        </MudList>
+        </List>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="@(() => _showChordSelectorDialog = false)">Cancel</MudButton>
+        <Button Color="Color.Default" OnClick="@(() => _showChordSelectorDialog = false)">Cancel</Button>
     </DialogActions>
-</MudDialog>
+</Modal>
 
 @code {
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
     [Parameter] public List<GuitarChord> Chords { get; set; } = new();
     
-    private DialogOptions DialogOptions = new()
-    {
-        MaxWidth = MaxWidth.Medium,
-        FullWidth = true,
-        CloseButton = false,
-        Position = DialogPosition.Center
-    };
     
-    private DialogOptions _selectorDialogOptions = new()
-    {
-        MaxWidth = MaxWidth.Small,
-        FullWidth = true,
-        Position = DialogPosition.Center
-    };
     
     private string _practiceMode = "single";
     private int _bpm = 60;
@@ -248,7 +236,13 @@
     private GuitarChord? _selectedChord;
     private GuitarChord? _currentChord;
     private List<GuitarChord> _practiceChords = new();
-    private IReadOnlyCollection<string> _selectedDifficulties = new HashSet<string> { "Beginner" };
+    private HashSet<string> _selectedDifficulties = new() { "Beginner" };
+
+    private void ToggleDifficulty(string level)
+    {
+        if (!_selectedDifficulties.Remove(level)) _selectedDifficulties.Add(level);
+    }
+
     
     private Timer? _metronomeTimer;
     private Timer? _practiceTimer;

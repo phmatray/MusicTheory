@@ -3,173 +3,170 @@
 @inject UserPreferencesService PreferencesService
 @inject ISnackbar Snackbar
 
-<MudDialog @bind-Visible="IsVisible" Options="DialogOptions">
+<Modal @bind-Open="IsVisible" CloseButton="true" Class="w-11/12 max-w-4xl">
     <TitleContent>
-        <MudText Typo="Typo.h5">
-            <MudIcon Icon="@Icons.Material.Filled.Settings" Class="mr-2" />
+        <Typography Typo="Typo.h5">
+            <Icon Name="@Icons.Material.Filled.Settings" Class="mr-2" />
             Settings
-        </MudText>
+        </Typography>
     </TitleContent>
     <DialogContent>
-        <MudTabs Elevation="0" Rounded="true" ApplyEffectsToContainer="true">
-            <MudTabPanel Text="Display" Icon="@Icons.Material.Filled.Visibility">
-                <MudGrid Class="pa-2">
-                    <MudItem xs="12" md="6">
-                        <MudSelect T="string" @bind-Value="_preferences.DefaultView" Label="Default View">
-                            <MudSelectItem Value="@("grid")">Grid View</MudSelectItem>
-                            <MudSelectItem Value="@("list")">List View</MudSelectItem>
-                        </MudSelect>
-                    </MudItem>
-                    <MudItem xs="12" md="6">
-                        <MudSlider T="float" @bind-Value="_preferences.ChordDiagramScale" 
-                                 Min="0.5f" Max="2.0f" Step="0.1f"
-                                 Class="mt-4">
-                            Diagram Scale: @_preferences.ChordDiagramScale.ToString("F1")x
-                        </MudSlider>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudSwitch @bind-Value="_preferences.ShowChordDiagrams" Color="Color.Primary">
+        <Tabs>
+            <Tab Title="Display">
+                <Grid Class="p-2">
+                    <Item xs="12" md="6">
+                        <Select T="string" @bind-Value="_preferences.DefaultView" Label="Default View">
+                            <SelectItem Value="@("grid")">Grid View</SelectItem>
+                            <SelectItem Value="@("list")">List View</SelectItem>
+                        </Select>
+                    </Item>
+                    <Item xs="12" md="6">
+                        <Typography Typo="Typo.body2" Class="mt-4">Diagram Scale: @_preferences.ChordDiagramScale.ToString("F1")x</Typography>
+                        <Range Value="_preferences.ChordDiagramScale" ValueChanged="@((double v) => _preferences.ChordDiagramScale = (float)v)"
+                               Min="0.5" Max="2.0" Step="0.1" Label="Diagram Scale" />
+                    </Item>
+                    <Item xs="12">
+                        <Switch @bind-Value="_preferences.ShowChordDiagrams" Color="Color.Primary">
                             Show chord diagrams in lists
-                        </MudSwitch>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudSwitch @bind-Value="_preferences.AutoShowFilters" Color="Color.Primary">
+                        </Switch>
+                    </Item>
+                    <Item xs="12">
+                        <Switch @bind-Value="_preferences.AutoShowFilters" Color="Color.Primary">
                             Auto-expand filters on page load
-                        </MudSwitch>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudSwitch @bind-Value="_preferences.AutoShowProgression" Color="Color.Primary">
+                        </Switch>
+                    </Item>
+                    <Item xs="12">
+                        <Switch @bind-Value="_preferences.AutoShowProgression" Color="Color.Primary">
                             Auto-show progression builder
-                        </MudSwitch>
-                    </MudItem>
-                </MudGrid>
-            </MudTabPanel>
+                        </Switch>
+                    </Item>
+                </Grid>
+            </Tab>
             
-            <MudTabPanel Text="Practice" Icon="@Icons.Material.Filled.School">
-                <MudGrid Class="pa-2">
-                    <MudItem xs="12" md="6">
-                        <MudSelect T="string" @bind-Value="_preferences.DefaultPracticeMode" Label="Default Practice Mode">
-                            <MudSelectItem Value="@("single")">Single Chord</MudSelectItem>
-                            <MudSelectItem Value="@("sequence")">Chord Sequence</MudSelectItem>
-                            <MudSelectItem Value="@("random")">Random Chords</MudSelectItem>
-                        </MudSelect>
-                    </MudItem>
-                    <MudItem xs="12" md="6">
-                        <MudNumericField @bind-Value="_preferences.DefaultBpm" 
+            <Tab Title="Practice">
+                <Grid Class="p-2">
+                    <Item xs="12" md="6">
+                        <Select T="string" @bind-Value="_preferences.DefaultPracticeMode" Label="Default Practice Mode">
+                            <SelectItem Value="@("single")">Single Chord</SelectItem>
+                            <SelectItem Value="@("sequence")">Chord Sequence</SelectItem>
+                            <SelectItem Value="@("random")">Random Chords</SelectItem>
+                        </Select>
+                    </Item>
+                    <Item xs="12" md="6">
+                        <NumericField @bind-Value="_preferences.DefaultBpm" 
                                        Label="Default BPM" 
                                        Min="40" Max="200" />
-                    </MudItem>
-                    <MudItem xs="12" md="6">
-                        <MudNumericField @bind-Value="_preferences.DefaultBeatsPerChord" 
+                    </Item>
+                    <Item xs="12" md="6">
+                        <NumericField @bind-Value="_preferences.DefaultBeatsPerChord" 
                                        Label="Default Beats per Chord" 
                                        Min="1" Max="8" />
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudSwitch @bind-Value="_preferences.PlayMetronomeSound" Color="Color.Primary">
+                    </Item>
+                    <Item xs="12">
+                        <Switch @bind-Value="_preferences.PlayMetronomeSound" Color="Color.Primary">
                             Play metronome sound
-                        </MudSwitch>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudSwitch @bind-Value="_preferences.ShowDiagramInPractice" Color="Color.Primary">
+                        </Switch>
+                    </Item>
+                    <Item xs="12">
+                        <Switch @bind-Value="_preferences.ShowDiagramInPractice" Color="Color.Primary">
                             Show chord diagram during practice
-                        </MudSwitch>
-                    </MudItem>
-                </MudGrid>
-            </MudTabPanel>
+                        </Switch>
+                    </Item>
+                </Grid>
+            </Tab>
             
-            <MudTabPanel Text="Chords" Icon="@Icons.Material.Filled.MusicNote">
-                <MudGrid Class="pa-2">
-                    <MudItem xs="12">
-                        <MudText Typo="Typo.subtitle1" Class="mb-2">Show Chord Difficulties</MudText>
-                        <MudChipSet T="string">
-                            <MudChip T="string" 
+            <Tab Title="Chords">
+                <Grid Class="p-2">
+                    <Item xs="12">
+                        <Typography Typo="Typo.subtitle1" Class="mb-2">Show Chord Difficulties</Typography>
+                        <div class="flex flex-wrap gap-2">
+                            <Chip 
                                    Text="Beginner" 
                                    Color="@(_preferences.ShowBeginnerChords ? Color.Success : Color.Default)"
                                    OnClick="@(() => _preferences.ShowBeginnerChords = !_preferences.ShowBeginnerChords)" />
-                            <MudChip T="string" 
+                            <Chip 
                                    Text="Intermediate" 
                                    Color="@(_preferences.ShowIntermediateChords ? Color.Warning : Color.Default)"
                                    OnClick="@(() => _preferences.ShowIntermediateChords = !_preferences.ShowIntermediateChords)" />
-                            <MudChip T="string" 
+                            <Chip 
                                    Text="Advanced" 
                                    Color="@(_preferences.ShowAdvancedChords ? Color.Error : Color.Default)"
                                    OnClick="@(() => _preferences.ShowAdvancedChords = !_preferences.ShowAdvancedChords)" />
-                        </MudChipSet>
-                    </MudItem>
-                    <MudItem xs="12" md="6">
-                        <MudNumericField @bind-Value="_preferences.MaxRecentChords" 
+                        </div>
+                    </Item>
+                    <Item xs="12" md="6">
+                        <NumericField @bind-Value="_preferences.MaxRecentChords" 
                                        Label="Max Recent Chords" 
                                        Min="5" Max="20" />
-                    </MudItem>
-                </MudGrid>
-            </MudTabPanel>
+                    </Item>
+                </Grid>
+            </Tab>
             
-            <MudTabPanel Text="Progressions" Icon="@Icons.Material.Filled.Queue">
-                <MudGrid Class="pa-2">
-                    <MudItem xs="12">
-                        <MudSwitch @bind-Value="_preferences.AutoSuggestNextChord" Color="Color.Primary">
+            <Tab Title="Progressions">
+                <Grid Class="p-2">
+                    <Item xs="12">
+                        <Switch @bind-Value="_preferences.AutoSuggestNextChord" Color="Color.Primary">
                             Auto-suggest next chords
-                        </MudSwitch>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudSlider T="int" @bind-Value="_preferences.SuggestionConfidenceThreshold" 
-                                 Min="0" Max="100" Step="10">
-                            Suggestion Confidence Threshold: @_preferences.SuggestionConfidenceThreshold%
-                        </MudSlider>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudSwitch @bind-Value="_preferences.ShowTransitionDifficulty" Color="Color.Primary">
+                        </Switch>
+                    </Item>
+                    <Item xs="12">
+                        <Typography Typo="Typo.body2">Suggestion Confidence Threshold: @_preferences.SuggestionConfidenceThreshold%</Typography>
+                        <Range Value="_preferences.SuggestionConfidenceThreshold" ValueChanged="@((double v) => _preferences.SuggestionConfidenceThreshold = (int)v)"
+                               Min="0" Max="100" Step="10" Label="Suggestion Confidence Threshold" />
+                    </Item>
+                    <Item xs="12">
+                        <Switch @bind-Value="_preferences.ShowTransitionDifficulty" Color="Color.Primary">
                             Show transition difficulty
-                        </MudSwitch>
-                    </MudItem>
-                </MudGrid>
-            </MudTabPanel>
+                        </Switch>
+                    </Item>
+                </Grid>
+            </Tab>
             
-            <MudTabPanel Text="Export" Icon="@Icons.Material.Filled.Share">
-                <MudGrid Class="pa-2">
-                    <MudItem xs="12" md="6">
-                        <MudSelect T="string" @bind-Value="_preferences.DefaultExportFormat" Label="Default Export Format">
-                            <MudSelectItem Value="@("text")">Plain Text</MudSelectItem>
-                            <MudSelectItem Value="@("chordpro")">ChordPro</MudSelectItem>
-                            <MudSelectItem Value="@("pdf")">PDF</MudSelectItem>
-                        </MudSelect>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudSwitch @bind-Value="_preferences.IncludeChordDiagramsInPdf" Color="Color.Primary">
+            <Tab Title="Export">
+                <Grid Class="p-2">
+                    <Item xs="12" md="6">
+                        <Select T="string" @bind-Value="_preferences.DefaultExportFormat" Label="Default Export Format">
+                            <SelectItem Value="@("text")">Plain Text</SelectItem>
+                            <SelectItem Value="@("chordpro")">ChordPro</SelectItem>
+                            <SelectItem Value="@("pdf")">PDF</SelectItem>
+                        </Select>
+                    </Item>
+                    <Item xs="12">
+                        <Switch @bind-Value="_preferences.IncludeChordDiagramsInPdf" Color="Color.Primary">
                             Include chord diagrams in PDF export
-                        </MudSwitch>
-                    </MudItem>
-                </MudGrid>
-            </MudTabPanel>
+                        </Switch>
+                    </Item>
+                </Grid>
+            </Tab>
             
-            <MudTabPanel Text="Accessibility" Icon="@Icons.Material.Filled.Accessibility">
-                <MudGrid Class="pa-2">
-                    <MudItem xs="12">
-                        <MudSwitch @bind-Value="_preferences.HighContrastMode" Color="Color.Primary">
+            <Tab Title="Accessibility">
+                <Grid Class="p-2">
+                    <Item xs="12">
+                        <Switch @bind-Value="_preferences.HighContrastMode" Color="Color.Primary">
                             High contrast mode
-                        </MudSwitch>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudSwitch @bind-Value="_preferences.ReducedMotion" Color="Color.Primary">
+                        </Switch>
+                    </Item>
+                    <Item xs="12">
+                        <Switch @bind-Value="_preferences.ReducedMotion" Color="Color.Primary">
                             Reduce animations
-                        </MudSwitch>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudSwitch @bind-Value="_preferences.DarkMode" Color="Color.Primary">
+                        </Switch>
+                    </Item>
+                    <Item xs="12">
+                        <Switch @bind-Value="_preferences.DarkMode" Color="Color.Primary">
                             Dark mode
-                        </MudSwitch>
-                    </MudItem>
-                </MudGrid>
-            </MudTabPanel>
-        </MudTabs>
+                        </Switch>
+                    </Item>
+                </Grid>
+            </Tab>
+        </Tabs>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Secondary" OnClick="ResetToDefaults">Reset to Defaults</MudButton>
-        <MudSpacer />
-        <MudButton Color="Color.Default" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveSettings">Save Settings</MudButton>
+        <Button Color="Color.Secondary" OnClick="ResetToDefaults">Reset to Defaults</Button>
+        <Spacer />
+        <Button Color="Color.Default" OnClick="Cancel">Cancel</Button>
+        <Button Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveSettings">Save Settings</Button>
     </DialogActions>
-</MudDialog>
+</Modal>
 
 @code {
     [Parameter] public bool IsVisible { get; set; }
@@ -178,13 +175,6 @@
     private UserPreferences _preferences = new();
     private UserPreferences _originalPreferences = new();
     
-    private DialogOptions DialogOptions = new()
-    {
-        MaxWidth = MaxWidth.Medium,
-        FullWidth = true,
-        CloseButton = true,
-        Position = DialogPosition.Center
-    };
     
     protected override async Task OnParametersSetAsync()
     {

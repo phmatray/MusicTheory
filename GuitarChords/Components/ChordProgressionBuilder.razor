@@ -1,28 +1,28 @@
 @using GuitarChords.Models
 
-<MudPaper Class="pa-4 mb-4" Elevation="2">
-    <MudGrid>
-        <MudItem xs="12" md="8">
-            <MudText Typo="Typo.h6" Class="mb-3">
-                <MudIcon Icon="@Icons.Material.Filled.QueueMusic" Class="mr-2" />
+<Paper Class="p-4 mb-4" Elevation="2">
+    <Grid>
+        <Item xs="12" md="8">
+            <Typography Typo="Typo.h6" Class="mb-3">
+                <Icon Name="@Icons.Material.Filled.QueueMusic" Class="mr-2" />
                 Chord Progression Builder
-            </MudText>
-        </MudItem>
-        <MudItem xs="12" md="4" Class="text-right">
-            <MudButtonGroup Variant="Variant.Text" Size="Size.Small">
-                <MudButton StartIcon="@Icons.Material.Filled.LibraryMusic" 
+            </Typography>
+        </Item>
+        <Item xs="12" md="4" Class="text-right">
+            <ButtonGroup Variant="Variant.Text" Size="Size.Small">
+                <Button StartIcon="@Icons.Material.Filled.LibraryMusic" 
                           Color="Color.Secondary"
                           OnClick="OnShowTemplates">
                     Templates
-                </MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.History" 
+                </Button>
+                <Button StartIcon="@Icons.Material.Filled.History" 
                           Color="Color.Secondary"
                           OnClick="OnShowSavedProgressions">
                     Saved
-                </MudButton>
-            </MudButtonGroup>
-        </MudItem>
-        <MudItem xs="12">
+                </Button>
+            </ButtonGroup>
+        </Item>
+        <Item xs="12">
             @if (Chords.Any())
             {
                 <div class="progression-container">
@@ -31,14 +31,14 @@
                         var index = i;
                         var chord = Chords[i];
                         <div class="progression-chord @(CurrentChordIndex == index && IsPlaying ? "playing" : "")">
-                            <MudChip T="string"
+                            <Chip 
                                     Text="@chord.Name"
                                     OnClose="() => OnRemoveChord.InvokeAsync(chord)"
                                     Color="@(CurrentChordIndex == index && IsPlaying ? Color.Success : Color.Primary)"
                                     Variant="@(CurrentChordIndex == index && IsPlaying ? Variant.Filled : Variant.Outlined)" />
                             @if (i < Chords.Count - 1)
                             {
-                                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Color="Color.Secondary" Size="Size.Small" />
+                                <Icon Name="@Icons.Material.Filled.ArrowForward" Color="Color.Secondary" Size="Size.Small" />
                             }
                         </div>
                     }
@@ -46,52 +46,51 @@
             }
             else
             {
-                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                <Typography Typo="Typo.body2" Color="Color.Secondary">
                     Click on chords below to add them to your progression, or load a template
-                </MudText>
+                </Typography>
             }
-        </MudItem>
-        <MudItem xs="12" md="6">
-            <MudButtonGroup Variant="Variant.Text" Size="Size.Small">
-                <MudButton StartIcon="@(IsPlaying ? Icons.Material.Filled.Stop : Icons.Material.Filled.PlayArrow)" 
+        </Item>
+        <Item xs="12" md="6">
+            <ButtonGroup Variant="Variant.Text" Size="Size.Small">
+                <Button StartIcon="@(IsPlaying ? Icons.Material.Filled.Stop : Icons.Material.Filled.PlayArrow)" 
                           Color="@(IsPlaying ? Color.Warning : Color.Success)" 
                           Disabled="@(!Chords.Any())"
                           OnClick="OnTogglePlayback">
                     @(IsPlaying ? "Stop" : "Play")
-                </MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.Clear" 
+                </Button>
+                <Button StartIcon="@Icons.Material.Filled.Clear" 
                           Color="Color.Error"
                           OnClick="OnClearProgression"
                           Disabled="@(!Chords.Any() || IsPlaying)">
                     Clear
-                </MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.Save" 
+                </Button>
+                <Button StartIcon="@Icons.Material.Filled.Save" 
                           Color="Color.Info"
                           Disabled="@(!Chords.Any() || IsPlaying)"
                           OnClick="OnSaveProgression">
                     Save
-                </MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.Share" 
+                </Button>
+                <Button StartIcon="@Icons.Material.Filled.Share" 
                           Color="Color.Secondary"
                           Disabled="@(!Chords.Any())"
                           OnClick="OnExportProgression">
                     Export
-                </MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.Shuffle" 
+                </Button>
+                <Button StartIcon="@Icons.Material.Filled.Shuffle" 
                           Color="Color.Secondary"
                           Disabled="@(Chords.Count < 2 || IsPlaying)"
                           OnClick="OnShuffleProgression">
                     Shuffle
-                </MudButton>
-            </MudButtonGroup>
-        </MudItem>
-        <MudItem xs="12" md="6" Class="text-right">
-            <MudSlider T="int" @bind-Value="Tempo" Min="60" Max="200" Step="10" Color="Color.Primary">
-                Tempo: @Tempo BPM
-            </MudSlider>
-        </MudItem>
-    </MudGrid>
-</MudPaper>
+                </Button>
+            </ButtonGroup>
+        </Item>
+        <Item xs="12" md="6" Class="text-right">
+            <Typography Typo="Typo.body2">Tempo: @Tempo BPM</Typography>
+            <Range Value="Tempo" ValueChanged="@((double v) => Tempo = (int)v)" Min="60" Max="200" Step="10" Color="Color.Primary" Label="Tempo" />
+        </Item>
+    </Grid>
+</Paper>
 
 @code {
     [Parameter] public List<GuitarChord> Chords { get; set; } = new();

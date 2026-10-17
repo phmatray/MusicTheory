@@ -2,10 +2,12 @@
 
   <PropertyGroup>
     <IsPackable>false</IsPackable>
+    <!-- DaisyBlazor compiles Styles/main.css to wwwroot/css/app.css with the Tailwind standalone CLI. -->
+    <DaisyBlazorBuildCss>true</DaisyBlazorBuildCss>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MudBlazor" />
+    <PackageReference Include="DaisyBlazor.Components" />
   </ItemGroup>
 
   <ItemGroup>

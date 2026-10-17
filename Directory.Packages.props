@@ -14,7 +14,7 @@
     <PackageVersion Include="xunit.v3" Version="4.0.2" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.1" />
     <PackageVersion Include="Shouldly" Version="4.3.0" />
-    <PackageVersion Include="MudBlazor" Version="9.11.0" />
+    <PackageVersion Include="DaisyBlazor.Components" Version="0.6.0" />
   </ItemGroup>
 
 </Project>

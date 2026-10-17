@@ -5,10 +5,11 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <base href="/"/>
+    <script src="_content/DaisyBlazor.Components/theme-init.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=swap" />
+    <link rel="stylesheet" href="@Assets["css/app.css"]"/>
     <link rel="stylesheet" href="@Assets["app.css"]"/>
     <link rel="stylesheet" href="@Assets["GuitarChords.styles.css"]"/>
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
-    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
     <ImportMap/>
     <HeadOutlet @rendermode="InteractiveServer"/>
 </head>
@@ -16,7 +17,6 @@
 <body>
 <Routes @rendermode="InteractiveServer"/>
 <script src="_framework/blazor.web.js"></script>
-<script src="_content/MudBlazor/MudBlazor.min.js"></script>
 <script src="js/guitar-audio.js"></script>
 <script src="js/simple-audio-test.js"></script>
 <script src="app.js"></script>

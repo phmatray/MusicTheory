@@ -18,6 +18,8 @@ guitar-audio-synth/Cargo.lock
 
 # WASM build output
 GuitarChords/wwwroot/wasm/
+# DaisyBlazor CSS output (built from GuitarChords/Styles/main.css)
+GuitarChords/wwwroot/css/app.css
 # IDE / build junk
 *.DotSettings.user
 build.log

@@ -1,5 +1,5 @@
 using GuitarChords.Components;
-using MudBlazor.Services;
+using DaisyBlazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,8 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// Add MudBlazor services
-builder.Services.AddMudServices();
+// Add DaisyBlazor services (ISnackbar + IDialogService)
+builder.Services.AddDaisyBlazor();
 
 // Add application services
 builder.Services.AddSingleton<GuitarChords.Services.GuitarChordService>();
