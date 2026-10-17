@@ -166,6 +166,23 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null)
     public ChordSymbol Transpose(KeySignature from, KeySignature to) =>
         Transpose(MusicTheoryUtilities.GetPitchClass(to.Tonic) - MusicTheoryUtilities.GetPitchClass(from.Tonic), to);
 
+    /// <summary>
+    /// Piano voicing: the chord in root position from <paramref name="octave"/> (interval spelling, so the #9 of
+    /// E7#9 is F##), ascending, with a slash bass placed below the root.
+    /// </summary>
+    public IReadOnlyList<Note> Voice(int octave = 4)
+    {
+        var notes = new Chord(new Note(Root.Name, Root.Alteration, octave), Type).GetNotes()
+            .OrderBy(MusicTheoryUtilities.GetTotalSemitones).ToList();
+        if (Bass is null)
+            return notes;
+        int root = MusicTheoryUtilities.GetTotalSemitones(notes[0]);
+        int bassOctave = octave + 1;
+        while (MusicTheoryUtilities.GetTotalSemitones(Bass.Name, Bass.Alteration, bassOctave) >= root)
+            bassOctave--;
+        return [new Note(Bass.Name, Bass.Alteration, bassOctave), .. notes];
+    }
+
     /// <summary>Renders the symbol in the given style, e.g. <c>Bbmaj7</c>, <c>D/F#</c>, <c>Bø7</c>.</summary>
     public string ToString(ChordSymbolStyle style)
     {
@@ -189,6 +206,9 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null)
         HashCode.Combine(Type, Root.Name, Root.Alteration, Bass?.Name, Bass?.Alteration);
 
     private static bool SameSpelling(Note a, Note b) => a.Name == b.Name && a.Alteration == b.Alteration;
+
+    /// <summary>Canonical ASCII suffix of a chord type, e.g. <c>m7b5</c>.</summary>
+    internal static string AsciiSuffix(ChordType type) => Suffixes[type];
 
     /// <summary>Note name without octave, e.g. <c>Bb</c> or <c>B♭</c>.</summary>
     internal static string Spell(Note note, AccidentalStyle style) => note.Name + (style, note.Alteration) switch
