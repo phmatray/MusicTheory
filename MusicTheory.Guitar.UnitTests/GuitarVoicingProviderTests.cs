@@ -157,3 +157,22 @@ public class ToMidiTests
         c.ToMidi(capo: 2).ShouldBe([50, 54, 57, 62, 66]);
     }
 }
+
+public class ChordAudioModuleTests
+{
+    private static string ModulePath([System.Runtime.CompilerServices.CallerFilePath] string here = "") =>
+        Path.Combine(Path.GetDirectoryName(here)!, "..", "MusicTheory.Guitar.Blazor", "wwwroot", "chord-audio.js");
+
+    [Fact]
+    public void Module_IsSmallAndQuiet()
+    {
+        var file = new FileInfo(ModulePath());
+        file.Exists.ShouldBeTrue();
+        file.Length.ShouldBeLessThanOrEqualTo(10 * 1024);
+        var text = File.ReadAllText(file.FullName);
+        text.ShouldNotContain("console.");
+        text.ShouldNotContain("import ");
+        text.ShouldContain("export async function playVoicing");
+        text.ShouldContain("export function stop");
+    }
+}
