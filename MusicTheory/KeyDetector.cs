@@ -23,19 +23,10 @@ public sealed record KeyCandidate(KeySignature Key, double Confidence, int Diato
 /// </remarks>
 public static class KeyDetector
 {
-    private enum Triad { Major, Minor, Diminished, Augmented, Any }
-
-    private static readonly (int Step, Triad Triad)[] MajorDegrees =
-        [(0, Triad.Major), (2, Triad.Minor), (4, Triad.Minor), (5, Triad.Major), (7, Triad.Major), (9, Triad.Minor), (11, Triad.Diminished)];
-
-    private static readonly (int Step, Triad Triad)[] MinorDegrees =
-        [(0, Triad.Minor), (2, Triad.Diminished), (3, Triad.Major), (5, Triad.Minor), (7, Triad.Minor), (8, Triad.Major), (10, Triad.Major),
-         (7, Triad.Major), (11, Triad.Diminished)];
-
     /// <summary>Ranks keys for a chord sequence, best first. Empty input gives an empty list.</summary>
     public static IReadOnlyList<KeyCandidate> Infer(IEnumerable<ChordSymbol> chords, int top = 3)
     {
-        var list = chords.Select(c => (Root: MusicTheoryUtilities.GetPitchClass(c.Root), Triad: TriadOf(c.Type))).ToList();
+        var list = chords.Select(c => (Root: MusicTheoryUtilities.GetPitchClass(c.Root), Triad: Diatonic.TriadOf(c.Type))).ToList();
         if (list.Count == 0 || top <= 0)
             return [];
 
@@ -63,7 +54,7 @@ public static class KeyDetector
     private static (double Score, int Hits) Score(List<(int Root, Triad Triad)> chords, KeySignature key)
     {
         int tonic = MusicTheoryUtilities.GetPitchClass(key.Tonic);
-        var degrees = key.Mode == KeyMode.Major ? MajorDegrees : MinorDegrees;
+        var degrees = Diatonic.Degrees(key.Mode);
 
         bool Fits((int Root, Triad Triad) ch, int step, Triad triad) =>
             ch.Root == (tonic + step) % 12 && (ch.Triad == Triad.Any || ch.Triad == triad);
@@ -93,14 +84,4 @@ public static class KeyDetector
         if (IsTonic(chords[^1])) score += 1.5;
         return (score, hits);
     }
-
-    private static Triad TriadOf(ChordType type) => type switch
-    {
-        ChordType.Minor or ChordType.Minor7 or ChordType.MinorMajor7 or ChordType.Minor6 or ChordType.Minor9
-            or ChordType.Minor11 or ChordType.Minor13 or ChordType.MinorAdd9 or ChordType.MinorAdd11 => Triad.Minor,
-        ChordType.Diminished or ChordType.HalfDiminished7 or ChordType.Diminished7 => Triad.Diminished,
-        ChordType.Augmented or ChordType.Augmented7 or ChordType.AugmentedMajor7 => Triad.Augmented,
-        ChordType.Sus2 or ChordType.Sus4 or ChordType.Sus2Sus4 or ChordType.Dominant7Sus4 or ChordType.Power5 => Triad.Any,
-        _ => Triad.Major,
-    };
 }

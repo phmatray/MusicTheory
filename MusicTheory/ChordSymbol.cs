@@ -190,6 +190,9 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null)
 
     private static bool SameSpelling(Note a, Note b) => a.Name == b.Name && a.Alteration == b.Alteration;
 
+    /// <summary>Canonical ASCII suffix of a chord type, e.g. <c>m7b5</c>.</summary>
+    internal static string AsciiSuffix(ChordType type) => Suffixes[type];
+
     /// <summary>Note name without octave, e.g. <c>Bb</c> or <c>B♭</c>.</summary>
     internal static string Spell(Note note, AccidentalStyle style) => note.Name + (style, note.Alteration) switch
     {
