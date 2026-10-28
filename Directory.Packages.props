@@ -15,7 +15,7 @@
     <PackageVersion Include="xunit.v3" Version="4.0.2" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.1" />
     <PackageVersion Include="Shouldly" Version="4.3.0" />
-    <PackageVersion Include="DaisyBlazor.Components" Version="0.10.0" />
+    <PackageVersion Include="DaisyBlazor.Components" Version="0.12.0" />
   </ItemGroup>
 
 </Project>
