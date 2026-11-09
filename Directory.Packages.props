@@ -12,7 +12,7 @@
          native `dotnet test` MTP mode selected in global.json ("test": { "runner": ... }).
          xunit 2.x is deliberately absent: do not reintroduce it. -->
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
-    <PackageVersion Include="xunit.v3" Version="4.0.2" />
+    <PackageVersion Include="xunit.v3" Version="4.0.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.1" />
     <PackageVersion Include="Shouldly" Version="4.3.0" />
     <PackageVersion Include="DaisyBlazor.Components" Version="0.12.0" />
