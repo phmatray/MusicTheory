@@ -371,10 +371,10 @@ def abc():
             toks.append(f"{name}/{d.numerator}/{d.denominator}{'~' if tied else ''}")
         ks = flat.getElementsByClass(key.KeySignature)[0]
         rows.append([path.name, flat.getElementsByClass(meter.TimeSignature)[0].ratioString, ks.sharps, " ".join(toks)])
-    write_to(abc_dir, "abc.csv", ["file", "meter", "key_sharps", "notes"], rows)
+    write_into(abc_dir, "abc.csv", ["file", "meter", "key_sharps", "notes"], rows)
 
 
-def write_to(directory, name, header, rows):
+def write_into(directory, name, header, rows):
     with open(directory / name, "w", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
         w.writerow(header)
