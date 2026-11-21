@@ -11,7 +11,7 @@ namespace MusicTheory.Toolbox.I18n;
 public static class Strings
 {
     /// <summary>Every table; a new tool adds its own here.</summary>
-    public static IReadOnlyList<IStringTable> Tables { get; } = [new ShellStrings(), new CircleStrings(), new IntervalStrings(), new TransposerStrings(), new AnalysisStrings(), new Tools.Fretboard.FretboardStrings(), new FinderStrings()];
+    public static IReadOnlyList<IStringTable> Tables { get; } = [new ShellStrings(), new CircleStrings(), new IntervalStrings(), new TransposerStrings(), new AnalysisStrings(), new Tools.Fretboard.FretboardStrings(), new FinderStrings(), new Tools.Voicings.VoicingsStrings(), new Tools.Piano.PianoStrings()];
 
     /// <summary>The text for <paramref name="key"/>, or <c>[key]</c> so a gap is visible (the parity test fails first).</summary>
     public static string T(Lang lang, string key)

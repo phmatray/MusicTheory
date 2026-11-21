@@ -37,7 +37,7 @@ public class StringsParityTests
         while (!File.Exists(Path.Combine(dir.FullName, "MusicTheory.sln"))) dir = dir.Parent!;
         var known = Strings.Tables.SelectMany(t => t.En.Keys).ToHashSet();
         var used = Directory.EnumerateFiles(Path.Combine(dir.FullName, "MusicTheory.Toolbox"), "*.razor", SearchOption.AllDirectories)
-            .SelectMany(f => System.Text.RegularExpressions.Regex.Matches(File.ReadAllText(f), "\"((?:shell|circle|intervals|transpose|fretboard|understand|analysis|finder)\\.[a-z.]+)\"").Select(m => m.Groups[1].Value))
+            .SelectMany(f => System.Text.RegularExpressions.Regex.Matches(File.ReadAllText(f), "\"((?:shell|circle|intervals|transpose|fretboard|understand|analysis|finder|voicings|piano)\\.[a-z.]+)\"").Select(m => m.Groups[1].Value))
             .Where(k => !k.EndsWith("."))   // "shell.lang." is a prefix completed at run time
             .Distinct().ToList();
         used.ShouldNotBeEmpty();
