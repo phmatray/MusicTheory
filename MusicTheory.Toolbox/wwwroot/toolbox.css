@@ -18,3 +18,5 @@ a { color: var(--sc-accent); }
 .tb-facts dt { font-weight: 600; margin-top: .5rem; }
 .tb-facts dd { margin: 0; }
 .tb-understand { margin-top: 1.5rem; }
+.tb-form { display: grid; gap: .5rem; max-width: 36rem; }
+.tb-form button { justify-self: start; }
