@@ -51,4 +51,8 @@ public sealed record AbcTune(int ReferenceNumber, string? Title, TimeSignature T
             return false;
         }
     }
+
+    /// <summary>Writes the canonical ABC: headers in the order <c>X T M L Q K</c>, notes relative to the key,
+    /// one <c>|</c> per measure and <c>|]</c> at the end. <see cref="Parse"/> reads it back to equal measures.</summary>
+    public override string ToString() => AbcWriter.Write(this);
 }
