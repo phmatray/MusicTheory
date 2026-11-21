@@ -87,7 +87,7 @@
 - New import/export formats ship as separate packages (`MusicTheory.ChordPro`, `.Midi`, …), not in the core.
 
 ## Worktree home
-- `.claude/worktrees/` (ignored by `.gitignore` from the init PR on; before it merges, **NOT ignored** on `dev`)
+- `.claude/worktrees/` (verified ignored — `worktrees-ignored` ok at profile time)
 
 ## Environment gotchas
 - Publishing to NuGet happens when the release-please PR merges, and it is irreversible; the publish job still uses `NUGET_API_KEY`, not Trusted Publishing.
