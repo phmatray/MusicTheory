@@ -35,12 +35,31 @@ public partial class PrivacyGuardTests
         foreach (var file in Sources())
         {
             var text = File.ReadAllText(file);
-            offences.AddRange(Forbidden.Where(text.Contains).Select(t => $"{Path.GetFileName(file)}: {t}"));
+            offences.AddRange(Forbidden.Where(t => text.Contains(t, StringComparison.OrdinalIgnoreCase)).Select(t => $"{Path.GetFileName(file)}: {t}"));
             offences.AddRange(Url().Matches(text).Select(m => m.Value)
-                .Where(u => !AllowedHosts.Any(h => u.Contains("//" + h)))
+                .Where(u => !IsAllowed(u))
                 .Select(u => $"{Path.GetFileName(file)}: {u}"));
         }
         offences.ShouldBeEmpty();
+    }
+
+    private static bool IsAllowed(string url) =>
+        Uri.TryCreate(url, UriKind.Absolute, out var uri)
+        && AllowedHosts.Any(h =>
+        {
+            var slash = h.IndexOf('/');
+            var host = slash < 0 ? h : h[..slash];
+            return uri.Host == host && (slash < 0 || uri.AbsolutePath.StartsWith(h[slash..], StringComparison.Ordinal));
+        });
+
+    [Fact]
+    public void The_allowlist_is_not_fooled_by_lookalikes()
+    {
+        IsAllowed("http://www.w3.org/2000/svg").ShouldBeTrue();
+        IsAllowed("https://github.com/phmatray/MusicTheory").ShouldBeTrue();
+        IsAllowed("https://www.w3.org.evil.com/").ShouldBeFalse();
+        IsAllowed("https://evil.com/?r=//github.com/phmatray").ShouldBeFalse();
+        IsAllowed("https://github.com/other").ShouldBeFalse();
     }
 
     [Fact]

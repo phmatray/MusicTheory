@@ -23,6 +23,28 @@ public class StringsParityTests
     }
 
     [Fact]
+    public void Comprendre_texts_stay_under_120_words()
+    {
+        foreach (var t in Strings.Tables)
+            foreach (var (k, v) in t.En.Concat(t.Fr).Where(p => p.Key.EndsWith(".understand")))
+                v.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length.ShouldBeLessThan(120, k);
+    }
+
+    [Fact]
+    public void Every_literal_key_used_in_the_source_exists_in_the_tables()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (!File.Exists(Path.Combine(dir.FullName, "MusicTheory.sln"))) dir = dir.Parent!;
+        var known = Strings.Tables.SelectMany(t => t.En.Keys).ToHashSet();
+        var used = Directory.EnumerateFiles(Path.Combine(dir.FullName, "MusicTheory.Toolbox"), "*.razor", SearchOption.AllDirectories)
+            .SelectMany(f => System.Text.RegularExpressions.Regex.Matches(File.ReadAllText(f), "\"((?:shell|circle|understand)\\.[a-z.]+)\"").Select(m => m.Groups[1].Value))
+            .Where(k => !k.EndsWith("."))   // "shell.lang." is a prefix completed at run time
+            .Distinct().ToList();
+        used.ShouldNotBeEmpty();
+        used.Where(k => !known.Contains(k)).ShouldBeEmpty();
+    }
+
+    [Fact]
     public void A_missing_key_is_visible()
     {
         Strings.T(Lang.Fr, "nope").ShouldBe("[nope]");

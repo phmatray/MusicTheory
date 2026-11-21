@@ -17,6 +17,7 @@ public static class ToolboxUrl
         var text = uri.OriginalString;
         var q = text.IndexOf('?');
         var hash = text.IndexOf('#');
+        if (hash >= 0 && hash < q) q = -1; // a '?' inside the fragment is not a query
         var query = q < 0 ? "" : text[(q + 1)..(hash > q ? hash : text.Length)];
         foreach (var pair in query.Split('&', StringSplitOptions.RemoveEmptyEntries))
         {
@@ -27,12 +28,12 @@ public static class ToolboxUrl
             switch (key)
             {
                 case "t": tool = value.ToLowerInvariant(); break;
-                case "lang": lang = ParseLang(value) ?? lang; break;
+                case "lang": lang = ParseLang(value, exact: true) ?? lang; break;
                 case "v": break; // only version 1 exists: every value reads as 1
                 default: rest[key] = value; break;
             }
         }
-        return new ToolState(tool, lang ?? ParseLang(browserLang) ?? Lang.En, rest);
+        return new ToolState(tool, lang ?? ParseLang(browserLang, exact: false) ?? Lang.En, rest);
     }
 
     /// <summary>The canonical query string, leading <c>?</c> included: <c>t</c>, <c>lang</c>, <c>v=1</c>, then the other keys sorted.</summary>
@@ -47,11 +48,15 @@ public static class ToolboxUrl
         return "?" + string.Join('&', parts);
     }
 
-    private static Lang? ParseLang(string? s) =>
-        s is null ? null
-        : s.StartsWith("fr", StringComparison.OrdinalIgnoreCase) ? Lang.Fr
-        : s.StartsWith("en", StringComparison.OrdinalIgnoreCase) ? Lang.En
-        : null;
+    // The link says exactly fr or en; a browser says fr-BE, en-US...
+    private static Lang? ParseLang(string? s, bool exact)
+    {
+        if (s is null) return null;
+        var code = exact ? s : s.Split('-', '_')[0];
+        return code.Equals("fr", StringComparison.OrdinalIgnoreCase) ? Lang.Fr
+            : code.Equals("en", StringComparison.OrdinalIgnoreCase) ? Lang.En
+            : null;
+    }
 
     private static string Decode(string s)
     {

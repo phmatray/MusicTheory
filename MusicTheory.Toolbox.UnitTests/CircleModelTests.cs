@@ -48,6 +48,19 @@ public class CircleModelTests
     }
 
     [Fact]
+    public void Every_ring_key_spells_a_seven_note_scale_from_its_tonic_in_both_languages()
+    {
+        foreach (var lang in new[] { Lang.En, Lang.Fr })
+            foreach (var k in CircleModel.Keys(lang))
+            {
+                k.ScaleNotes.Count.ShouldBe(7);
+                k.ScaleNotes.Distinct().Count().ShouldBe(7);
+            }
+        string.Join(" ", CircleModel.For("F#", Lang.En).Key.ScaleNotes).ShouldBe("F# G# A# B C# D# E#");
+        string.Join(" ", CircleModel.For("Db", Lang.Fr).Key.ScaleNotes).ShouldBe("Ré bémol Mi bémol Fa Sol bémol La bémol Si bémol Do");
+    }
+
+    [Fact]
     public void No_key_is_C_without_a_notice() => CircleModel.For(null, Lang.En).Fallback.ShouldBeFalse();
 
     [Fact]

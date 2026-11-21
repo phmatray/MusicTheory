@@ -34,6 +34,14 @@ public class ToolboxUrlTests
     }
 
     [Fact]
+    public void Fragment_before_the_query_is_not_parsed_and_lang_must_be_exact()
+    {
+        Canon("https://x.test/#/a?b=1").ShouldBe("?lang=en&v=1");
+        Canon("https://x.test/?lang=fruit", "fr").ShouldBe("?lang=fr&v=1");
+        Canon("https://x.test/?lang=FR", "en").ShouldBe("?lang=fr&v=1");
+    }
+
+    [Fact]
     public void Keys_are_lowercased_and_values_trimmed()
     {
         Canon("https://x.test/?T=Circle&KEY=%20G%20").ShouldBe("?t=circle&lang=en&v=1&key=G");
