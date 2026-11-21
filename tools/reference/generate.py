@@ -127,6 +127,23 @@ def keys():
     write("keys.csv", ["tonic", "mode", "sharps", "altered"], rows)
 
 
+def neoriemannian():
+    from music21 import analysis, chord
+
+    rows = []
+    for (l, a), quality in itertools.product(SPELLINGS, ("major", "minor")):
+        third = interval.Interval("M3" if quality == "major" else "m3")
+        root = note.Note(m21(l, a, 4))
+        c = chord.Chord([root, root.transpose(third), root.transpose("P5")])
+        for move in "PLR":
+            r = getattr(analysis.neoRiemannian, move)(c)
+            res = ours(r.root(), False)
+            if res is None or any(ours(p, False) is None for p in r.pitches):
+                continue
+            rows.append([f"{l}{OURS[a]}", quality, move, res, r.quality])
+    write("neoriemannian.csv", ["root", "type", "move", "result_root", "result_type"], rows)
+
+
 DURATION_TYPES = [("Whole", "whole"), ("Half", "half"), ("Quarter", "quarter"), ("Eighth", "eighth"),
                   ("Sixteenth", "16th"), ("ThirtySecond", "32nd"), ("SixtyFourth", "64th")]
 
@@ -162,5 +179,6 @@ if __name__ == "__main__":
     scales()
     modes()
     keys()
+    neoriemannian()
     durations()
     pcsets()
