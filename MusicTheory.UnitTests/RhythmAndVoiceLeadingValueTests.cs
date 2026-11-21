@@ -4,31 +4,32 @@ namespace MusicTheory.UnitTests;
 public class RhythmAndVoiceLeadingValueTests
 {
     [Theory]
-    [InlineData(DurationType.Whole, "whole", "𝅝", 1.0)]
-    [InlineData(DurationType.Half, "half", "𝅗𝅥", 0.5)]
-    [InlineData(DurationType.Quarter, "quarter", "𝅘𝅥", 0.25)]
-    [InlineData(DurationType.Eighth, "eighth", "𝅘𝅥𝅮", 0.125)]
-    [InlineData(DurationType.Sixteenth, "16th", "𝅘𝅥𝅯", 0.0625)]
-    [InlineData(DurationType.ThirtySecond, "32nd", "𝅘𝅥𝅰", 0.03125)]
-    [InlineData(DurationType.SixtyFourth, "64th", "𝅘𝅥𝅱", 0.015625)]
-    public void Duration_NamesSymbolsAndValues(DurationType type, string name, string symbol, double value)
+    [InlineData(DurationType.Whole, "whole", "𝅝", 1, 1)]
+    [InlineData(DurationType.Half, "half", "𝅗𝅥", 1, 2)]
+    [InlineData(DurationType.Quarter, "quarter", "𝅘𝅥", 1, 4)]
+    [InlineData(DurationType.Eighth, "eighth", "𝅘𝅥𝅮", 1, 8)]
+    [InlineData(DurationType.Sixteenth, "16th", "𝅘𝅥𝅯", 1, 16)]
+    [InlineData(DurationType.ThirtySecond, "32nd", "𝅘𝅥𝅰", 1, 32)]
+    [InlineData(DurationType.SixtyFourth, "64th", "𝅘𝅥𝅱", 1, 64)]
+    public void Duration_NamesSymbolsAndValues(DurationType type, string name, string symbol, int num, int den)
     {
         var d = new Duration(type);
         d.ToString().ShouldBe(name);
         d.GetSymbol().ShouldBe(symbol);
-        d.GetValueInWholeNotes().ShouldBe(value);
+        d.Value.ShouldBe(Rational.Of(num, den));
         d.IsTuplet.ShouldBeFalse();
+        d.Tuplet.ShouldBeNull();
     }
 
     [Theory]
-    [InlineData(1, "dotted quarter", 0.375)]
-    [InlineData(2, "double dotted quarter", 0.4375)]
-    [InlineData(3, "triple dotted quarter", 0.46875)]
-    public void Duration_Dots(int dots, string name, double value)
+    [InlineData(1, "dotted quarter", 3, 8)]
+    [InlineData(2, "double dotted quarter", 7, 16)]
+    [InlineData(3, "triple dotted quarter", 15, 32)]
+    public void Duration_Dots(int dots, string name, int num, int den)
     {
         var d = new Duration(DurationType.Quarter, dots);
         d.ToString().ShouldBe(name);
-        d.GetValueInWholeNotes().ShouldBe(value);
+        d.Value.ShouldBe(Rational.Of(num, den));
         d.GetSymbol().ShouldBe("𝅘𝅥" + new string('.', dots));
     }
 
@@ -37,24 +38,11 @@ public class RhythmAndVoiceLeadingValueTests
     {
         var triplet = Duration.CreateTuplet(DurationType.Eighth, 3, 2);
         triplet.IsTuplet.ShouldBeTrue();
+        triplet.Tuplet.ShouldBe((3, 2));
         triplet.ToString().ShouldBe("3:2 eighth");
-        triplet.GetValueInWholeNotes().ShouldBe(0.125 * 2 / 3);
+        triplet.Value.ShouldBe(Rational.Of(1, 12));
         triplet.ShouldBe(Duration.CreateTuplet(DurationType.Eighth, 3, 2));
         triplet.ShouldNotBe(new Duration(DurationType.Eighth));
-    }
-
-    [Fact]
-    public void Duration_Add_IsASumThatOnlyEqualsAnotherSum()
-    {
-        var sum = new Duration(DurationType.Half).Add(new Duration(DurationType.Half));
-        sum.GetValueInWholeNotes().ShouldBe(1.0);
-        sum.ToString().ShouldBe("1 whole notes");
-        sum.ShouldNotBe(new Duration(DurationType.Whole));        // version 1 said these were equal
-        new Duration(DurationType.Whole).ShouldNotBe(sum);
-        sum.ShouldBe(new Duration(DurationType.Quarter, 1).Add(new Duration(DurationType.Quarter, 1)).Add(new Duration(DurationType.Quarter)));
-        new Duration(DurationType.Quarter, 1).Add(new Duration(DurationType.Eighth, 1)).ToString().ShouldBe("0.5625 whole notes");
-        sum.GetHashCode().ShouldBe(new Duration(DurationType.Half).Add(new Duration(DurationType.Half)).GetHashCode());
-        sum.ShouldNotBe(new Duration(DurationType.Half).Add(new Duration(DurationType.Quarter)));
     }
 
     [Fact]
@@ -62,12 +50,8 @@ public class RhythmAndVoiceLeadingValueTests
     {
         var q = new Duration(DurationType.Quarter);
         Should.Throw<ArgumentOutOfRangeException>(() => q.GetTimeInSeconds(0)).ParamName.ShouldBe("bpm");
-        Should.Throw<ArgumentNullException>(() => q.GetValueInMeasures(null!));
-        Should.Throw<ArgumentNullException>(() => q.Divide(null!));
-        Should.Throw<ArgumentNullException>(() => q.Add(null!));
+        Should.Throw<ArgumentOutOfRangeException>(() => q.GetTimeInSeconds(double.NaN)).ParamName.ShouldBe("bpm");
         q.GetTimeInSeconds(60).ShouldBe(1.0);
-        q.GetValueInMeasures(TimeSignature.CommonTime).ShouldBe(0.25);
-        new Duration(DurationType.Half).Divide(q).ShouldBe(2);
         q.Equals((object)"quarter").ShouldBeFalse();
     }
 

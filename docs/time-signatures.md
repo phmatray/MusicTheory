@@ -17,25 +17,32 @@ var triplet = Duration.CreateTuplet(DurationType.Eighth, 3, 2);
 Console.WriteLine(quarter);                          // quarter
 Console.WriteLine(dottedHalf);                       // dotted half
 Console.WriteLine(triplet);                          // 3:2 eighth
-Console.WriteLine(quarter.GetValueInWholeNotes());   // 0.25
-Console.WriteLine(dottedHalf.GetValueInWholeNotes()); // 0.75
-Console.WriteLine(Math.Round(triplet.GetValueInWholeNotes(), 4));   // 0.0833
+Console.WriteLine(quarter.Value);                    // 1/4
+Console.WriteLine(dottedHalf.Value);                 // 3/4
+Console.WriteLine(triplet.Value);                    // 1/12
+```
+
+`Value` is an exact `Rational` in whole notes, so sums never drift. Three triplet eighths are exactly a quarter:
+
+```csharp
+Console.WriteLine(triplet.Value * Rational.Of(3) == quarter.Value);   // True
 ```
 
 Each dot adds half of the previous value:
 
 ```csharp
-Console.WriteLine(new Duration(DurationType.Quarter, 2).GetValueInWholeNotes());   // 0.4375
+Console.WriteLine(new Duration(DurationType.Quarter, 2).Value);   // 7/16
 Console.WriteLine(new Duration(DurationType.Quarter, 2));                          // double dotted quarter
 ```
 
 ## Tempo
 
-`GetTimeInSeconds` takes a tempo in quarter-note beats per minute:
+`GetTimeInSeconds` takes a tempo in beats per minute; the beat is a quarter note unless you pass another duration:
 
 ```csharp
 Console.WriteLine(new Duration(DurationType.Quarter).GetTimeInSeconds(120));   // 0.5
 Console.WriteLine(new Duration(DurationType.Whole).GetTimeInSeconds(60));      // 4
+Console.WriteLine(new Duration(DurationType.Half, 1).GetTimeInSeconds(60, new Duration(DurationType.Quarter, 1)));   // 2
 ```
 
 ## Time signatures
@@ -69,18 +76,20 @@ catch (ArgumentException e)
 
 ## Durations and measures
 
+A measure is `numerator/denominator` of a whole note. Divide a duration's `Value` by it to get measures:
+
 ```csharp
-var common = TimeSignature.CommonTime;
-Console.WriteLine(new Duration(DurationType.Half).GetValueInMeasures(common));       // 0.5
-Console.WriteLine(new Duration(DurationType.Whole).GetValueInMeasures(waltz));       // 1.3333333333333333
-Console.WriteLine(new Duration(DurationType.Half).Divide(new Duration(DurationType.Eighth)));   // 4
+Rational Measure(TimeSignature ts) => Rational.Of(ts.Numerator, ts.Denominator);
+
+Console.WriteLine(new Duration(DurationType.Half).Value / Measure(TimeSignature.CommonTime));   // 1/2
+Console.WriteLine(new Duration(DurationType.Whole).Value / Measure(waltz));                     // 4/3
 ```
 
-`Add` sums two durations. The sum is a length, not a note value, so it is only equal to another sum:
+Durations are not added. Add their `Value`s, then turn the `Rational` back into notatable durations:
 
 ```csharp
-var sum = new Duration(DurationType.Half).Add(new Duration(DurationType.Quarter));
-Console.WriteLine(sum.GetValueInWholeNotes());          // 0.75
-Console.WriteLine(sum);                                  // 0.75 whole notes
-Console.WriteLine(sum.Equals(new Duration(DurationType.Half, 1)));   // False
+var total = new Duration(DurationType.Half).Value + new Duration(DurationType.Quarter).Value;
+Console.WriteLine(total);                                               // 3/4
+Console.WriteLine(string.Join(" + ", Duration.Decompose(Rational.Of(5, 8))));   // half + eighth
+Console.WriteLine(Duration.TryFromValue(total, out var d) ? d : null);  // dotted half
 ```
