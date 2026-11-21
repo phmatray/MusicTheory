@@ -18,10 +18,16 @@
 
 <a class="skip" href="#main">Skip to content</a>
 
-<aside class="folio" aria-hidden="true">
-  <a class="folio__mark" href="#top" tabindex="-1">MusicTheory</a>
-  <span class="folio__chapter"><span data-folio-numeral>&nbsp;</span> <span data-folio-title>Title page</span></span>
-</aside>
+<header class="folio">
+  <a class="folio__mark" href="#top">MusicTheory</a>
+  <span class="folio__chapter" aria-hidden="true"><span data-folio-numeral>&nbsp;</span> <span data-folio-title>Title page</span></span>
+  <nav class="folio__nav" aria-label="Site">
+    <a href="docs/getting-started.html">Docs</a>
+    <a href="api/index.html">API</a>
+    <a href="https://github.com/phmatray/MusicTheory">GitHub</a>
+    <a href="https://www.nuget.org/packages/MusicTheory">NuGet</a>
+  </nav>
+</header>
 
 <main id="main">
 
@@ -140,12 +146,12 @@
         <svg class="circle" viewBox="-200 -200 400 400" role="img" aria-labelledby="circle-title">
           <title id="circle-title">The circle of fifths</title>
           <g class="circle__ring" data-circle-ring></g>
-          <circle class="circle__pointer" cx="0" cy="-168" r="22"></circle>
+          <circle class="circle__pointer" cx="0" cy="-150" r="24"></circle>
         </svg>
 
         <div class="key__readout">
           <p class="key__name"><span data-key-major>C</span> major <span class="key__minor">relative <span data-key-minor>Am</span></span></p>
-          <svg class="staff" viewBox="0 0 320 120" role="img" aria-labelledby="staff-title">
+          <svg class="staff" viewBox="0 -24 320 150" role="img" aria-labelledby="staff-title">
             <title id="staff-title">Key signature on a treble staff</title>
             <g class="staff__lines"></g>
             <text class="staff__clef" x="6" y="92">𝄞</text>

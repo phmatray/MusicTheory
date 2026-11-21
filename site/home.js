@@ -41,18 +41,23 @@
     return node;
   };
 
-  ring.append(el("circle", { class: "ring", r: 190 }), el("circle", { class: "ring", r: 104 }));
+  ring.append(el("circle", { class: "ring", r: 190 }), el("circle", { class: "ring", r: 96 }));
+  const spelled = [];
   const labels = []; // counter-rotated each frame so the names stay upright while the ring turns
-  // One position per fifth; enharmonic keys (B/C♭, F♯/G♭, C♯/D♭) share one.
+  // One position per fifth.
   for (let p = 0; p < 12; p++) {
-    const here = keys.filter(k => ((k.accidentals % 12) + 12) % 12 === p);
+    // Enharmonic keys (B/C♭, F♯/G♭, C♯/D♭) share a position: the ring shows the sharp spelling on the sharp
+    // half of the tour and the flat one once the tour has crossed to A♭.
+    const here = keys.filter(k => ((k.accidentals % 12) + 12) % 12 === p).sort((a, b) => b.accidentals - a.accidentals);
     const angle = (p * step - 90) * Math.PI / 180;
     const at = r => ({ x: (Math.cos(angle) * r).toFixed(2), y: (Math.sin(angle) * r).toFixed(2) });
     const tick = at(190), inner = at(178);
     ring.append(el("line", { x1: tick.x, y1: tick.y, x2: inner.x, y2: inner.y }));
-    const major = at(150), minor = at(122);
-    labels.push(ring.appendChild(el("text", { class: "circle__major", x: major.x, y: major.y }, here.map(k => k.major).join("/"))));
-    labels.push(ring.appendChild(el("text", { class: "circle__minor", x: minor.x, y: minor.y }, here.map(k => k.minor).join("/"))));
+    const major = at(150), minor = at(118);
+    const majorLabel = ring.appendChild(el("text", { class: "circle__major", x: major.x, y: major.y }, here[0].major));
+    const minorLabel = ring.appendChild(el("text", { class: "circle__minor", x: minor.x, y: minor.y }, here[0].minor));
+    labels.push(majorLabel, minorLabel);
+    if (here.length > 1) spelled.push({ majorLabel, minorLabel, sharp: here[0], flat: here[1] });
   }
 
   // ── The staff ────────────────────────────────────────────────────────────
@@ -82,7 +87,7 @@
     k.altered.forEach((name, i) => {
       const letter = name[0], sharp = name.endsWith("♯");
       const y = bottom - (sharp ? sharpSteps : flatSteps)[letter] * half;
-      const glyph = el("text", { class: "staff__accidental", x: 74 + i * 20, y: y + 10 }, sharp ? "♯" : "♭");
+      const glyph = el("text", { class: "staff__accidental", x: 74 + i * 20, y: y + (sharp ? 5 : 8) }, sharp ? "♯" : "♭");
       // Engrave the accidentals this key adds to the previous one.
       if (!previous.split(",").includes(name)) {
         glyph.setAttribute("data-new", "");
@@ -102,6 +107,12 @@
       const angle = (f * step).toFixed(2);
       ring.setAttribute("transform", `rotate(${-angle})`);
       for (const label of labels) label.setAttribute("transform", `rotate(${angle} ${label.getAttribute("x")} ${label.getAttribute("y")})`);
+      const flatSide = Math.round(f) > tour.indexOf(byName["C♯"]);
+      for (const s of spelled) {
+        const k = flatSide ? s.flat : s.sharp;
+        s.majorLabel.textContent = k.major;
+        s.minorLabel.textContent = k.minor;
+      }
       show(tour[Math.round(f)]);
     }
     requestAnimationFrame(frame);
