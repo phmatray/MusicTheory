@@ -216,14 +216,14 @@ xx321x             Generated    -       base  1  difficulty   7.5  fingers --321
 1332xx             Generated    -       base  1  difficulty     8  fingers 1342--  sounds E2 B2 E3 G#3 x x  midi 40,47,52,56
 xx3211             Generated    -       base  1  difficulty     8  fingers --4312  sounds x x E3 G#3 B3 E4  midi 52,56,59,64
 ## C (ukulele)
-x003               Generated    -       base  1  difficulty   4.1  fingers ---1  sounds x C4 E4 C5  midi 60,64,72
-500x               Generated    -       base  5  difficulty   4.7  fingers 1---  sounds C5 C4 E4 x  midi 72,60,64
+0003               Generated    -       base  1  difficulty   3.6  fingers ---1  sounds G4 C4 E4 C5  midi 67,60,64,72
+000x               Generated    -       base  1  difficulty     4  fingers ----  sounds G4 C4 E4 x  midi 67,60,64
+0403               Generated    -       base  1  difficulty   5.1  fingers -2-1  sounds G4 E4 E4 C5  midi 67,64,64,72
+x003               Generated    -       base  1  difficulty   5.6  fingers ---1  sounds x C4 E4 C5  midi 60,64,72
 5003               Generated    -       base  3  difficulty   5.6  fingers 2--1  sounds C5 C4 E4 C5  midi 72,60,64,72
-540x               Generated    -       base  4  difficulty   5.9  fingers 21--  sounds C5 E4 E4 x  midi 72,64,64
+0433               Generated    -       base  1  difficulty   6.1  fingers -312  sounds G4 E4 G4 C5  midi 67,64,67,72
+500x               Generated    -       base  5  difficulty   6.2  fingers 1---  sounds C5 C4 E4 x  midi 72,60,64
 5403               Generated    -       base  3  difficulty   6.6  fingers 32-1  sounds C5 E4 E4 C5  midi 72,64,64,72
-543x               Generated    -       base  3  difficulty   7.1  fingers 321-  sounds C5 E4 G4 x  midi 72,64,67
-5433               Generated    -       base  3  difficulty   7.6  fingers 4312  sounds C5 E4 G4 C5  midi 72,64,67,72
-5x03               Generated    -       base  3  difficulty   7.6  fingers 2--1  sounds C5 x E4 C5  midi 72,64,72
 ## C/Bb (bass outside the chord)
 x12010             Generated    -       base  1  difficulty     6  fingers -13-2-  sounds x Bb2 E3 G3 C4 E4  midi 46,52,55,60,64
 x1201x             Generated    -       base  1  difficulty   6.5  fingers -13-2-  sounds x Bb2 E3 G3 C4 x  midi 46,52,55,60
