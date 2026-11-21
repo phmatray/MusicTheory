@@ -154,6 +154,12 @@ The site at <https://phmatray.github.io/MusicTheory/> is built from `docs/` and 
 [chord sheets and ABC](docs/chord-sheets-and-abc.md), [MIDI and MusicXML](docs/midi-and-musicxml.md) and
 [ear training](docs/ear-training.md).
 
+## 🧰 Toolbox
+
+A client-side web app for music schools and their students, at <https://phmatray.github.io/MusicTheory/toolbox/>
+(French and English). Exercises are shared as a link, and nothing is stored or sent anywhere. The
+[teacher guide and privacy statement](https://phmatray.github.io/MusicTheory/toolbox/?t=help) say exactly how.
+
 ## 📄 License
 
 MIT. See [LICENSE](LICENSE).

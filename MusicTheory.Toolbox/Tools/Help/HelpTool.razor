@@ -1,0 +1,28 @@
+@{
+    var lang = State.Lang;
+    string[] sections = ["share", "seed", "key", "ceiling", "privacy", "verify"];
+}
+<PageTitle>@Strings.T(lang, "help.title") - @Strings.T(lang, "shell.title")</PageTitle>
+
+<h1>@Strings.T(lang, "help.title")</h1>
+<p>@Strings.T(lang, "help.blurb")</p>
+
+@foreach (var s in sections)
+{
+    <h2>@Strings.T(lang, "help." + s + ".h")</h2>
+    <p>@Strings.T(lang, "help." + s + ".p")</p>
+    @if (s == "privacy")
+    {
+        <ul>
+            @foreach (var p in HelpModel.UrlParameters())
+            {
+                <li><code>@p</code></li>
+            }
+        </ul>
+        <p>@Strings.T(lang, "help.privacy.none")</p>
+    }
+}
+
+@code {
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+}

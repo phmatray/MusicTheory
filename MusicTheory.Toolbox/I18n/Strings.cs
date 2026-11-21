@@ -4,6 +4,7 @@ using MusicTheory.Toolbox.Tools.Analysis;
 using MusicTheory.Toolbox.Tools.Circle;
 using MusicTheory.Toolbox.Tools.Dictation;
 using MusicTheory.Toolbox.Tools.Finder;
+using MusicTheory.Toolbox.Tools.Help;
 using MusicTheory.Toolbox.Tools.Intervals;
 using MusicTheory.Toolbox.Tools.Progressions;
 using MusicTheory.Toolbox.Tools.Scales;
@@ -15,7 +16,7 @@ namespace MusicTheory.Toolbox.I18n;
 public static class Strings
 {
     /// <summary>Every table; a new tool adds its own here.</summary>
-    public static IReadOnlyList<IStringTable> Tables { get; } = [new ShellStrings(), new CircleStrings(), new DictationStrings(), new IntervalStrings(), new TransposerStrings(), new AnalysisStrings(), new FinderStrings(), new Tools.Fretboard.FretboardStrings(), new Tools.Voicings.VoicingsStrings(), new Tools.Piano.PianoStrings(), new ChordStrings(), new ScaleStrings(), new ProgressionStrings()];
+    public static IReadOnlyList<IStringTable> Tables { get; } = [new ShellStrings(), new CircleStrings(), new DictationStrings(), new IntervalStrings(), new TransposerStrings(), new AnalysisStrings(), new FinderStrings(), new Tools.Fretboard.FretboardStrings(), new Tools.Voicings.VoicingsStrings(), new Tools.Piano.PianoStrings(), new ChordStrings(), new ScaleStrings(), new ProgressionStrings(), new HelpStrings()];
 
     /// <summary>The text for <paramref name="key"/>, or <c>[key]</c> so a gap is visible (the parity test fails first).</summary>
     public static string T(Lang lang, string key)
