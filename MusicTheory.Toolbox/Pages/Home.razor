@@ -1,0 +1,11 @@
+@page "/"
+
+<PageTitle>MusicTheory Toolbox</PageTitle>
+
+<h1>Toolbox</h1>
+<p>Music theory tools that run entirely in your browser.</p>
+<p class="tb-proof">The library is loaded client-side: <code>Interval.Between(C4, G4)</code> is <strong>@_proof</strong>.</p>
+
+@code {
+    private readonly string _proof = Interval.Between(Note.Parse("C4"), Note.Parse("G4")).ToString();
+}

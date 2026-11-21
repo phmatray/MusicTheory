@@ -28,6 +28,9 @@ jobs:
         global-json-file: global.json
     - name: Build the site
       run: dotnet run --project tools/SiteGen -c Release -- . _site
+    # After SiteGen, which wipes _site first. Also on pull requests: a broken Toolbox fails the PR.
+    - name: Publish the Toolbox under /toolbox
+      run: bash tools/toolbox/publish.sh . _site
     - name: Upload the site
       if: github.event_name != 'pull_request'
       uses: actions/upload-pages-artifact@v5
