@@ -171,6 +171,35 @@ def pcsets():
     write("pcsets.csv", ["pcs", "normal", "prime", "icv"], rows)
 
 
+def tempo():
+    from fractions import Fraction
+    from music21 import stream, tempo as m21tempo
+
+    layouts = [
+        [(Fraction(0), 120)],
+        [(Fraction(0), 120), (Fraction(2), 90)],
+        [(Fraction(0), 60), (Fraction(1, 2), 100), (Fraction(3), 45)],
+        [(Fraction(0), 90), (Fraction(5, 4), 150)],  # mid-bar change
+        [(Fraction(0), 100), (Fraction(1), 80), (Fraction(5, 2), 140)],
+    ]
+    rows = []
+    for layout in layouts:
+        s = stream.Stream()
+        for pos, bpm in layout:
+            s.insert(float(pos * 4), m21tempo.MetronomeMark(number=bpm, referent=note.Note(type="quarter")))
+        for i in range(0, 64):  # one quarter note every 1/8 whole note, off the grid of changes too
+            n = note.Note("C4", quarterLength=0.5)
+            s.insert(i * 0.5, n)
+        changes = " ".join(f"{p.numerator}/{p.denominator}@{b}" for p, b in layout)
+        for m in s.secondsMap:
+            n = m["element"]
+            if not isinstance(n, note.Note):
+                continue
+            pos = Fraction(n.offset).limit_denominator(64) / 4
+            rows.append([changes, f"{pos.numerator}/{pos.denominator}", repr(float(m["offsetSeconds"]))])
+    write("tempo.csv", ["changes", "position", "seconds"], rows)
+
+
 if __name__ == "__main__":
     print("music21", music21.__version__)
     OUT.mkdir(parents=True, exist_ok=True)
@@ -182,3 +211,4 @@ if __name__ == "__main__":
     neoriemannian()
     durations()
     pcsets()
+    tempo()
