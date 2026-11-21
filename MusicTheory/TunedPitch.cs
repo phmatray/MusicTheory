@@ -42,5 +42,6 @@ public sealed record TunedPitch
     }
 
     /// <summary>The note and its signed offset to one decimal, such as <c>A4 +23.4¢</c>.</summary>
-    public override string ToString() => $"{Note} {Cents.ToString("+0.0;-0.0", CultureInfo.InvariantCulture)}¢";
+    // Rounding first, then adding +0.0, turns a tiny negative offset into +0.0 rather than "-0.0".
+    public override string ToString() => $"{Note} {(Math.Round(Cents, 1) + 0.0).ToString("+0.0;-0.0", CultureInfo.InvariantCulture)}¢";
 }

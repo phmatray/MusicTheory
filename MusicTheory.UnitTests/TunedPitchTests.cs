@@ -44,6 +44,7 @@ public class TunedPitchTests
     {
         new TunedPitch(Note.Parse("A4"), 23.44).ToString().ShouldBe("A4 +23.4¢");
         new TunedPitch(Note.Parse("A4"), -12.34).ToString().ShouldBe("A4 -12.3¢");
+        new TunedPitch(Note.Parse("A4"), -0.01).ToString().ShouldBe("A4 +0.0¢");
     }
 
     [Fact]
