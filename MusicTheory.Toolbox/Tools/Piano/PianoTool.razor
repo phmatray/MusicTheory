@@ -15,6 +15,8 @@
     const double kw = 28, kh = 120, bh = 72, pad = 4;
     var whites = view.Keys.Count(k => !k.IsBlack);
     var width = whites * kw + 2 * pad;
+    var rootPc = (Note.TryParse((root ?? "C") + "4", out var rn) ? rn : Note.Parse("C4")).PitchClass;
+    var label = Strings.T(lang, "piano.keyboard", view.Marks.Count) + ": " + string.Join(", ", view.Marks.Select(m => m.Label + " " + m.Finger));
     var byMidi = view.Marks.ToDictionary(m => m.Midi);
     string Num(double v) => v.ToString("0.##", CultureInfo.InvariantCulture);
 }
@@ -32,7 +34,7 @@
         <select @onchange='e => Set("root", e.Value?.ToString())'>
             @foreach (var r in rootIds)
             {
-                <option value="@r" selected="@string.Equals(r, root ?? "C", StringComparison.OrdinalIgnoreCase)">@NoteNames.Format(Note.Parse(r + "4"), lang)</option>
+                <option value="@r" selected="@(Note.Parse(r + "4").PitchClass == rootPc)">@NoteNames.Format(Note.Parse(r + "4"), lang)</option>
             }
         </select>
     </label>
@@ -65,7 +67,7 @@
 </div>
 
 <div class="tb-neck-wrap">
-<svg class="tb-neck tb-piano" style="min-width:@(Num(width))px" viewBox="0 0 @Num(width) @Num(kh + 2 * pad)" role="img" aria-label="@Strings.T(lang, "piano.keyboard", view.Marks.Count)">
+<svg class="tb-neck tb-piano" style="min-width:@(Num(width))px" viewBox="0 0 @Num(width) @Num(kh + 2 * pad)" role="img" aria-label="@label">
     <g transform="translate(@Num(pad) @Num(pad))">
         @foreach (var k in view.Keys.Where(k => !k.IsBlack))
         {
@@ -79,7 +81,7 @@
         {
             var m = byMidi[k.Midi];
             var cx = (k.X + k.Width / 2) * kw;
-            var cy = k.IsBlack ? bh - 18 : kh - 36;
+            var cy = k.IsBlack ? bh - 40 : kh - 36;
             <g>
                 <title>@m.Label</title>
                 <circle class="tb-dot tb-dot-root" cx="@Num(cx)" cy="@Num(cy)" r="9" />
@@ -90,7 +92,7 @@
                 }
                 else
                 {
-                    <g><text class="tb-open tb-key-black-label" x="@Num(cx)" y="@Num(bh + 12)" text-anchor="middle">@m.Label</text></g>
+                    <g><text class="tb-open tb-key-black-label" x="@Num(cx)" y="@Num(bh - 12)" text-anchor="middle">@m.Label</text></g>
                 }
             </g>
         }
