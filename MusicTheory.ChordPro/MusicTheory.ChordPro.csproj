@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- ChordPro chord sheets: parse and round-trip. -->
+    <PackageId>MusicTheory.ChordPro</PackageId>
+    <Product>MusicTheory.ChordPro</Product>
+    <Description>ChordPro for MusicTheory: parses chord sheets into lines and chord segments and writes them back byte for byte.</Description>
+    <PackageTags>music;theory;chordpro;chords;lyrics;songbook;music-theory;dotnet</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <!-- No baseline: the package has not been published yet. -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\icon.png" Pack="true" PackagePath="" />
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MusicTheory\MusicTheory.csproj" />
+  </ItemGroup>
+
+</Project>

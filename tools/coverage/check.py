@@ -2,6 +2,7 @@
 
     dotnet test --project MusicTheory.UnitTests --coverage --coverage-output-format cobertura --coverage-output $PWD/TestResults/core.xml
     dotnet test --project MusicTheory.Guitar.UnitTests --coverage --coverage-output-format cobertura --coverage-output $PWD/TestResults/guitar.xml
+    dotnet test --project MusicTheory.ChordPro.UnitTests --coverage --coverage-output-format cobertura --coverage-output $PWD/TestResults/chordpro.xml
     python3 tools/coverage/check.py TestResults/*.xml
 
 A line counts as covered when any report covers it; a branch takes the best count seen. Every uncovered
@@ -13,7 +14,7 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 
-LIBRARIES = {"MusicTheory", "MusicTheory.Guitar", "MusicTheory.Guitar.Blazor"}
+LIBRARIES = {"MusicTheory", "MusicTheory.Guitar", "MusicTheory.Guitar.Blazor", "MusicTheory.ChordPro"}
 
 
 def main(paths):
