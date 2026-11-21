@@ -3,7 +3,7 @@ namespace MusicTheory;
 /// <summary>
 /// Represents a musical time signature (meter).
 /// </summary>
-public class TimeSignature : IEquatable<TimeSignature>
+public sealed record TimeSignature
 {
     /// <summary>
     /// Gets the numerator (top number) of the time signature.
@@ -63,13 +63,9 @@ public class TimeSignature : IEquatable<TimeSignature>
     }
 
     /// <summary>
-    /// Gets the duration of one measure in whole notes.
+    /// Gets the duration of one measure in whole notes, exactly.
     /// </summary>
-    /// <returns>The measure duration as a fraction of a whole note.</returns>
-    public double GetMeasureDuration()
-    {
-        return (double)Numerator / Denominator;
-    }
+    public Rational MeasureLength => Rational.Of(Numerator, Denominator);
 
     /// <summary>
     /// Gets the number of beats per measure.
@@ -142,56 +138,5 @@ public class TimeSignature : IEquatable<TimeSignature>
     public override string ToString()
     {
         return $"{Numerator}/{Denominator}";
-    }
-
-    /// <summary>
-    /// Determines whether this time signature equals another.
-    /// </summary>
-    /// <param name="other">The other time signature.</param>
-    /// <returns>True if equal; otherwise, false.</returns>
-    public bool Equals(TimeSignature? other)
-    {
-        if (other is null)
-            return false;
-        
-        return Numerator == other.Numerator && Denominator == other.Denominator;
-    }
-
-    /// <summary>
-    /// Determines whether this time signature equals another object.
-    /// </summary>
-    /// <param name="obj">The object to compare.</param>
-    /// <returns>True if equal; otherwise, false.</returns>
-    public override bool Equals(object? obj)
-    {
-        return Equals(obj as TimeSignature);
-    }
-
-    /// <summary>
-    /// Gets the hash code for this time signature.
-    /// </summary>
-    /// <returns>The hash code.</returns>
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Numerator, Denominator);
-    }
-
-    /// <summary>
-    /// Determines whether two time signatures are equal.
-    /// </summary>
-    public static bool operator ==(TimeSignature? left, TimeSignature? right)
-    {
-        if (left is null)
-            return right is null;
-        
-        return left.Equals(right);
-    }
-
-    /// <summary>
-    /// Determines whether two time signatures are not equal.
-    /// </summary>
-    public static bool operator !=(TimeSignature? left, TimeSignature? right)
-    {
-        return !(left == right);
     }
 }
