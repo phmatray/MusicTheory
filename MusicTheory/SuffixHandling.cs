@@ -11,4 +11,10 @@ public enum SuffixHandling
     /// (<c>Cfoo/E</c>) moves its root and bass and keeps the rest as written.
     /// </summary>
     KeepUnparsed,
+
+    /// <summary>
+    /// Root and bass move, the suffix text is kept exactly as written, even when the chord parses
+    /// (<c>C-7</c> up 2 is <c>D-7</c>, <c>CM7</c> is <c>DM7</c>, <c>CΔ7</c> is <c>DΔ7</c>).
+    /// </summary>
+    Verbatim,
 }

@@ -16,7 +16,7 @@ public static class ChordTransposer
     /// <param name="semitones">Semitones up (positive) or down (negative).</param>
     /// <param name="targetKey">The key of the result, if known.</param>
     /// <param name="style">Output style; defaults to the input's own: Unicode accidentals if it uses ♭/♯, jazz glyphs if it uses ° ø Δ +.</param>
-    /// <param name="suffix">With <see cref="SuffixHandling.KeepUnparsed"/>, text that is not a chord but starts with a root (<c>Cfoo/E</c>) still moves its root and bass and keeps the rest as written.</param>
+    /// <param name="suffix">With <see cref="SuffixHandling.KeepUnparsed"/>, text that is not a chord but starts with a root (<c>Cfoo/E</c>) still moves its root and bass and keeps the rest as written. With <see cref="SuffixHandling.Verbatim"/>, every chord keeps its suffix as written (<c>C-7</c> becomes <c>D-7</c>).</param>
     public static string Transpose(string chordSymbol, int semitones, KeySignature? targetKey = null, ChordSymbolStyle? style = null, SuffixHandling suffix = SuffixHandling.Canonical) =>
         Move(chordSymbol, c => c.Transpose(semitones, Practical(targetKey ?? KeyOfNewRoot(c, semitones))), style, suffix);
 
@@ -26,9 +26,9 @@ public static class ChordTransposer
 
     private static string Move(string text, Func<ChordSymbol, ChordSymbol> move, ChordSymbolStyle? style, SuffixHandling suffix)
     {
-        if (ChordSymbol.TryParse(text, out var chord))
+        if (suffix != SuffixHandling.Verbatim && ChordSymbol.TryParse(text, out var chord))
             return move(chord).ToString(style ?? StyleOf(text));
-        if (suffix != SuffixHandling.KeepUnparsed || !TrySplit(text.Trim(), out var root, out var tail, out var bass))
+        if (suffix == SuffixHandling.Canonical || !TrySplit(text.Trim(), out var root, out var tail, out var bass))
             return text;
 
         // Root and bass go through a scratch chord so the spelling rules live in one place.

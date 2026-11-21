@@ -50,6 +50,14 @@ public class ChordProTransposeTests
     }
 
     [Fact]
+    public void Verbatim_keeps_the_writers_suffix()
+    {
+        const string text = "{key: G}\n[G-7]a [CΔ7]b";
+        ChordProDocument.Parse(text).Transpose(2, SuffixHandling.Verbatim).ToString().ShouldBe("{key: A}\n[A-7]a [DΔ7]b");
+        ChordProDocument.Parse(text).Transpose(2).ToString().ShouldBe("{key: A}\n[Am7]a [Dmaj7]b");
+    }
+
+    [Fact]
     public void KeepUnparsed_moves_root_and_bass_of_unreadable_chords()
     {
         const string text = "{key: G}\n[Gfoo/B]a [*Riff] [N.C.]";

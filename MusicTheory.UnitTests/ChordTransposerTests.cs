@@ -85,6 +85,31 @@ public class ChordTransposerTests
         ChordTransposer.Transpose("CM7/E", 2, suffix: SuffixHandling.KeepUnparsed).ShouldBe(ChordTransposer.Transpose("CM7/E", 2));
     }
 
+    [Theory]
+    [InlineData("C-7", "D-7")]
+    [InlineData("CM7", "DM7")]
+    [InlineData("CΔ7", "DΔ7")]
+    [InlineData("Cmaj7/E", "Dmaj7/F#")]
+    [InlineData("C6/9", "D6/9")]
+    [InlineData("Cfoo/E", "Dfoo/F#")]
+    public void Transpose_Verbatim_KeepsSuffixText(string text, string expected) =>
+        ChordTransposer.Transpose(text, 2, suffix: SuffixHandling.Verbatim).ShouldBe(expected);
+
+    [Theory]
+    [InlineData("C-7", "Dm7")]
+    [InlineData("CM7", "Dmaj7")]
+    public void Transpose_DefaultRewritesSuffix(string text, string expected) =>
+        ChordTransposer.Transpose(text, 2).ShouldBe(expected);
+
+    [Fact]
+    public void Transpose_Verbatim_BetweenKeys() =>
+        ChordTransposer.Transpose("A-7/G", K("C"), K("Eb"), suffix: SuffixHandling.Verbatim).ShouldBe("C-7/Bb");
+
+    [Theory]
+    [InlineData("N.C.")] [InlineData("%")] [InlineData("xyz")] [InlineData("am")]
+    public void Transpose_Verbatim_NonChordsUnchanged(string text) =>
+        ChordTransposer.Transpose(text, 2, suffix: SuffixHandling.Verbatim).ShouldBe(text);
+
     [Fact]
     public void Transpose_DefaultLeavesUnparseableTextAlone() =>
         ChordTransposer.Transpose("Cfoo/E", 2).ShouldBe("Cfoo/E");
