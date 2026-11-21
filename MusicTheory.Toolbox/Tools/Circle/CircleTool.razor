@@ -1,0 +1,48 @@
+@{
+    var lang = State.Lang;
+    State.Params.TryGetValue("key", out var requested);
+    var view = CircleModel.For(requested, lang);
+    var keys = CircleModel.Keys(lang);
+    var current = view.Key;
+}
+<PageTitle>@Strings.T(lang, "circle.title") - @Strings.T(lang, "shell.title")</PageTitle>
+
+<h1>@Strings.T(lang, "circle.title")</h1>
+<p>@Strings.T(lang, "circle.blurb")</p>
+@if (view.Fallback)
+{
+    <p class="tb-notice" role="status">@Strings.T(lang, "circle.invalid", requested ?? "")</p>
+}
+
+<svg class="tb-ring" viewBox="-110 -110 220 220" role="group" aria-label="@Strings.T(lang, "circle.ring")">
+    @for (var i = 0; i < keys.Count; i++)
+    {
+        var k = keys[i];
+        var angle = (i * 30 - 90) * Math.PI / 180;
+        var x = (85 * Math.Cos(angle)).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+        var y = (85 * Math.Sin(angle)).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+        var selected = k.Id == current.Id;
+        var href = ToolboxUrl.Build(State with { Params = new Dictionary<string, string>(State.Params) { ["key"] = k.Id } });
+        <a href="@href"
+           aria-label="@k.Title" aria-current="@(selected ? "true" : null)">
+            <circle cx="@x" cy="@y" r="17" class="@(selected ? "tb-key tb-key-on" : "tb-key")" />
+            <text x="@x" y="@y" text-anchor="middle" dominant-baseline="central">@NoteNames.Format(Note.Parse(k.Id + "4"), lang)</text>
+        </a>
+    }
+</svg>
+
+<h2>@current.Title</h2>
+<dl class="tb-facts">
+    <dt>@Strings.T(lang, "circle.signature")</dt>
+    <dd>@current.Signature</dd>
+    <dt>@Strings.T(lang, "circle.relative")</dt>
+    <dd>@current.RelativeMinor</dd>
+    <dt>@Strings.T(lang, "circle.scale")</dt>
+    <dd>@string.Join(" ", current.ScaleNotes)</dd>
+</dl>
+
+<Understand Lang="lang" TextKey="circle.understand" />
+
+@code {
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+}

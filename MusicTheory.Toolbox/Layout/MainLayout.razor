@@ -1,9 +1,27 @@
 @inherits LayoutComponentBase
+@implements IDisposable
+@inject NavigationManager Nav
+@inject ToolboxSession Session
 
+@{ var state = Session.Current; }
 <header class="tb-header">
-    <a class="tb-title" href=".">MusicTheory Toolbox</a>
-    <nav class="tb-nav" aria-label="Tools"></nav>
+    <a class="tb-title" href="@ToolboxUrl.Build(new ToolState("", state.Lang, new Dictionary<string, string>()))">@Strings.T(state.Lang, "shell.title")</a>
+    <nav class="tb-nav" aria-label="@Strings.T(state.Lang, "shell.nav")">
+        @foreach (var tool in ToolRegistry.All)
+        {
+            <a href="@ToolboxUrl.Build(new ToolState(tool.Id, state.Lang, new Dictionary<string, string>()))">@Strings.T(state.Lang, tool.TitleKey)</a>
+        }
+    </nav>
+    <LangSwitch State="state" />
 </header>
 <main class="tb-main">
     @Body
 </main>
+
+@code {
+    protected override void OnInitialized() => Nav.LocationChanged += OnChanged;
+
+    private void OnChanged(object? sender, LocationChangedEventArgs e) => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Nav.LocationChanged -= OnChanged;
+}

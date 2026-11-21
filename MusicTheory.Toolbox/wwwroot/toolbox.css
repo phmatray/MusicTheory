@@ -5,3 +5,16 @@ a { color: var(--sc-accent); }
 .tb-header { display: flex; gap: 1.5rem; align-items: baseline; padding: 1rem 1.5rem; border-bottom: 1px solid var(--mt-rule); }
 .tb-title { font-family: var(--sc-font-display); font-size: 1.25rem; text-decoration: none; color: var(--sc-ink); }
 .tb-main { max-width: 60rem; margin: 0 auto; padding: 1.5rem; }
+.tb-nav { display: flex; gap: 1rem; flex: 1; }
+.tb-lang { display: flex; gap: .75rem; }
+.tb-lang a[aria-current="true"] { color: var(--sc-ink); font-weight: 600; text-decoration: none; }
+.tb-grid { padding-left: 1.25rem; }
+.tb-notice { padding: .5rem .75rem; border-left: 3px solid var(--sc-accent); }
+.tb-ring { width: min(100%, 26rem); height: auto; }
+.tb-ring text { font-size: 9px; fill: var(--sc-ink); pointer-events: none; }
+.tb-key { fill: var(--sc-canvas); stroke: var(--sc-accent); stroke-width: 1.5; }
+.tb-key-on { fill: var(--sc-accent); }
+.tb-ring a:focus-visible circle { stroke-width: 3; }
+.tb-facts dt { font-weight: 600; margin-top: .5rem; }
+.tb-facts dd { margin: 0; }
+.tb-understand { margin-top: 1.5rem; }

@@ -1,11 +1,14 @@
-@page "/"
+<PageTitle>@Strings.T(State.Lang, "shell.title")</PageTitle>
 
-<PageTitle>MusicTheory Toolbox</PageTitle>
-
-<h1>Toolbox</h1>
-<p>Music theory tools that run entirely in your browser.</p>
-<p class="tb-proof">The library is loaded client-side: <code>Interval.Between(C4, G4)</code> is <strong>@_proof</strong>.</p>
+<h1>@Strings.T(State.Lang, "shell.title")</h1>
+<p>@Strings.T(State.Lang, "shell.intro")</p>
+<ul class="tb-grid">
+    @foreach (var tool in ToolRegistry.All)
+    {
+        <li><a href="@ToolboxUrl.Build(new ToolState(tool.Id, State.Lang, new Dictionary<string, string>()))">@Strings.T(State.Lang, tool.TitleKey)</a></li>
+    }
+</ul>
 
 @code {
-    private readonly string _proof = Interval.Between(Note.Parse("C4"), Note.Parse("G4")).ToString();
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
 }
