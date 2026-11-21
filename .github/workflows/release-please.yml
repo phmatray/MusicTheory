@@ -3,7 +3,11 @@ name: release-please
 # Derives the next version from the Conventional Commits on `dev` (the default branch) and keeps a
 # release PR up to date: CHANGELOG.md, .release-please-manifest.json and the single <Version> in
 # Directory.Build.props (x-release-please-version marker). Merging that PR tags vX.Y.Z and creates
-# the GitHub Release; the publish job below then pushes MusicTheory and MusicTheory.Guitar to NuGet.
+# the GitHub Release; the publish job below then pushes every packable project to NuGet.
+#
+# NuGet Trusted Publishing (OIDC): no long-lived API key. NuGet/login trades the GitHub OIDC token for
+# a key valid about an hour, under the nuget.org policy (owner phmatray, repo MusicTheory, workflow
+# release-please.yml). NUGET_USER is the nuget.org profile name, not a credential.
 #
 # Publishing lives in THIS workflow, gated on `release_created`: a tag created by release-please with
 # GITHUB_TOKEN does not trigger other workflows. PRs are squash-merged, so the PR title decides the bump.
@@ -11,8 +15,14 @@ name: release-please
 on:
   push:
     branches: [dev]
-  # Manual re-run: refreshes the release PR, or finishes a merged release whose run failed.
+  # Manual run: refreshes the release PR; with `tag`, packs and publishes that existing release tag
+  # (a merged release whose publish failed, e.g. v2.0.0 when the old API key had expired).
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to publish (e.g. v2.0.0). Empty = only refresh the release PR.
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -42,13 +52,26 @@ jobs:
   publish:
     name: Pack & publish
     needs: release-please
-    if: needs.release-please.outputs.release_created == 'true'
+    if: needs.release-please.outputs.release_created == 'true' || (github.event_name == 'workflow_dispatch' && inputs.tag != '')
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: write # upload the packages to the GitHub Release
+      id-token: write # GitHub OIDC token for NuGet Trusted Publishing
+    env:
+      TAG: ${{ needs.release-please.outputs.tag_name || inputs.tag }}
+      NUGET_USER: ${{ secrets.NUGET_USER }}
     steps:
+      # A release that silently skips the push is how 2.0.0 was tagged and never published: fail instead.
+      - name: Require the NuGet profile name
+        if: env.NUGET_USER == ''
+        run: |
+          echo "::error::Secret NUGET_USER (the nuget.org profile name) is not set; nothing would be published."
+          exit 1
+
       - uses: actions/checkout@v7
         with:
-          ref: ${{ needs.release-please.outputs.tag_name }}
+          ref: ${{ env.TAG }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
@@ -58,21 +81,28 @@ jobs:
       - name: Test
         run: dotnet test -c Release
 
-      # Every IsPackable project (MusicTheory, MusicTheory.Guitar, ...) at the one shared version.
+      # Every IsPackable project at the one shared version of the tag.
       - name: Pack
         run: |
           dotnet pack -c Release -o artifacts
           ls -1 artifacts
+
+      # Login sits right before the push: the exchanged key lives about an hour.
+      - name: NuGet login (OIDC)
+        id: login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ env.NUGET_USER }}
 
       # Pushing a .nupkg also pushes the .snupkg next to it. --skip-duplicate keeps re-runs idempotent.
       - name: Push to NuGet
         run: |
           set -e
           for pkg in artifacts/*.nupkg; do
-            dotnet nuget push "$pkg" -k "${{ secrets.NUGET_API_KEY }}" -s https://api.nuget.org/v3/index.json --skip-duplicate
+            dotnet nuget push "$pkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" -s https://api.nuget.org/v3/index.json --skip-duplicate
           done
 
       - name: Attach packages to the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ needs.release-please.outputs.tag_name }}" artifacts/*.nupkg artifacts/*.snupkg --clobber
+        run: gh release upload "$TAG" artifacts/*.nupkg artifacts/*.snupkg --clobber
