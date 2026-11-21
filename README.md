@@ -86,6 +86,10 @@ foreach (var v in VoiceLeader.Lead(
 // F4 A4 C5 E5
 // F4 A4 B4 D5
 // E4 G4 B4 D5
+
+// Which scales fit a chord? Fewest avoid notes first.
+ChordScale.ScalesFor(ChordSymbol.Parse("G7")).Select(s => s.Type);  // LydianDominant, ..., Mixolydian, ...
+ChordScale.ScalesFor(ChordSymbol.Parse("G7alt")).Any(s => s.Type == ScaleType.Altered);  // true
 ```
 
 ## 🎯 How it is checked
