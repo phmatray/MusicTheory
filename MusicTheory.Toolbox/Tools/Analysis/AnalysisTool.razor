@@ -1,0 +1,72 @@
+@{
+    var lang = State.Lang;
+    State.Params.TryGetValue("chords", out var chords);
+    State.Params.TryGetValue("key", out var key);
+    var result = AnalysisModel.Run(chords ?? "", key, lang);
+}
+<PageTitle>@Strings.T(lang, "analysis.title") - @Strings.T(lang, "shell.title")</PageTitle>
+
+<h1>@Strings.T(lang, "analysis.title")</h1>
+<p>@Strings.T(lang, "analysis.blurb")</p>
+
+<form method="get">
+    <input type="hidden" name="t" value="analysis" />
+    <input type="hidden" name="lang" value="@(lang == Lang.Fr ? "fr" : "en")" />
+    <input type="hidden" name="v" value="1" />
+    <p><label>@Strings.T(lang, "analysis.chords")<br />
+        <input name="chords" value="@chords" size="40" /></label></p>
+    <p><label>@Strings.T(lang, "analysis.key")<br />
+        <input name="key" value="@key" size="8" /></label></p>
+    <p><button type="submit">@Strings.T(lang, "analysis.apply")</button></p>
+</form>
+
+@if (result.Error is not null)
+{
+    <p class="tb-notice" role="alert">@result.Error</p>
+}
+else if (result.Rows.Count > 0)
+{
+    <p><strong>@Strings.T(lang, "analysis.usedkey")</strong>: @result.UsedKey@(result.Detected ? " (" + Strings.T(lang, "analysis.detected") + ")" : "")</p>
+    @if (result.Candidates.Count > 0)
+    {
+        <h2>@Strings.T(lang, "analysis.candidates")</h2>
+        <ol>
+            @foreach (var c in result.Candidates)
+            {
+                <li>@c.Name (@Strings.T(lang, "analysis.confidence", c.Percent))</li>
+            }
+        </ol>
+    }
+    <table class="tb-table">
+        <thead>
+            <tr>
+                <th>@Strings.T(lang, "analysis.col.index")</th>
+                <th>@Strings.T(lang, "analysis.col.chord")</th>
+                <th>@Strings.T(lang, "analysis.col.numeral")</th>
+                <th>@Strings.T(lang, "analysis.col.function")</th>
+                <th>@Strings.T(lang, "analysis.col.cadence")</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in result.Rows)
+            {
+                <tr>
+                    <td>@r.Index</td><td>@r.Chord</td><td>@r.Numeral</td><td>@r.Function</td><td>@r.Cadence</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <h2>@Strings.T(lang, "analysis.regions")</h2>
+    <ul>
+        @foreach (var g in result.Regions)
+        {
+            <li>@Strings.T(lang, "analysis.region", g.Key, g.Start, g.End)@(g.PivotIndex is { } p ? ", " + Strings.T(lang, "analysis.pivot", p) : "")</li>
+        }
+    </ul>
+}
+
+<Understand Lang="lang" TextKey="analysis.understand" />
+
+@code {
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+}
