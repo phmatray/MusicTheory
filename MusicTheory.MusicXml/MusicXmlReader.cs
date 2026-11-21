@@ -84,7 +84,9 @@ public static class MusicXmlReader
 
             if (element.Element("chord") is not null)
             {
-                events[^1].Pitches.Add(pitch!);
+                if (pitch is null || events.Count == 0)
+                    throw new FormatException($"Measure {label}: a <chord/> note must be a pitch that follows another note.");
+                events[^1].Pitches.Add(pitch);
                 continue;
             }
 

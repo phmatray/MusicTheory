@@ -207,6 +207,14 @@ public class MusicXmlRoundTripTests
         Should.Throw(() => ReadPart($"<measure number=\"1\">{Meter44}{Nt(body)}</measure>"), expected);
     }
 
+    [Theory]
+    [InlineData("<chord/><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type>")]
+    [InlineData("<chord/><rest/><duration>4</duration><type>quarter</type>")]
+    public void A_chord_note_must_be_a_pitch_after_another_note(string body)
+    {
+        Should.Throw<FormatException>(() => ReadPart($"<measure number=\"1\">{Meter44}{Nt(body)}</measure>")).Message.ShouldContain("<chord/>");
+    }
+
     [Fact]
     public void A_tied_rest_is_read_as_an_untied_rest()
     {
