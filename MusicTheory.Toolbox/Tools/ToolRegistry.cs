@@ -26,10 +26,8 @@ public static class ToolRegistry
         new("intervals", "intervals.title", typeof(IntervalDrillTool)),
         new("finder", "finder.title", typeof(FinderTool)),
         new("transpose", "transpose.title", typeof(TransposerTool)),
-        new("transpose", "transpose.title", typeof(TransposerTool)),
         new("fretboard", "fretboard.title", typeof(Fretboard.FretboardTool)),
         new("analysis", "analysis.title", typeof(AnalysisTool)),
-        new("intervals", "intervals.title", typeof(IntervalDrillTool)),
     ];
 
     public static ToolInfo? Find(string id) => All.FirstOrDefault(t => t.Id == id);
