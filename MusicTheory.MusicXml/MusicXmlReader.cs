@@ -9,7 +9,7 @@ public static class MusicXmlReader
 {
     /// <summary>
     /// Reads the first <c>&lt;part&gt;</c> of a <c>score-partwise</c> document. Grace and cue notes are skipped, ties
-    /// come from <c>&lt;tie&gt;</c> (sound), an <c>implicit="yes"</c> measure becomes a pickup, and the key is the one in
+    /// come from <c>&lt;tie&gt;</c> (sound), an <c>implicit="yes"</c> measure becomes a pickup (its invisible padding rests are dropped), and the key is the one in
     /// the first measure.
     /// </summary>
     /// <param name="document">The MusicXML document.</param>
@@ -46,7 +46,7 @@ public static class MusicXmlReader
             }
 
             var timeSignature = meter ?? throw new FormatException($"Measure {label} has no <time> before its first note.");
-            var events = ReadEvents(m, divisions, label);
+            var events = ReadEvents(m, divisions, label, (string?)m.Attribute("implicit") == "yes");
             var filled = events.Aggregate(Rational.Zero, (sum, e) => sum + e.Duration.Value);
             measures.Add(new Measure(timeSignature, events, (string?)m.Attribute("implicit") == "yes" ? filled : null));
         }
@@ -56,7 +56,7 @@ public static class MusicXmlReader
         return new MusicXmlScore(root.XPathSelectElement("work/work-title")?.Value, key, measures[0].TimeSignature, measures);
     }
 
-    private static List<RhythmEvent> ReadEvents(XElement measure, int divisions, string label)
+    private static List<RhythmEvent> ReadEvents(XElement measure, int divisions, string label, bool pickup)
     {
         var events = new List<(List<Note> Pitches, Duration Duration, bool Tied)>();
         foreach (var element in measure.Elements())
@@ -72,6 +72,9 @@ public static class MusicXmlReader
             }
 
             if (element.Element("grace") is not null || element.Element("cue") is not null)
+                continue;
+            // music21 pads a pickup measure to a full bar with an invisible rest; it is not part of the music.
+            if (pickup && element.Element("rest") is not null && (string?)element.Attribute("print-object") == "no")
                 continue;
             var voice = (string?)element.Element("voice");
             if (voice is not (null or "1"))

@@ -1,0 +1,7 @@
+file,meter,fifths,mode,notes
+accidentals.musicxml,4/4,0,major,F##4:1/4 Bb3:1/4 C#5:1/4 Eb4:1/4
+triplets.musicxml,4/4,1,major,G4:1/6 A4:1/6 B4:1/6 C5:1/4 r:1/4
+pickup.musicxml,3/4,-2,major,F4:1/4 Bb4:3/4 A4:1/2 G4:1/4
+ties.musicxml,4/4,0,major,C4:3/4 C4:1/4~ C4:1/2 C4:1/2
+chords.musicxml,4/4,2,major,D4+F#4+A4:1/2 G3+B3+D4:1/2 D4+F#4+A4:1
+minor.musicxml,6/8,0,minor,A4:3/8 G#4:1/8 A4:1/8 B4:1/8 r:3/4
