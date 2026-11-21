@@ -43,7 +43,16 @@ doubly augmented fourth.
   bebop scales (`BebopDominant`) and world scales (`HungarianMinor`, `Hirajoshi`), 22 in all.
 - **Keys**: signatures including theoretical keys, the circle of fifths, relative and parallel keys.
 - **Harmony**: diatonic triads and sevenths, Roman-numeral analysis, key detection, voice-leading checks.
-- **Rhythm**: durations with dots and tuplets, time signatures.
+- **Tuning and temperaments**: equal, Pythagorean, just and quarter-comma meantone temperaments, cents and frequencies.
+- **Solfège**: syllables in words or ASCII, with la-based minor.
+- **Modes and chord-scales**: the mode catalogue, and which scales fit a chord (`ChordScale`).
+- **Piano voicings**: close, drop-2, drop-3, shell and rootless voicings, with voice leading between chords.
+- **Advanced harmony**: tritone substitutions, ii-V insertion, cadence and modulation detection.
+- **Rhythm**: durations with dots and tuplets, time signatures, exact measures, tempo and swing.
+- **Pitch-class sets**: the Forte catalogue and neo-Riemannian transformations.
+- **Instruments**: ukulele, mandolin, bass, seven-string and alternate tunings with voicings and diagrams.
+- **Ear training**: seeded interval, chord, scale, progression and melody drills.
+- **Import and export** (optional packages): ChordPro chord sheets, ABC tunes, Standard MIDI Files and MusicXML.
 - **Guitar** (`MusicTheory.Guitar`): voicings for every chord type in any tuning, capo, chord-diagram geometry, spoken chord names and screen-reader labels in English and French.
 - **Blazor** (`MusicTheory.Guitar.Blazor`): chord playback in the browser.
 
@@ -53,6 +62,10 @@ doubly augmented fourth.
 dotnet add package MusicTheory
 dotnet add package MusicTheory.Guitar          # optional
 dotnet add package MusicTheory.Guitar.Blazor   # optional
+dotnet add package MusicTheory.ChordPro        # optional
+dotnet add package MusicTheory.Midi            # optional
+dotnet add package MusicTheory.MusicXml        # optional
+dotnet add package MusicTheory.Abc             # optional
 ```
 
 Requires .NET 11.
@@ -97,7 +110,7 @@ ChordScale.ScalesFor(ChordSymbol.Parse("G7alt")).Any(s => s.Type == ScaleType.Al
 
 - **Against music21.** `tools/reference/generate.py` computes 3,669 intervals, 2,240 transpositions,
   315 scales and 70 key signatures with [music21](https://web.mit.edu/music21/); the tests replay every row.
-- **100% coverage.** The three packages are covered at 100% of lines and branches; CI fails below that
+- **100% coverage.** The seven packages are covered at 100% of lines and branches; CI fails below that
   (`tools/coverage/check.py`).
 - **Mutation testing.** Stryker.NET runs on demand (Actions, *Mutation testing*), with break thresholds in each test
   project's `stryker-config.json`.
@@ -125,15 +138,21 @@ UPDATE_GOLDEN=1 dotnet test --project MusicTheory.Guitar.UnitTests   # accept an
 
 ## 🗺️ Roadmap
 
-The next features are tracked as issues, one family each: tuning and temperaments (#118), the mode
-catalogue (#121), piano voicings (#125), advanced harmony (#128), exact rhythm (#133), pitch-class set
-theory (#138), MusicXML, MIDI, ChordPro and ABC (#142), more instruments (#147), solfège (#117) and ear
-training (#152).
+Everything planned in #117 to #156 has shipped. What is next lives in the
+[open issues](https://github.com/phmatray/MusicTheory/issues): Documentation 2.0 (#230) and the Toolbox, a
+client-side web app for music schools (#244).
 
 ## 📖 Documentation
 
 The site at <https://phmatray.github.io/MusicTheory/> is built from `docs/` and the XML documentation by
-`tools/SiteGen`: guides, tutorials, and an API reference generated from the code.
+`tools/SiteGen`: guides, tutorials, and an API reference generated from the code. Start with
+[Getting started](docs/getting-started.md), then the guides for
+[tuning and temperaments](docs/tuning-and-temperaments.md), [solfège](docs/solfege.md),
+[modes](docs/mode-catalogue.md), [piano voicings](docs/piano-voicings.md),
+[advanced harmony](docs/advanced-harmony.md), [measures and tempo](docs/measures-and-tempo.md),
+[pitch-class sets](docs/pitch-class-sets.md), [instruments](docs/instruments.md),
+[chord sheets and ABC](docs/chord-sheets-and-abc.md), [MIDI and MusicXML](docs/midi-and-musicxml.md) and
+[ear training](docs/ear-training.md).
 
 ## 📄 License
 
