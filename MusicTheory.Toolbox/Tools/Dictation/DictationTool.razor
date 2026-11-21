@@ -2,7 +2,10 @@
 @using MusicTheory.Toolbox.Drills
 @using MusicTheory.Toolbox.Tools.Dictation
 @using MusicTheory.Training
+@using Microsoft.JSInterop
+@using MusicTheory.Toolbox.Rendering
 @inject NavigationManager Nav
+@inject IJSRuntime Js
 @{
     var lang = State.Lang;
     var l = Link;
@@ -93,9 +96,13 @@ else
     @if (l.TeacherKey)
     {
         <h2>@Strings.T(lang, "dictation.teacher")</h2>
-        @foreach (var keyed in _session.Questions)
+        @foreach (var (keyed, i) in _session.Questions.Select((k, i) => (k, i + 1)))
         {
             <Staff Abc="@Abc(keyed, keyed.Answer)" Alt="@Alt(keyed.Answer, lang)" />
+            <div class="tb-controls">
+                <button type="button" class="tb-btn tb-export-midi" @onclick="() => DownloadMidi(keyed, i)">@Strings.T(lang, "dictation.export.midi")</button>
+                <button type="button" class="tb-btn tb-export-xml" @onclick="() => DownloadXml(keyed, i)">@Strings.T(lang, "dictation.export.xml")</button>
+            </div>
         }
     }
 }
@@ -161,6 +168,13 @@ else
 
     private static string Alt(IReadOnlyList<Note> notes, Lang lang) =>
         Strings.T(lang, "dictation.staff.alt", string.Join(' ', notes.Select(n => NoteNames.Format(n, lang) + n.Octave)));
+
+    private ValueTask DownloadMidi(Question<IReadOnlyList<Note>> q, int n) =>
+        Js.InvokeVoidAsync("toolboxDownload", ExportModel.FileName(Link.Seed!.Value, n, "mid"), "audio/midi", Convert.ToBase64String(ExportModel.Midi(q)));
+
+    private ValueTask DownloadXml(Question<IReadOnlyList<Note>> q, int n) =>
+        Js.InvokeVoidAsync("toolboxDownload", ExportModel.FileName(Link.Seed!.Value, n, "musicxml"), "application/vnd.recordare.musicxml+xml",
+            Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(ExportModel.MusicXml(q))));
 
     private void Go(DrillLink l) => Nav.NavigateTo(ToolboxUrl.Build(l.ToState(State.Lang)));
 
