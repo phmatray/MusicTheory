@@ -64,5 +64,8 @@ public class MeasureTests
         Should.Throw<ArgumentNullException>(() => Ev(DurationType.Quarter) with { Pitches = null! });
         Should.Throw<ArgumentNullException>(() => Ev(DurationType.Quarter) with { Duration = null! });
         (Ev(DurationType.Quarter) with { TiedToNext = true }).TiedToNext.ShouldBeTrue();
+        var moved = Ev(DurationType.Quarter) with { Pitches = [Note.Parse("D4")], Duration = new Duration(DurationType.Half) };
+        moved.Pitches.ShouldBe([Note.Parse("D4")]);
+        moved.Duration.Value.ShouldBe(Rational.Of(1, 2));
     }
 }
