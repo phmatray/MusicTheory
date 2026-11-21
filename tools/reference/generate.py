@@ -92,6 +92,29 @@ def scales():
     write("scales.csv", ["tonic", "type", "notes"], rows)
 
 
+MODES = [
+    (scale.MelodicMinorScale, 2, "DorianFlat2"), (scale.MelodicMinorScale, 3, "LydianAugmented"),
+    (scale.MelodicMinorScale, 4, "LydianDominant"), (scale.MelodicMinorScale, 5, "MixolydianFlat6"),
+    (scale.MelodicMinorScale, 6, "LocrianNatural2"), (scale.MelodicMinorScale, 7, "Altered"),
+    (scale.HarmonicMinorScale, 2, "LocrianNatural6"), (scale.HarmonicMinorScale, 3, "IonianAugmented"),
+    (scale.HarmonicMinorScale, 4, "DorianSharp4"), (scale.HarmonicMinorScale, 5, "PhrygianDominant"),
+    (scale.HarmonicMinorScale, 6, "LydianSharp2"), (scale.HarmonicMinorScale, 7, "Ultralocrian"),
+]
+
+
+def modes():
+    rows = []
+    for (l, a), (cls, k, name) in itertools.product(SPELLINGS, MODES):
+        # The parent's degree k lands on our tonic: build the parent on the tonic moved down by the
+        # parent's own degree-k interval, then read it ascending from the tonic to the octave above.
+        ref = cls(note.Note("C4")).getPitches("C4", "C5")
+        up = interval.Interval(ref[0], ref[k - 1])
+        parent = cls(note.Note(m21(l, a, 4)).transpose(up.reverse()))
+        spelled = [ours(p) for p in parent.getPitches(m21(l, a, 4), m21(l, a, 5))]
+        rows.append([f"{l}{OURS[a]}4", name, " ".join(s or "!" for s in spelled)])
+    write("modes.csv", ["tonic", "type", "notes"], rows)
+
+
 def keys():
     rows = []
     for (l, a), mode in itertools.product(SPELLINGS, ("major", "minor")):
@@ -108,4 +131,5 @@ if __name__ == "__main__":
     intervals()
     transpositions()
     scales()
+    modes()
     keys()
