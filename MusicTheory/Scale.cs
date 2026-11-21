@@ -166,6 +166,35 @@ public sealed record Scale
         return Formula(Type).Select(root.Transpose).ToList();
     }
 
+    // The heptatonic mode families, in degree order. A method, not a static field (Stryker).
+    private static ScaleType[][] Families() =>
+    [
+        [ScaleType.Ionian, ScaleType.Dorian, ScaleType.Phrygian, ScaleType.Lydian, ScaleType.Mixolydian, ScaleType.Aeolian, ScaleType.Locrian],
+        [ScaleType.MelodicMinor, ScaleType.DorianFlat2, ScaleType.LydianAugmented, ScaleType.LydianDominant, ScaleType.MixolydianFlat6, ScaleType.LocrianNatural2, ScaleType.Altered],
+        [ScaleType.HarmonicMinor, ScaleType.LocrianNatural6, ScaleType.IonianAugmented, ScaleType.DorianSharp4, ScaleType.PhrygianDominant, ScaleType.LydianSharp2, ScaleType.Ultralocrian],
+    ];
+
+    private ScaleType FamilyKey => Type switch
+    {
+        ScaleType.Major => ScaleType.Ionian,
+        ScaleType.NaturalMinor => ScaleType.Aeolian,
+        _ => Type,
+    };
+
+    /// <summary>The scale's modes, one per degree: index i starts on degree i + 1. Index 0 is this scale.</summary>
+    /// <exception cref="InvalidOperationException">The type is not in a heptatonic mode family.</exception>
+    public IReadOnlyList<Scale> GetModes()
+    {
+        var key = FamilyKey;
+        var family = Families().FirstOrDefault(f => f.Contains(key))
+            ?? throw new InvalidOperationException($"{Type} has no named modes; only the major, melodic minor and harmonic minor families do.");
+        int position = Array.IndexOf(family, key);
+        var notes = GetNotes().ToList();
+        return Enumerable.Range(0, 7)
+            .Select(k => new Scale(notes[k], k == 0 ? Type : family[(position + k) % 7]))
+            .ToList();
+    }
+
     /// <summary>The same scale on a tonic transposed by <paramref name="interval"/>.</summary>
     public Scale Transpose(Interval interval) => new(Root.Transpose(interval), Type);
 
