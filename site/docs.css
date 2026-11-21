@@ -76,5 +76,5 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--sc-accent); ou
   .docs-menu summary { display: block; cursor: pointer; padding: var(--sc-2) 0; font-size: var(--sc-t-sm); text-transform: uppercase; letter-spacing: var(--sc-track-wide); }
   .docs-menu:not([open]) .docs-nav { display: none; }
   .docs-nav { position: static; max-height: none; }
-  .docs-bar { gap: var(--sc-4); }
+  .docs-bar { gap: var(--sc-2) var(--sc-3); flex-wrap: wrap; font-size: var(--sc-t-xs); letter-spacing: 0.04em; }
 }

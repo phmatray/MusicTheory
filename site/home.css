@@ -19,6 +19,9 @@ code { font-family: var(--sc-font-mono); font-size: 0.86em; }
 }
 .folio__mark { color: var(--sc-ink); text-decoration: none; font-weight: 600; pointer-events: auto; }
 .folio__chapter [data-folio-numeral] { color: var(--sc-accent); font-weight: 600; }
+.folio__nav { margin-left: auto; display: flex; gap: var(--sc-4); pointer-events: auto; }
+.folio__nav a { color: var(--sc-ink-soft); text-decoration: none; }
+.folio__nav a:hover { color: var(--sc-accent); }
 
 /* ── Title page ────────────────────────────────────────────────────────────── */
 .title-page { min-height: 100svh; display: grid; align-items: end; padding-block-end: clamp(4rem, 14vh, 9rem); }
@@ -112,7 +115,9 @@ a:hover { color: var(--sc-accent); }
 a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 3px; }
 
 @media (max-width: 860px) {
-  .folio { padding-block: var(--sc-3) var(--sc-2); font-size: var(--sc-t-xs); }
+  .folio { padding-block: var(--sc-3) var(--sc-2); font-size: var(--sc-t-xs); letter-spacing: 0.04em; }
+  .folio__chapter { display: none; }
+  .folio__nav { gap: var(--sc-3); }
   .chapter__grid { grid-template-columns: minmax(0, 1fr); gap: var(--sc-4); }
   .chapter__head { position: static; display: flex; align-items: baseline; gap: var(--sc-4); }
   .chapter__numeral { font-size: clamp(3rem, 10vw, 4rem); }
