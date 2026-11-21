@@ -33,10 +33,10 @@
 }
 else
 {
-    @if (_session.Current is { } q)
+    @if (_shown is { } q)
     {
-        <h2 class="tb-progress">@Strings.T(lang, "intervals.question", _session.Index + 1, _session.Questions.Count)</h2>
-        <DrillPlayer Sounds="q.Sounds" Lang="lang" @key="_session.Index" />
+        <h2 class="tb-progress">@Strings.T(lang, "intervals.question", _session.Index + (_last is null ? 1 : 0), _session.Questions.Count)</h2>
+        <DrillPlayer Sounds="q.Sounds" Lang="lang" @key="q" />
         <div class="tb-answers" role="group" aria-label="@Strings.T(lang, "intervals.choices")">
             @foreach (var choice in q.Choices)
             {
@@ -81,6 +81,7 @@ else
     private DrillLink Link => DrillLink.FromState(State);
     private DrillSessionModel<Interval>? _session;
     private AnswerResult<Interval>? _last;
+    private Question<Interval>? _shown;
     private DrillLink? _built;
 
     private string ShareUrl => Nav.Uri.Split('?')[0] + ToolboxUrl.Build((Link with { TeacherKey = false }).ToState(State.Lang));
@@ -98,16 +99,17 @@ else
     {
         _last = null;
         var l = Link;
-        if (l.Seed is not { } seed) { _session = null; return; }
+        if (l.Seed is not { } seed) { _session = null; _shown = null; return; }
         var options = IntervalDrillOptions.For(l.Difficulty);
         var drill = new IntervalDrill(options, seed);
         var questions = Enumerable.Range(0, l.Count).Select(_ => drill.Next()).ToArray();
         _session = new DrillSessionModel<Interval>(questions, drill.Check);
+        _shown = _session.Current;
     }
 
     private void Answer(Interval choice) => _last = _session!.Answer(choice);
 
-    private void Next() => _last = null;
+    private void Next() { _last = null; _shown = _session!.Current; }
 
     private static string Kind(Question<Interval> q) =>
         q.Sounds.Count == 1 ? "intervals.kind.together"
@@ -117,7 +119,7 @@ else
 
     private void Generate() => Go(Link with { Seed = (ulong)Random.Shared.Next(1, 1_000_000_000) });
 
-    // Changing difficulty or count changes the exercise, so a seeded link gets a new seed.
+    // The seed stays: the same number under another difficulty or count is another exercise, still shareable.
     private void OnDifficulty(ChangeEventArgs e) =>
         Go(DrillLink.FromState(State with { Params = new Dictionary<string, string>(State.Params) { ["d"] = e.Value?.ToString() ?? "" } }));
 
