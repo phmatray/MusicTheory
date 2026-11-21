@@ -22,6 +22,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.ChordPro", "Mus
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.ChordPro.UnitTests", "MusicTheory.ChordPro.UnitTests\MusicTheory.ChordPro.UnitTests.csproj", "{F4A38A3D-2D32-4FE5-8150-C28307898201}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.Midi", "MusicTheory.Midi\MusicTheory.Midi.csproj", "{2A60687C-BB83-48A1-BA47-A7EC639628C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.Midi.UnitTests", "MusicTheory.Midi.UnitTests\MusicTheory.Midi.UnitTests.csproj", "{62BA8A77-4A88-450F-A172-E68B1E94DBB6}"
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.MusicXml", "MusicTheory.MusicXml\MusicTheory.MusicXml.csproj", "{99287509-7725-4FDF-9F43-376867DC5C3A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.MusicXml.UnitTests", "MusicTheory.MusicXml.UnitTests\MusicTheory.MusicXml.UnitTests.csproj", "{92495607-EDFD-4F38-80DE-469BEC17B147}"
@@ -159,6 +162,30 @@ Global
 		{F4A38A3D-2D32-4FE5-8150-C28307898201}.Release|x64.Build.0 = Release|Any CPU
 		{F4A38A3D-2D32-4FE5-8150-C28307898201}.Release|x86.ActiveCfg = Release|Any CPU
 		{F4A38A3D-2D32-4FE5-8150-C28307898201}.Release|x86.Build.0 = Release|Any CPU
+		{2A60687C-BB83-48A1-BA47-A7EC639628C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A60687C-BB83-48A1-BA47-A7EC639628C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A60687C-BB83-48A1-BA47-A7EC639628C8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2A60687C-BB83-48A1-BA47-A7EC639628C8}.Debug|x64.Build.0 = Debug|Any CPU
+		{2A60687C-BB83-48A1-BA47-A7EC639628C8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2A60687C-BB83-48A1-BA47-A7EC639628C8}.Debug|x86.Build.0 = Debug|Any CPU
+		{2A60687C-BB83-48A1-BA47-A7EC639628C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A60687C-BB83-48A1-BA47-A7EC639628C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A60687C-BB83-48A1-BA47-A7EC639628C8}.Release|x64.ActiveCfg = Release|Any CPU
+		{2A60687C-BB83-48A1-BA47-A7EC639628C8}.Release|x64.Build.0 = Release|Any CPU
+		{2A60687C-BB83-48A1-BA47-A7EC639628C8}.Release|x86.ActiveCfg = Release|Any CPU
+		{2A60687C-BB83-48A1-BA47-A7EC639628C8}.Release|x86.Build.0 = Release|Any CPU
+		{62BA8A77-4A88-450F-A172-E68B1E94DBB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62BA8A77-4A88-450F-A172-E68B1E94DBB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62BA8A77-4A88-450F-A172-E68B1E94DBB6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{62BA8A77-4A88-450F-A172-E68B1E94DBB6}.Debug|x64.Build.0 = Debug|Any CPU
+		{62BA8A77-4A88-450F-A172-E68B1E94DBB6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{62BA8A77-4A88-450F-A172-E68B1E94DBB6}.Debug|x86.Build.0 = Debug|Any CPU
+		{62BA8A77-4A88-450F-A172-E68B1E94DBB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62BA8A77-4A88-450F-A172-E68B1E94DBB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62BA8A77-4A88-450F-A172-E68B1E94DBB6}.Release|x64.ActiveCfg = Release|Any CPU
+		{62BA8A77-4A88-450F-A172-E68B1E94DBB6}.Release|x64.Build.0 = Release|Any CPU
+		{62BA8A77-4A88-450F-A172-E68B1E94DBB6}.Release|x86.ActiveCfg = Release|Any CPU
+		{62BA8A77-4A88-450F-A172-E68B1E94DBB6}.Release|x86.Build.0 = Release|Any CPU
 		{99287509-7725-4FDF-9F43-376867DC5C3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{99287509-7725-4FDF-9F43-376867DC5C3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99287509-7725-4FDF-9F43-376867DC5C3A}.Debug|x64.ActiveCfg = Debug|Any CPU
