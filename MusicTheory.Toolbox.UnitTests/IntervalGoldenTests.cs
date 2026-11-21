@@ -19,6 +19,6 @@ public class IntervalGoldenTests
         while (!File.Exists(Path.Combine(dir.FullName, "MusicTheory.sln"))) dir = dir.Parent!;
         var path = Path.Combine(dir.FullName, "MusicTheory.Toolbox.UnitTests", "Golden", "intervals-seed42.txt");
         if (Environment.GetEnvironmentVariable("UPDATE_GOLDEN") == "1") File.WriteAllText(path, Actual());
-        Actual().ShouldBe(File.ReadAllText(path));
+        Actual().ShouldBe(File.ReadAllText(path).ReplaceLineEndings("\n")); // git may check the file out with CRLF on Windows
     }
 }
