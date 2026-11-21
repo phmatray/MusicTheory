@@ -24,7 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Golden/*.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../MusicTheory/MusicTheory.csproj" />
+    <ProjectReference Include="../MusicTheory.Guitar/MusicTheory.Guitar.csproj" />
     <ProjectReference Include="../MusicTheory.Toolbox/MusicTheory.Toolbox.csproj" />
   </ItemGroup>
 
