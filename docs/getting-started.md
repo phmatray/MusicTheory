@@ -109,4 +109,8 @@ Console.WriteLine(Note.Parse("H4", NoteNotation.German));        // B4
 ## Next steps
 
 - [Notes](notes.md), [Intervals](intervals.md), [Chords](chords.md), [Scales](scales.md), [Keys](key-signatures.md)
+- Rhythm and tuning: [Time signatures](time-signatures.md), [Measures and tempo](measures-and-tempo.md), [Tuning and temperaments](tuning-and-temperaments.md), [Solfège](solfege.md)
+- Harmony: [Mode catalogue](mode-catalogue.md), [Piano voicings](piano-voicings.md), [Advanced harmony](advanced-harmony.md), [Pitch-class sets](pitch-class-sets.md)
+- Instruments and files: [Instruments](instruments.md), [Chord sheets and ABC tunes](chord-sheets-and-abc.md), [MIDI and MusicXML files](midi-and-musicxml.md)
+- Practice: [Ear training](ear-training.md)
 - [The API reference](../api/index.html), generated from the XML documentation

@@ -31,7 +31,9 @@ invalid signature and is killed at launch, which breaks the GuitarChords build. 
 ## Architecture
 
 Packages: `MusicTheory` (the theory), `MusicTheory.Guitar` (voicings, tunings, diagram geometry),
-`MusicTheory.Guitar.Blazor` (playback). `GuitarChords` is a demo app, not packed.
+`MusicTheory.Guitar.Blazor` (playback), and four optional I/O packages: `MusicTheory.ChordPro` (chord sheets),
+`MusicTheory.Midi` (Standard MIDI Files), `MusicTheory.MusicXml` and `MusicTheory.Abc` (tunes). `GuitarChords`
+is a demo app and `MusicTheory.Toolbox` is the Blazor WebAssembly toolbox for music schools; neither is packed.
 
 - **Spelled values.** `Note`, `Interval`, `Chord`, `Scale`, `KeySignature`, `ChordSymbol` are sealed records
   with value equality and constructor validation. Everything is built by interval from a root, never by
@@ -67,5 +69,5 @@ computes; never type an output by hand. Visible copy uses no em dashes.
 
 ## Roadmap
 
-Feature families are tracked as GitHub issues #117 to #156 (parents: #118, #121, #125, #128, #133, #138,
-#142, #147, #152; solfège is #117).
+The feature families of #117 to #156 are shipped. Open work is on the issue list: Documentation 2.0 (#230)
+and the Toolbox (#244).
