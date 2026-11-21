@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.Abc.UnitTests",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.Toolbox", "MusicTheory.Toolbox\MusicTheory.Toolbox.csproj", "{0D347FC9-03A5-4733-8291-4E8E32BBE4CA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.Toolbox.UnitTests", "MusicTheory.Toolbox.UnitTests\MusicTheory.Toolbox.UnitTests.csproj", "{051F9375-81DD-41DA-85ED-A19A6E09A04A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -250,6 +252,18 @@ Global
 		{0D347FC9-03A5-4733-8291-4E8E32BBE4CA}.Release|x64.Build.0 = Release|Any CPU
 		{0D347FC9-03A5-4733-8291-4E8E32BBE4CA}.Release|x86.ActiveCfg = Release|Any CPU
 		{0D347FC9-03A5-4733-8291-4E8E32BBE4CA}.Release|x86.Build.0 = Release|Any CPU
+		{051F9375-81DD-41DA-85ED-A19A6E09A04A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{051F9375-81DD-41DA-85ED-A19A6E09A04A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{051F9375-81DD-41DA-85ED-A19A6E09A04A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{051F9375-81DD-41DA-85ED-A19A6E09A04A}.Debug|x64.Build.0 = Debug|Any CPU
+		{051F9375-81DD-41DA-85ED-A19A6E09A04A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{051F9375-81DD-41DA-85ED-A19A6E09A04A}.Debug|x86.Build.0 = Debug|Any CPU
+		{051F9375-81DD-41DA-85ED-A19A6E09A04A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{051F9375-81DD-41DA-85ED-A19A6E09A04A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{051F9375-81DD-41DA-85ED-A19A6E09A04A}.Release|x64.ActiveCfg = Release|Any CPU
+		{051F9375-81DD-41DA-85ED-A19A6E09A04A}.Release|x64.Build.0 = Release|Any CPU
+		{051F9375-81DD-41DA-85ED-A19A6E09A04A}.Release|x86.ActiveCfg = Release|Any CPU
+		{051F9375-81DD-41DA-85ED-A19A6E09A04A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
