@@ -25,3 +25,5 @@ a { color: var(--sc-accent); }
 .tb-answers { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }
 .tb-right { font-weight: 600; }
 .tb-key-list { padding-left: 1.5rem; }
+.tb-form { display: grid; gap: .5rem; max-width: 36rem; }
+.tb-form button { justify-self: start; }

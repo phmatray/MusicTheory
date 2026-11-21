@@ -1,5 +1,6 @@
 using MusicTheory.Toolbox.Tools.Circle;
 using MusicTheory.Toolbox.Tools.Intervals;
+using MusicTheory.Toolbox.Tools.Transposer;
 
 namespace MusicTheory.Toolbox.Tools;
 
@@ -12,6 +13,7 @@ public static class ToolRegistry
     public static IReadOnlyList<ToolInfo> All { get; } = [
         new("circle", "circle.title", typeof(CircleTool)),
         new("intervals", "intervals.title", typeof(IntervalDrillTool)),
+        new("transpose", "transpose.title", typeof(TransposerTool)),
     ];
 
     public static ToolInfo? Find(string id) => All.FirstOrDefault(t => t.Id == id);
