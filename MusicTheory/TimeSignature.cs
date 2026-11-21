@@ -94,7 +94,15 @@ public sealed record TimeSignature
         && BeatGroups.SequenceEqual(other.BeatGroups);
 
     /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(Numerator, Denominator, BeatGroups.Count);
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+        hash.Add(Numerator);
+        hash.Add(Denominator);
+        foreach (var group in BeatGroups)
+            hash.Add(group);
+        return hash.ToHashCode();
+    }
 
     private static Rational[] ToRationals(IEnumerable<int> groups, int denominator) =>
         groups.Select(g => Rational.Of(g, denominator)).ToArray();
