@@ -186,6 +186,18 @@ public class ToMidiTests
         c.ToMidi().ShouldBe([48, 52, 55, 60, 64]);
         c.ToMidi(capo: 2).ShouldBe([50, 54, 57, 62, 66]);
     }
+
+    [Fact]
+    public void TuningWithAnotherStringCount_IsRefused()
+    {
+        var v = new GuitarVoicingProvider().GetVoicings(ChordSymbol.Parse("C"), new VoicingOptions(Tuning.Ukulele))[0];
+        v.ToMidi(Tuning.Ukulele).ShouldBe([67, 60, 64, 72]);
+        var ex = Should.Throw<ArgumentException>(() => v.ToMidi(Tuning.Standard));
+        ex.Message.ShouldStartWith("The voicing has 4 strings but the tuning 'Standard' has 6.");
+        ex.ParamName.ShouldBe("tuning");
+        Should.Throw<ArgumentException>(() => v.ToMidi());
+        Should.Throw<ArgumentException>(() => v.Sound(Tuning.Standard));
+    }
 }
 
 public class ChordAudioModuleTests
