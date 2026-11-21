@@ -48,7 +48,9 @@ public enum NoteNotation
     /// <summary>English letters with accidentals: <c>Bb4</c>, <c>F#</c>, <c>B♭</c>.</summary>
     English,
     /// <summary>German names: <c>H</c> is B, <c>B</c> is B♭, suffixes <c>-is</c> and <c>-es</c> (<c>Fis</c>, <c>Es</c>, <c>As</c>, <c>Heses</c>).</summary>
-    German
+    German,
+    /// <summary>Fixed-do solfège: <c>Do</c>, <c>Ré dièse 4</c>, <c>Sib3</c>; <c>Do</c> is always C. See <see cref="Solfege"/>.</summary>
+    FixedDo
 }
 
 /// <summary>
@@ -317,20 +319,25 @@ public sealed record Note
     {
         note = null;
         var s = text.AsSpan().Trim();
-        bool read = notation == NoteNotation.German
-            ? TryParseGermanPitchClass(s, out var pitch, out var consumed)
-            : TryParsePitchClass(s, out pitch, out consumed);
+        Note? pitch;
+        int consumed;
+        bool read = notation switch
+        {
+            NoteNotation.German => TryParseGermanPitchClass(s, out pitch, out consumed),
+            NoteNotation.FixedDo => Solfege.TryParseFixedDoPitchClass(s, out pitch, out consumed),
+            _ => TryParsePitchClass(s, out pitch, out consumed),
+        };
         if (!read)
             return false;
         if (consumed == s.Length)
         {
-            note = pitch;
+            note = pitch!;
             return true;
         }
         if (s[consumed] == '+' || !int.TryParse(s[consumed..], System.Globalization.NumberStyles.AllowLeadingSign,
                 System.Globalization.CultureInfo.InvariantCulture, out var octave) || octave is < MinOctave or > MaxOctave)
             return false;
-        note = new Note(pitch.Name, pitch.Alteration, octave);
+        note = new Note(pitch!.Name, pitch.Alteration, octave);
         return true;
     }
 

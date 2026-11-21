@@ -127,6 +127,23 @@ def keys():
     write("keys.csv", ["tonic", "mode", "sharps", "altered"], rows)
 
 
+def neoriemannian():
+    from music21 import analysis, chord
+
+    rows = []
+    for (l, a), quality in itertools.product(SPELLINGS, ("major", "minor")):
+        third = interval.Interval("M3" if quality == "major" else "m3")
+        root = note.Note(m21(l, a, 4))
+        c = chord.Chord([root, root.transpose(third), root.transpose("P5")])
+        for move in "PLR":
+            r = getattr(analysis.neoRiemannian, move)(c)
+            res = ours(r.root(), False)
+            if res is None or any(ours(p, False) is None for p in r.pitches):
+                continue
+            rows.append([f"{l}{OURS[a]}", quality, move, res, r.quality])
+    write("neoriemannian.csv", ["root", "type", "move", "result_root", "result_type"], rows)
+
+
 DURATION_TYPES = [("Whole", "whole"), ("Half", "half"), ("Quarter", "quarter"), ("Eighth", "eighth"),
                   ("Sixteenth", "16th"), ("ThirtySecond", "32nd"), ("SixtyFourth", "64th")]
 
@@ -195,6 +212,35 @@ def measures():
     write("measures.csv", ["case", "meter", "input", "expected"], rows)
 
 
+def tempo():
+    from fractions import Fraction
+    from music21 import stream, tempo as m21tempo
+
+    layouts = [
+        [(Fraction(0), 120)],
+        [(Fraction(0), 120), (Fraction(2), 90)],
+        [(Fraction(0), 60), (Fraction(1, 2), 100), (Fraction(3), 45)],
+        [(Fraction(0), 90), (Fraction(5, 4), 150)],  # mid-bar change
+        [(Fraction(0), 100), (Fraction(1), 80), (Fraction(5, 2), 140)],
+    ]
+    rows = []
+    for layout in layouts:
+        s = stream.Stream()
+        for pos, bpm in layout:
+            s.insert(float(pos * 4), m21tempo.MetronomeMark(number=bpm, referent=note.Note(type="quarter")))
+        for i in range(0, 64):  # one quarter note every 1/8 whole note, off the grid of changes too
+            n = note.Note("C4", quarterLength=0.5)
+            s.insert(i * 0.5, n)
+        changes = " ".join(f"{p.numerator}/{p.denominator}@{b}" for p, b in layout)
+        for m in s.secondsMap:
+            n = m["element"]
+            if not isinstance(n, note.Note):
+                continue
+            pos = Fraction(n.offset).limit_denominator(64) / 4
+            rows.append([changes, f"{pos.numerator}/{pos.denominator}", repr(float(m["offsetSeconds"]))])
+    write("tempo.csv", ["changes", "position", "seconds"], rows)
+
+
 if __name__ == "__main__":
     print("music21", music21.__version__)
     OUT.mkdir(parents=True, exist_ok=True)
@@ -203,6 +249,8 @@ if __name__ == "__main__":
     scales()
     modes()
     keys()
+    neoriemannian()
     durations()
     pcsets()
     measures()
+    tempo()

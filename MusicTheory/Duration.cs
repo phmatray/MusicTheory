@@ -114,11 +114,7 @@ public sealed record Duration
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="bpm"/> is not a positive finite number.</exception>
     public double GetTimeInSeconds(double bpm, Duration? beat = null)
     {
-        if (!double.IsFinite(bpm) || bpm <= 0)
-            throw new ArgumentOutOfRangeException(nameof(bpm), bpm, "Tempo must be a positive number.");
-
-        var beats = Value / (beat ?? new Duration(DurationType.Quarter)).Value;
-        return beats.ToDouble() * 60.0 / bpm;
+        return new TempoMap(bpm, beat).SecondsAt(Value);
     }
 
     /// <summary>
