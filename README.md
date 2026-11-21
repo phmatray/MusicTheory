@@ -76,6 +76,14 @@ HarmonicAnalyzer.Analyze(
 CadenceDetector.Detect(
     new[] { "C", "F", "G", "Am" }.Select(ChordSymbol.Parse).ToList(),
     KeySignature.Parse("C"));                                     // Cadence(Deceptive, 3)
+
+// Voice leading: each voicing moves the least from the previous one.
+foreach (var v in VoiceLeader.Lead(
+             new[] { "Dm7", "G7", "Cmaj7" }.Select(ChordSymbol.Parse), PianoVoicingStyle.RootlessA))
+    Console.WriteLine(string.Join(" ", v));
+// F4 A4 C5 E5
+// F4 A4 B4 D5
+// E4 G4 B4 D5
 ```
 
 ## 🎯 How it is checked
