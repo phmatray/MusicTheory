@@ -53,3 +53,17 @@ a { color: var(--sc-accent); }
 .tb-dot-label { font-size: 8px; fill: var(--sc-ink); pointer-events: none; }
 .tb-dot-label-root { fill: var(--sc-canvas); }
 .tb-dot-long { font-size: 5.5px; }
+.tb-voicings { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1rem 0; }
+.tb-voicing { margin: 0; width: 11rem; }
+.tb-voicing svg { width: 100%; height: auto; }
+.tb-voicing figcaption { display: flex; flex-direction: column; gap: .15rem; font-size: .85rem; }
+.tb-voicing figcaption button { align-self: start; margin-top: .25rem; }
+.tb-vo-open { fill: none; stroke: var(--sc-ink); stroke-width: 1.2; }
+.tb-vo-muted, .tb-vo-pos { font-size: 10px; fill: var(--sc-ink); }
+.tb-vo-barre { stroke: var(--sc-accent); stroke-width: 14; stroke-linecap: round; }
+.tb-piano { max-width: 60rem; }
+.tb-key-white { fill: var(--sc-canvas); stroke: var(--sc-ink); stroke-width: 1; }
+.tb-key-black { fill: var(--sc-ink); stroke: var(--sc-ink); }
+.tb-finger { font-size: 11px; }
+.tb-check { flex-direction: row !important; align-items: center; align-self: end; }
+.tb-key-black-label { fill: var(--sc-canvas); font-size: 8px; }

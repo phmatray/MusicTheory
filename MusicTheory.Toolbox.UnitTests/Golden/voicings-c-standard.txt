@@ -1,0 +1,8 @@
+x32010 base1 fingers[-,3,2,-,1,-] barre- Open shape
+x320xx base1 fingers[-,2,1,-,-,-] barre- Found shape
+x35553 base3 fingers[-,1,2,3,4,1] barre f3 s1-5 A-form shape
+x3201x base1 fingers[-,3,2,-,1,-] barre- Found shape
+x35050 base3 fingers[-,1,2,-,3,-] barre- Found shape
+x320x0 base1 fingers[-,2,1,-,-,-] barre- Found shape
+8 10 10 9 8 8 base8 fingers[1,3,4,2,1,1] barre f8 s0-5 E-form shape
+x x 10 12 13 12 base10 fingers[-,-,1,2,4,3] barre- D-form shape
