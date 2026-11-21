@@ -1,4 +1,5 @@
 @using MusicTheory.Guitar.Blazor
+@implements IDisposable
 @inject ChordAudio Audio
 
 <button type="button" class="tb-btn tb-play" @onclick="PlayAsync">@Strings.T(Lang, _played ? "intervals.replay" : "intervals.play")</button>
@@ -18,6 +19,10 @@
     [Parameter] public bool ChordSteps { get; set; }
 
     private bool _played;
+    private CancellationTokenSource? _cts;
+
+    // Leaving the question stops the rest of a progression, so it cannot sound over the next one.
+    public void Dispose() => _cts?.Cancel();
 
     // Behind a click: browsers refuse audio before a user gesture.
     private async Task PlayAsync()
@@ -26,10 +31,13 @@
         _played = true;
         if (ChordSteps)
         {
-            foreach (var step in steps)
+            _cts?.Cancel();
+            _cts = new CancellationTokenSource();
+            var token = _cts.Token;
+            for (var i = 0; i < steps.Count && !token.IsCancellationRequested; i++)
             {
-                await Audio.PlayAsync(step);
-                await Task.Delay(ChordStepMs);
+                await Audio.PlayAsync(steps[i]);
+                if (i < steps.Count - 1) await Task.Delay(ChordStepMs, token).ContinueWith(_ => { });
             }
         }
         else if (steps.Count == 1)
