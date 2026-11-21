@@ -50,8 +50,9 @@ public static class Solfege
         new string?[] { "te", "ti", null },
     };
 
-    private static NoteName DoNote(KeySignature key, MinorSolfege minor) =>
-        key.Mode == KeyMode.Minor && minor == MinorSolfege.LaBased ? key.GetRelative().Tonic.Name : key.Tonic.Name;
+    // The major key whose tonic is do: the relative major (la-based minor) or the parallel major (do-based minor).
+    private static KeySignature DoKey(KeySignature key, MinorSolfege minor) =>
+        key.Mode == KeyMode.Major ? key : minor == MinorSolfege.LaBased ? key.GetRelative() : key.GetParallel();
 
     /// <summary>
     /// The movable-do syllable of <paramref name="note"/> in <paramref name="key"/> (<c>fi</c> for C♯ in G major),
@@ -62,8 +63,9 @@ public static class Solfege
     {
         ArgumentNullException.ThrowIfNull(note);
         ArgumentNullException.ThrowIfNull(key);
-        int degree = ((int)note.Name - (int)DoNote(key, minor) + 7) % 7;
-        int offset = (int)note.Alteration - (int)key.GetAlteration(note.Name);
+        var doKey = DoKey(key, minor);
+        int degree = ((int)note.Name - (int)doKey.Tonic.Name + 7) % 7;
+        int offset = (int)note.Alteration - (int)doKey.GetAlteration(note.Name);
         return Math.Abs(offset) > 1 ? null : MovableTable()[degree][offset + 1];
     }
 
@@ -75,13 +77,14 @@ public static class Solfege
         if (text is null)
             return false;
         var table = MovableTable();
+        var doKey = DoKey(key, minor);
         for (int degree = 0; degree < 7; degree++)
             for (int offset = -1; offset <= 1; offset++)
             {
                 if (!string.Equals(table[degree][offset + 1], text.Trim(), StringComparison.OrdinalIgnoreCase))
                     continue;
-                var letter = (NoteName)(((int)DoNote(key, minor) + degree) % 7);
-                int alteration = (int)key.GetAlteration(letter) + offset;
+                var letter = (NoteName)(((int)doKey.Tonic.Name + degree) % 7);
+                int alteration = (int)doKey.GetAlteration(letter) + offset;
                 if (Math.Abs(alteration) > 2)
                     return false;
                 note = new Note(letter, (Alteration)alteration);

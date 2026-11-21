@@ -58,6 +58,24 @@ public class SolfegeTests
         Solfege.MovableDo(Note.Parse("G#"), a).ShouldBe("si");
     }
 
+    [Theory]
+    [InlineData("A", "do")]
+    [InlineData("B", "re")]
+    [InlineData("C", "me")]
+    [InlineData("D", "fa")]
+    [InlineData("E", "sol")]
+    [InlineData("F", "le")]
+    [InlineData("G", "te")]
+    public void MovableDo_DoBasedMinor(string note, string expected) =>
+        Solfege.MovableDo(Note.Parse(note), KeySignature.Parse("Am"), MinorSolfege.DoBased).ShouldBe(expected);
+
+    [Fact]
+    public void TryParseMovableDo_DoBasedMinor()
+    {
+        Solfege.TryParseMovableDo("me", KeySignature.Parse("Am"), out var n, MinorSolfege.DoBased).ShouldBeTrue();
+        n.ShouldBe(Note.Parse("C4"));
+    }
+
     [Fact]
     public void MovableDo_RejectsNulls()
     {
