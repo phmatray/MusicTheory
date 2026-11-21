@@ -102,6 +102,15 @@ Console.WriteLine(ChordSymbol.Parse("Cmi7"));                     // Cm7
 Console.WriteLine(ChordSymbol.TryParse("N.C.", out _));           // False
 ```
 
+The default parse is strict about the root: lyrics contain words like `a` and `em`, so `am` is not a chord.
+`ChordSymbolParseOptions.Lenient` reads lower-case roots, and should only be used on text already known to be chords.
+
+```csharp
+Console.WriteLine(ChordSymbol.TryParse("am", out _));                                     // False
+Console.WriteLine(ChordSymbol.Parse("f#m", ChordSymbolParseOptions.Lenient));             // F#m
+Console.WriteLine(ChordSymbol.TryParse("be", ChordSymbolParseOptions.Lenient, out _));    // False
+```
+
 ```csharp
 var symbol = ChordSymbol.Parse("Bbm7b5");
 Console.WriteLine(symbol.ToString(ChordSymbolStyle.Unicode));     // B♭ø7

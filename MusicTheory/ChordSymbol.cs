@@ -28,6 +28,22 @@ public sealed record ChordSymbolStyle(AccidentalStyle Accidentals, bool UseJazzG
 }
 
 /// <summary>
+/// Options for <see cref="ChordSymbol.Parse(string, ChordSymbolParseOptions)"/>.
+/// </summary>
+/// <param name="AllowLowerCaseRoot">Read the root and the slash bass letter in either case (<c>am</c>, <c>f#m</c>).</param>
+public sealed record ChordSymbolParseOptions(bool AllowLowerCaseRoot = false)
+{
+    /// <summary>The default: upper-case roots only, so lyric words are not read as chords.</summary>
+    public static readonly ChordSymbolParseOptions Strict = new();
+
+    /// <summary>
+    /// Lower-case roots accepted. A bare <c>a</c> or <c>em</c> becomes a chord, so use it only on text already known
+    /// to be chords, never on lyrics.
+    /// </summary>
+    public static readonly ChordSymbolParseOptions Lenient = new(AllowLowerCaseRoot: true);
+}
+
+/// <summary>
 /// A lead-sheet chord symbol such as <c>Am7</c>, <c>D/F#</c>, <c>B♭Δ7</c> or <c>C7b9#11</c>: a root, a chord
 /// type, optional tensions and an optional bass that need not be a chord tone (<c>C/Bb</c>).
 /// </summary>
@@ -97,18 +113,35 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null, I
     /// <c>6/9</c>/<c>69</c>, <c>7alt</c>, <c>mMaj7</c>/<c>m(maj7)</c>, <c>5</c>, and parenthesised alterations (<c>7(b9)</c>).
     /// </summary>
     /// <exception cref="FormatException">The text is not a chord symbol.</exception>
-    public static ChordSymbol Parse(string text) =>
-        TryParse(text, out var symbol) ? symbol : throw new FormatException($"Not a chord symbol: '{text}'.");
+    public static ChordSymbol Parse(string text) => Parse(text, ChordSymbolParseOptions.Strict);
+
+    /// <summary>
+    /// Parses a chord symbol with the given options; see <see cref="Parse(string)"/>.
+    /// </summary>
+    /// <exception cref="ArgumentNullException"><paramref name="options"/> is null.</exception>
+    /// <exception cref="FormatException">The text is not a chord symbol.</exception>
+    public static ChordSymbol Parse(string text, ChordSymbolParseOptions options) =>
+        TryParse(text, options, out var symbol) ? symbol : throw new FormatException($"Not a chord symbol: '{text}'.");
 
     /// <summary>
     /// Tries to parse a chord symbol; see <see cref="Parse"/>. Returns false (never throws) for
     /// <c>N.C.</c>, <c>%</c>, empty strings and other non-chords.
     /// </summary>
-    public static bool TryParse(string? text, [NotNullWhen(true)] out ChordSymbol? symbol)
+    public static bool TryParse(string? text, [NotNullWhen(true)] out ChordSymbol? symbol) =>
+        TryParse(text, ChordSymbolParseOptions.Strict, out symbol);
+
+    /// <summary>
+    /// Tries to parse a chord symbol with the given options; see <see cref="TryParse(string?, out ChordSymbol?)"/>.
+    /// Never throws on the text.
+    /// </summary>
+    /// <exception cref="ArgumentNullException"><paramref name="options"/> is null.</exception>
+    public static bool TryParse(string? text, ChordSymbolParseOptions options, [NotNullWhen(true)] out ChordSymbol? symbol)
     {
+        ArgumentNullException.ThrowIfNull(options);
+        var lower = options.AllowLowerCaseRoot;
         symbol = null;
         var s = text.AsSpan().Trim();
-        if (s.IsEmpty || !char.IsUpper(s[0]) || !Note.TryParsePitchClass(s, out var root, out var consumed))
+        if (s.IsEmpty || !(lower || char.IsUpper(s[0])) || !Note.TryParsePitchClass(s, out var root, out var consumed))
             return false;
 
         var suffix = s[consumed..];
@@ -117,7 +150,7 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null, I
         if (slash >= 0)
         {
             var tail = suffix[(slash + 1)..];
-            if (!tail.IsEmpty && char.IsUpper(tail[0]) && Note.TryParsePitchClass(tail, out var b, out var used) && used == tail.Length)
+            if (!tail.IsEmpty && (lower || char.IsUpper(tail[0])) && Note.TryParsePitchClass(tail, out var b, out var used) && used == tail.Length)
             {
                 bass = b;
                 suffix = suffix[..slash];
