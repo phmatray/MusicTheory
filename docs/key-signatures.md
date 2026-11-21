@@ -34,13 +34,13 @@ Console.WriteLine(gSharp.GetAlteration(NoteName.F));    // DoubleSharp
 ## Parsing
 
 `KeySignature.Parse` reads a tonic followed by an optional mode: `m`, `min`, `minor`, `maj`, `major`, or `M`.
-It accepts keys with at most seven accidentals; build a theoretical key with the constructor.
+It accepts keys up to the constructor's limit of fourteen accidentals, theoretical ones included.
 
 ```csharp
 Console.WriteLine(KeySignature.Parse("F#m"));         // F#m
 Console.WriteLine(KeySignature.Parse("E♭ minor"));    // Ebm
 Console.WriteLine(KeySignature.Parse("c major"));     // C
-Console.WriteLine(KeySignature.TryParse("G#", out _)); // False
+Console.WriteLine(KeySignature.TryParse("G#", out _)); // True
 ```
 
 ## Related keys

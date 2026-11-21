@@ -116,6 +116,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
         private readonly int _stretch;
         private readonly HashSet<int> _allowed;
         private readonly HashSet<int> _required;
+        private readonly HashSet<int> _tones;
         private readonly int _bass;
         private readonly bool _reentrant;
         public readonly int MaxFret;
@@ -132,6 +133,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
                 .Select(n => Mod12(n.PitchClass - root)).Distinct().ToList();
             _allowed = intervals.Select(i => (i + root) % 12).ToHashSet();
             _required = intervals.Where(i => !Optional(chord.Type, i)).Select(i => (i + root) % 12).ToHashSet();
+            _tones = _allowed.ToHashSet();
             _bass = chord.Bass is null ? root : chord.Bass.PitchClass;
             _allowed.Add(_bass);
             _reentrant = tuning.IsReentrant;
@@ -219,6 +221,8 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
                 + innerMutes * 1.5
                 // A muted string costs more on a re-entrant (4-string) instrument, where it drops a whole register: full chords rank first.
                 + (frets.Length - sounding.Count) * (_reentrant ? 2 : 0.5)
+                // Dropping a chord tone must cost more than a barre, or thin shapes tie with full ones.
+                + _tones.Count(t => !pcs.Contains(t)) * 2
                 + source switch { VoicingSource.Curated => -3, VoicingSource.MovableShape => -1, _ => 2 };
 
             return new GuitarVoicing(_chord, frets, fingers, barre, high <= 4 ? 1 : low, source, shape, Math.Round(difficulty, 2));

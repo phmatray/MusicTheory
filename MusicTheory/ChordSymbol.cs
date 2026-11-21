@@ -199,13 +199,43 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null, I
     public ChordSymbol Transpose(Interval interval) =>
         this with { Root = Root.Transpose(interval), Bass = Bass?.Transpose(interval) };
 
-    /// <summary>Transposes root and bass by semitones and spells them in <paramref name="targetKey"/>.</summary>
+    /// <summary>
+    /// Transposes root and bass by semitones and spells them in <paramref name="targetKey"/>. A black-key note
+    /// outside the key keeps the direction of its own accidental (a flat Eb moved to G is Bb, not A#).
+    /// </summary>
     public ChordSymbol Transpose(int semitones, KeySignature targetKey) =>
-        this with { Root = Root.TransposeBySemitones(semitones, targetKey), Bass = Bass?.TransposeBySemitones(semitones, targetKey) };
+        this with { Root = BySemitones(Root, semitones, targetKey), Bass = Bass is null ? null : BySemitones(Bass, semitones, targetKey) };
 
-    /// <summary>Moves the chord from one key to another (by tonic distance), spelled in <paramref name="to"/>.</summary>
-    public ChordSymbol Transpose(KeySignature from, KeySignature to) =>
-        Transpose(to.Tonic.PitchClass - from.Tonic.PitchClass, to);
+    /// <summary>
+    /// Moves the chord from one key to another by the interval between the tonics, so a borrowed Eb in C is Bb in G.
+    /// It falls back to the spelling of <paramref name="to"/> only to avoid a double accidental.
+    /// </summary>
+    public ChordSymbol Transpose(KeySignature from, KeySignature to)
+    {
+        int semitones = to.Tonic.PitchClass - from.Tonic.PitchClass;
+        int letters = ((int)to.Tonic.Name - (int)from.Tonic.Name + 7) % 7;
+        return this with { Root = ByInterval(Root, semitones, letters, to), Bass = Bass is null ? null : ByInterval(Bass, semitones, letters, to) };
+    }
+
+    private static Note ByInterval(Note n, int semitones, int letters, KeySignature to)
+    {
+        var spelled = n.TransposeBySemitones(semitones).Respell((NoteName)(((int)n.Name + letters) % 7));
+        return spelled is { Alteration: Alteration.Flat or Alteration.Natural or Alteration.Sharp }
+            ? spelled
+            : n.TransposeBySemitones(semitones, to);
+    }
+
+    private static Note BySemitones(Note n, int semitones, KeySignature key)
+    {
+        var spelled = n.TransposeBySemitones(semitones, key);
+        if (spelled.Alteration == Alteration.Natural || n.Alteration == Alteration.Natural
+            || key.GetAlteration(spelled.Name) == spelled.Alteration
+            || Math.Sign((int)n.Alteration) == Math.Sign((int)spelled.Alteration))
+            return spelled;
+        // A flat source takes the letter above, a sharp source the letter below.
+        int step = n.Alteration == Alteration.Flat ? 1 : 6;
+        return spelled.Respell((NoteName)(((int)spelled.Name + step) % 7))!;
+    }
 
     /// <summary>
     /// Piano voicing: the chord in root position from <paramref name="octave"/> (interval spelling, so the #9 of

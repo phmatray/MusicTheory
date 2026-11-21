@@ -21,14 +21,18 @@ public static class ChordTransposer
         if (!ChordSymbol.TryParse(chordSymbol, out var chord))
             return chordSymbol;
         targetKey ??= KeyOfNewRoot(chord, semitones);
-        return chord.Transpose(semitones, targetKey).ToString(style ?? StyleOf(chordSymbol));
+        return chord.Transpose(semitones, Practical(targetKey)).ToString(style ?? StyleOf(chordSymbol));
     }
 
     /// <summary>Transposes a chord symbol from one key to another, spelled in <paramref name="to"/>.</summary>
     public static string Transpose(string chordSymbol, KeySignature from, KeySignature to, ChordSymbolStyle? style = null) =>
         ChordSymbol.TryParse(chordSymbol, out var chord)
-            ? chord.Transpose(from, to).ToString(style ?? StyleOf(chordSymbol))
+            ? chord.Transpose(Practical(from), Practical(to)).ToString(style ?? StyleOf(chordSymbol))
             : chordSymbol;
+
+    // A theoretical key (A# major, ten sharps) is read as its practical enharmonic (Bb).
+    private static KeySignature Practical(KeySignature key) =>
+        Math.Abs(key.AccidentalCount) <= 7 ? key : key.GetEnharmonicEquivalents().First();
 
     // The new root, spelled on the old root's side, then its major key when that key has a real signature.
     private static KeySignature KeyOfNewRoot(ChordSymbol chord, int semitones)

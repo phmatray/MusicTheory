@@ -206,6 +206,41 @@ public class GuitarVoicingProviderTests
     }
 }
 
+public class VoicingRankingTests
+{
+    private static readonly GuitarVoicingProvider Provider = new();
+
+    private static List<string> Tabs(string chord) =>
+        Provider.GetVoicings(ChordSymbol.Parse(chord), new VoicingOptions(Max: 50)).Select(v => v.ToTab()).ToList();
+
+    [Theory]
+    [InlineData("Bm", "x24432", "x2040x")]
+    [InlineData("Bm", "x24432", "x20x0x")]
+    [InlineData("Bbmaj7", "x13231", "x102xx")]
+    [InlineData("Bbmaj7", "x13231", "600xxx")]
+    public void CompleteShape_RanksBeforeThinShape(string chord, string complete, string thin)
+    {
+        var tabs = Tabs(chord);
+        tabs.IndexOf(complete).ShouldBeGreaterThanOrEqualTo(0);
+        tabs.IndexOf(complete).ShouldBeLessThan(tabs.IndexOf(thin));
+    }
+
+    [Theory]
+    [InlineData("C")]
+    [InlineData("Am")]
+    [InlineData("G7")]
+    [InlineData("Bm")]
+    [InlineData("Bbmaj7")]
+    [InlineData("Cm7")]
+    public void FirstVoicing_SoundsEveryChordTone(string chord)
+    {
+        var symbol = ChordSymbol.Parse(chord);
+        var tones = symbol.ToChord().GetNotes().Select(n => n.PitchClass).ToHashSet();
+        var sounded = Provider.GetVoicings(symbol)[0].ToMidi().Select(m => m % 12).ToHashSet();
+        tones.IsSubsetOf(sounded).ShouldBeTrue();
+    }
+}
+
 public class ToMidiTests
 {
     [Fact]

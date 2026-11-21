@@ -66,12 +66,17 @@ public class KeyAndScaleValueTests
         KeySignature.Parse(text).ShouldBe(new KeySignature(Note.Parse(tonic), mode));
 
     [Theory]
-    [InlineData("")] [InlineData(null)] [InlineData("X")] [InlineData("C dorian")] [InlineData("G#")] [InlineData("Fbm")] [InlineData("Cbbm")]
-    public void KeySignature_TryParse_RejectsUnknownAndTheoreticalKeys(string? text)
+    [InlineData("")] [InlineData(null)] [InlineData("X")] [InlineData("C dorian")] [InlineData("Fbb")] [InlineData("Cbbm")]
+    public void KeySignature_TryParse_RejectsUnknownAndBeyondFourteenAccidentals(string? text)
     {
         KeySignature.TryParse(text, out var key).ShouldBeFalse();
         key.ShouldBeNull();
     }
+
+    [Theory]
+    [InlineData("A#")] [InlineData("D#")] [InlineData("G#")] [InlineData("Fb")] [InlineData("Fbm")]
+    public void KeySignature_Parse_AcceptsTheoreticalKeys(string text) =>
+        KeySignature.Parse(text).ToString().ShouldBe(text);
 
     [Fact]
     public void KeySignature_Parse_ThrowsFormatException() =>
