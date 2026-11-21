@@ -56,13 +56,16 @@ else if (result.Rows.Count > 0)
             }
         </tbody>
     </table>
-    <h2>@Strings.T(lang, "analysis.regions")</h2>
-    <ul>
-        @foreach (var g in result.Regions)
-        {
-            <li>@Strings.T(lang, "analysis.region", g.Key, g.Start, g.End)@(g.PivotIndex is { } p ? ", " + Strings.T(lang, "analysis.pivot", p) : "")</li>
-        }
-    </ul>
+    @if (result.Regions.Count > 1)
+    {
+        <h2>@Strings.T(lang, "analysis.regions")</h2>
+        <ul>
+            @foreach (var g in result.Regions)
+            {
+                <li>@Strings.T(lang, "analysis.region", g.Key, g.Start, g.End)@(g.PivotIndex is { } p ? ", " + Strings.T(lang, "analysis.pivot", p) : "")</li>
+            }
+        </ul>
+    }
 }
 
 <Understand Lang="lang" TextKey="analysis.understand" />

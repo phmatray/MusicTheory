@@ -67,6 +67,13 @@ public class AnalysisModelTests
     }
 
     [Fact]
+    public void Too_long_input_is_refused_and_a_chosen_key_hides_detected_regions()
+    {
+        AnalysisModel.Run(string.Join(' ', Enumerable.Repeat("C", AnalysisModel.MaxChords + 1)), "C", Lang.En).Error.ShouldNotBeNull();
+        AnalysisModel.Run("C Am F G7 C", "A minor", Lang.En).Regions.ShouldBeEmpty();
+    }
+
+    [Fact]
     public void Lower_case_roots_are_accepted()
     {
         AnalysisModel.Run("c am f g7 c", "C", Lang.En).Error.ShouldBeNull();

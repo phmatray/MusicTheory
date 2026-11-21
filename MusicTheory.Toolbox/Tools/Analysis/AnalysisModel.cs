@@ -26,11 +26,15 @@ public sealed record AnalysisResult(
 
 public static class AnalysisModel
 {
+    /// <summary>The URL is user input and the detectors are super-linear: longer progressions are refused.</summary>
+    public const int MaxChords = 128;
+
     /// <summary>Analyses <paramref name="chordsText"/> (tokens split on whitespace and <c>|</c>) in <paramref name="key"/>, or in the detected key when it is null or blank. Never throws.</summary>
     public static AnalysisResult Run(string chordsText, string? key, Lang lang)
     {
         var chords = new List<ChordSymbol>();
         var tokens = (chordsText ?? "").Split([' ', '\t', '\r', '\n', '|'], StringSplitOptions.RemoveEmptyEntries);
+        if (tokens.Length > MaxChords) return Fail(Strings.T(lang, "analysis.toomany", MaxChords));
         foreach (var token in tokens)
         {
             if (!ChordSymbol.TryParse(token, ChordSymbolParseOptions.Lenient, out var chord))
@@ -54,10 +58,13 @@ public static class AnalysisModel
         var numerals = HarmonicAnalyzer.Analyze(chords, used);
         var cadences = CadenceDetector.Detect(chords, used)
             .Select(c => new CadenceMark(c.Index + 1, Strings.T(lang, "analysis.cad." + c.Type))).ToList();
+        var byIndex = cadences.ToDictionary(c => c.Index, c => c.Label);
         var rows = numerals.Select((n, i) => new Row(i + 1, tokens[i], n.ToString(),
-            Strings.T(lang, "analysis.fn." + n.Function), cadences.FirstOrDefault(c => c.Index == i + 1)?.Label)).ToList();
-        var regions = ModulationDetector.Detect(chords)
-            .Select(r => new RegionRow(KeyName(r.Key, lang), r.Start + 1, r.End + 1, r.PivotIndex + 1)).ToList();
+            Strings.T(lang, "analysis.fn." + n.Function), byIndex.GetValueOrDefault(i + 1))).ToList();
+        // Regions are always auto-detected, so with a key the user chose they could contradict it: only shown without one.
+        var regions = detected
+            ? ModulationDetector.Detect(chords).Select(r => new RegionRow(KeyName(r.Key, lang), r.Start + 1, r.End + 1, r.PivotIndex + 1)).ToList()
+            : [];
         return new AnalysisResult(rows, cadences, regions, candidates, KeyName(used, lang), detected, null);
     }
 
