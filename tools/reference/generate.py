@@ -12,10 +12,11 @@ covered by MusicTheory's own tests.
 import csv
 import itertools
 import pathlib
-from fractions import Fraction
 
 import music21
-from music21 import chord, interval, key, meter, note, scale, stream
+from fractions import Fraction
+
+from music21 import chord, duration, interval, key, meter, note, scale, stream
 
 OUT = pathlib.Path(__file__).resolve().parents[2] / "MusicTheory.UnitTests" / "Reference"
 LETTERS = "CDEFGAB"
@@ -126,6 +127,24 @@ def keys():
     write("keys.csv", ["tonic", "mode", "sharps", "altered"], rows)
 
 
+DURATION_TYPES = [("Whole", "whole"), ("Half", "half"), ("Quarter", "quarter"), ("Eighth", "eighth"),
+                  ("Sixteenth", "16th"), ("ThirtySecond", "32nd"), ("SixtyFourth", "64th")]
+
+
+def durations():
+    """Undotted-to-triple-dotted values and 3:2, 5:4, 7:4 tuplets, as fractions of a whole note."""
+    rows = []
+    for ours_name, m21_name in DURATION_TYPES:
+        for dots in range(4):
+            d = duration.Duration(type=m21_name, dots=dots)
+            rows.append([ours_name, dots, "", "", Fraction(d.quarterLength) / 4])
+        for actual, normal in ((3, 2), (5, 4), (7, 4)):
+            d = duration.Duration(type=m21_name)
+            d.appendTuplet(duration.Tuplet(actual, normal))
+            rows.append([ours_name, 0, actual, normal, Fraction(d.quarterLength) / 4])
+    write("durations.csv", ["type", "dots", "actual", "normal", "whole_notes"], rows)
+
+
 def pcsets():
     rows = []
     for mask in range(1, 4096):
@@ -184,5 +203,6 @@ if __name__ == "__main__":
     scales()
     modes()
     keys()
+    durations()
     pcsets()
     measures()
