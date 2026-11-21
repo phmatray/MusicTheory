@@ -39,6 +39,8 @@ doubly augmented fourth.
   intervals, inversion, music21 names (`M3`, `M-3`, `dd2`) with `Parse`.
 - **Chords**: 42 chord types, extensions, inversions, and lead-sheet symbols with tensions (`C7b9#11`).
 - **Scales**: major, three minors, seven modes, pentatonics, blues, whole tone and chromatic, spelled by interval.
+  Also the melodic-minor and harmonic-minor modes (`ScaleType.Altered`, `LydianDominant`, `PhrygianDominant`),
+  bebop scales (`BebopDominant`) and world scales (`HungarianMinor`, `Hirajoshi`), 22 in all.
 - **Keys**: signatures including theoretical keys, the circle of fifths, relative and parallel keys.
 - **Harmony**: diatonic triads and sevenths, Roman-numeral analysis, key detection, voice-leading checks.
 - **Rhythm**: durations with dots and tuplets, time signatures.
