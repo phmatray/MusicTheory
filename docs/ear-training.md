@@ -34,7 +34,8 @@ together, so a melodic interval is two steps of one note and a harmonic one is a
 ## Checking an answer
 
 `Check` returns an `AnswerResult` with `IsCorrect`, a `Score` between 0 and 1 and the `Expected` answer.
-The interval drill scores 1 for a right answer and 0 for a wrong one.
+The interval drill scores 1 for a right answer and 0 for a wrong one. It compares by ear: the answer is
+reduced to its simple form and matched on semitones, so an augmented fourth and a diminished fifth are the same answer.
 
 ```csharp
 var right = drill.Check(question, question.Answer);
@@ -120,16 +121,19 @@ Console.WriteLine(melodies.Check(m, m.Answer).IsCorrect);            // True
 ## Difficulty
 
 `Difficulty` has three levels, `Beginner`, `Intermediate` and `Advanced`. Every options type has a
-`For(Difficulty)` factory that widens its pool: the interval drill grows from five intervals to twelve and
-adds descending and harmonic questions, and the melody drill grows from 4 to 8 notes.
+`For(Difficulty)` factory that widens its pool: the interval drill grows from five intervals to twelve, adds descending questions at Intermediate and
+harmonic ones at Advanced, and the melody drill grows from 4 to 8 notes.
 
 ```csharp
-string Row(Difficulty level) =>
-    $"{level} {IntervalDrillOptions.For(level).Pool.Count} {MelodyDrillOptions.For(level).Length}";
+string Row(Difficulty level)
+{
+    var o = IntervalDrillOptions.For(level);
+    return $"{level} {o.Pool.Count} {o.Descending} {o.Harmonic} {MelodyDrillOptions.For(level).Length}";
+}
 
-Console.WriteLine(Row(Difficulty.Beginner));       // Beginner 5 4
-Console.WriteLine(Row(Difficulty.Intermediate));   // Intermediate 9 6
-Console.WriteLine(Row(Difficulty.Advanced));       // Advanced 12 8
+Console.WriteLine(Row(Difficulty.Beginner));       // Beginner 5 False False 4
+Console.WriteLine(Row(Difficulty.Intermediate));   // Intermediate 9 True False 6
+Console.WriteLine(Row(Difficulty.Advanced));       // Advanced 12 True True 8
 ```
 
 The options are plain records, so you can also build your own pool, for example thirds only.
