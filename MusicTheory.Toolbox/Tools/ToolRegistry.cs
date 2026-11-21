@@ -1,4 +1,5 @@
 using MusicTheory.Toolbox.Tools.Circle;
+using MusicTheory.Toolbox.Tools.Dictation;
 using MusicTheory.Toolbox.Tools.Intervals;
 using MusicTheory.Toolbox.Tools.Transposer;
 
@@ -12,6 +13,7 @@ public static class ToolRegistry
     /// <summary>Every tool; a new tool adds itself here and in <c>Strings.Tables</c>.</summary>
     public static IReadOnlyList<ToolInfo> All { get; } = [
         new("circle", "circle.title", typeof(CircleTool)),
+        new("dictation", "dictation.title", typeof(DictationTool)),
         new("intervals", "intervals.title", typeof(IntervalDrillTool)),
         new("transpose", "transpose.title", typeof(TransposerTool)),
     ];

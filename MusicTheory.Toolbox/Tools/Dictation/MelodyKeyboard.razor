@@ -1,0 +1,28 @@
+@using MusicTheory.Toolbox.Tools.Dictation
+<div class="tb-piano" role="group" aria-label="@Strings.T(Lang, "dictation.keyboard")" style="--whites:@_whites">
+    @foreach (var k in _keys)
+    {
+        var note = MelodyInputModel.Spell(k.Midi, Key);
+        var label = NoteNames.Format(note, Lang) + note.Octave;
+        <button type="button" class="tb-pkey @(k.IsBlack ? "tb-black" : "tb-white")" style="--x:@k.X.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)"
+                disabled="@Disabled" aria-label="@label" title="@label" @onclick="() => OnPick.InvokeAsync(note)"><span>@(k.IsBlack ? "" : label)</span></button>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public int Low { get; set; }
+    [Parameter, EditorRequired] public int High { get; set; }
+    [Parameter] public KeySignature? Key { get; set; }
+    [Parameter, EditorRequired] public Lang Lang { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public EventCallback<Note> OnPick { get; set; }
+
+    private IReadOnlyList<PianoKey> _keys = [];
+    private int _whites;
+
+    protected override void OnParametersSet()
+    {
+        _keys = PianoLayout.Keys(Low, High);
+        _whites = _keys.Count(k => !k.IsBlack);
+    }
+}
