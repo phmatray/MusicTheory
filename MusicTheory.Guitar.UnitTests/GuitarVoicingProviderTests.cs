@@ -1,5 +1,34 @@
 namespace MusicTheory.Guitar.UnitTests;
 
+public class ExtendedRangeShapeTests
+{
+    private static readonly GuitarVoicingProvider Provider = new();
+
+    private static IReadOnlyList<GuitarVoicing> Voicings(string chord, Tuning tuning) =>
+        Provider.GetVoicings(ChordSymbol.Parse(chord), new VoicingOptions(tuning));
+
+    [Fact]
+    public void SevenString_C_HasCuratedOpenShape() =>
+        Voicings("C", Tuning.SevenString).ShouldContain(v => v.ToTab() == "xx32010" && v.Source == VoicingSource.Curated);
+
+    [Fact]
+    public void SevenString_F_HasBarre() =>
+        Voicings("F", Tuning.SevenString).Select(v => v.ToTab()).ShouldContain("x133211");
+
+    [Fact]
+    public void EightString_C_HasCuratedOpenShape()
+    {
+        var eight = new Tuning("8-string", new[] { "F#1", "B1", "E2", "A2", "D3", "G3", "B3", "E4" }.Select(Note.Parse).ToArray());
+        Voicings("C", eight).Select(v => v.ToTab()).ShouldContain("xxx32010");
+    }
+
+    [Theory]
+    [InlineData("C")]
+    [InlineData("G")]
+    public void DropD_HasOnlyGeneratedShapes(string chord) =>
+        Voicings(chord, Tuning.DropD).ShouldAllBe(v => v.Source == VoicingSource.Generated);
+}
+
 public class GuitarVoicingProviderTests
 {
     private static readonly GuitarVoicingProvider Provider = new();

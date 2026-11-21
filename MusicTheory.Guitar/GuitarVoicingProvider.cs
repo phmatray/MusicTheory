@@ -17,7 +17,7 @@ public interface IGuitarVoicingProvider
 /// slash bass), on non-re-entrant tunings the lowest string sounds the root or the slash bass (on re-entrant tunings it sounds somewhere), all required tones sound (root, 3rd or sus
 /// tones, 7th, alterations and the top extension; the perfect 5th, and the 9th/11th of 11th/13th chords, may be
 /// left out), at most one muted string sits between sounding strings, and a fingering with fingers 1–4 (index
-/// barre allowed) exists. Curated and movable shapes are only used in standard tuning.
+/// barre allowed) exists. Curated and movable shapes are only used when the top six strings are in standard tuning; extra low strings are muted.
 /// </remarks>
 public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
 {
@@ -75,16 +75,17 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
                 found[key] = voicing;
         }
 
-        if (tuning.Strings.Count == 6 && tuning.Strings.Select(n => n.MidiNumber).SequenceEqual(Tuning.Standard.Strings.Select(n => n.MidiNumber)))
+        int extra = tuning.Strings.Count - 6;
+        if (extra >= 0 && tuning.Strings.Skip(extra).Select(n => n.MidiNumber).SequenceEqual(Tuning.Standard.Strings.Select(n => n.MidiNumber)))
         {
             foreach (var tab in Curated())
-                Offer(tab.Select(c => c == 'x' ? (int?)null : c - '0').ToArray(), VoicingSource.Curated, "open");
+                Offer(Enumerable.Repeat<int?>(null, extra).Concat(tab.Select(c => c == 'x' ? (int?)null : c - '0')).ToArray(), VoicingSource.Curated, "open");
 
             foreach (var (name, rootString, offsets) in Movable())
             {
-                int first = Mod12(chord.Root.PitchClass - tuning.Strings[rootString].MidiNumber);
+                int first = Mod12(chord.Root.PitchClass - tuning.Strings[rootString + extra].MidiNumber);
                 for (int fret = first; fret <= spec.MaxFret; fret += 12)
-                    Offer(offsets.Select(o => o + fret).ToArray(), VoicingSource.MovableShape, name);
+                    Offer(Enumerable.Repeat<int?>(null, extra).Concat(offsets.Select(o => o + fret)).ToArray(), VoicingSource.MovableShape, name);
             }
         }
 
