@@ -1,17 +1,17 @@
 C        x32010 open 1.5  x35553 A-form 6.6  8 10 10 9 8 8 E-form 7.6
 Cm       x35543 A-form 6.6  8 10 10 8 8 8 E-form 6.6  x x 10 12 13 11 D-form 8.2
-C7       x32310 open 2.5  x35353 A-form 5.6  8 10 8 9 8 8 E-form 6.6
+C7       x32310 open 4.5  x35353 A-form 5.6  8 10 8 9 8 8 E-form 6.6
 Cmaj7    x32000 open 0.3  x35453 A-form 6.6  8 10 9 9 8 8 E-form 7.6
 Cm7      x35343 A-form 5.6  8 10 8 8 8 8 E-form 5.6  x x 10 12 11 11 D-form 7.7
 Csus2    x300xx gen 5.1  x35533 A-form 5.6  x x 10 12 13 10 D-form 8.2
 Csus4    x35563 A-form 7.1  8 10 10 10 8 8 E-form 7.6  x x 10 12 13 13 D-form 8.2
 Cdim     xxx542 gen 8.3  x3454x gen 8.6  x34x4x gen 9.1
 Caug     x32110 gen 7.5  x321xx gen 7.5  xxx554 gen 7.9
-C6       x322xx gen 7.3  x32210 gen 7.5  xxx555 gen 7.7
-Cm6      x312xx gen 7.5  xxx545 gen 7.9  x3121x gen 8
+C6       x35055 gen 8.1  x32055 gen 8.3  x35250 gen 8.3
+Cm6      x35045 gen 8.1  x3524x gen 8.8  x31213 gen 9
 Cadd9    x32030 open 1.3  x30030 gen 5.1  x30010 gen 5.5
-C9       x30330 gen 6.1  x30310 gen 6.5  x303x0 gen 7.1
-C7sus4   x35363 A-form 6.1  8 10 8 10 8 8 E-form 6.6  x333xx gen 7.1
+C9       x30056 gen 7.6  x30330 gen 8.1  x30353 gen 8.1
+C7sus4   x35363 A-form 6.1  8 10 8 10 8 8 E-form 6.6  x33363 gen 8.1
 C5       x350xx gen 7.1  x3x01x gen 8  x355xx gen 8.1
 Cm7b5    x3434x A-form 5.1  8x887x E-form 7.8  x31312 gen 9
 Cdim7    8x787x E-form 7.8  x3424x gen 8.3  x31212 gen 9
@@ -24,11 +24,11 @@ Dsus2    xx0230 open 0.8  x57755 A-form 6.2  x x 12 14 15 12 D-form 8.8
 Dsus4    xx0233 open 1.8  x57785 A-form 7.7  10 12 12 12 10 10 E-form 8.2
 Ddim     xx0131 gen 7  xx01x1 gen 7  xx0x64 gen 8.9
 Daug     xx0332 gen 6.8  xx03x2 gen 7.8  x543xx gen 8.1
-D6       xx0202 gen 5.3  xx0402 gen 6.3  xx0x02 gen 6.3
-Dm6      xx0201 open 0.5  xx0x01 gen 6  xx0401 gen 6.5
+D6       xx0202 gen 5.3  x50202 gen 7.3  x5420x gen 7.8
+Dm6      xx0201 open 0.5  x5320x gen 7.8  xx0465 gen 7.9
 Dadd9    xx0252 gen 7.8  x50252 gen 8.3  x54230 gen 8.3
-D9       xx0552 gen 7.8  x54550 gen 7.9  x54530 gen 8.1
-D7sus4   xx001x gen 4.5  x57585 A-form 6.7  10 12 10 12 10 10 E-form 7.2
+D9       xx0552 gen 9.8  10 7 7 7 7 8 gen 9.8  x54550 gen 9.9
+D7sus4   xx001x gen 6.5  x57585 A-form 6.7  10 12 10 12 10 10 E-form 7.2
 D5       xx023x open 1.3  x502xx gen 7.3  x5023x gen 7.8
 Dm7b5    x5656x A-form 5.7  xx0111 gen 6  10 x 10 10 9 x E-form 8.4
 Ddim7    xx0101 gen 5  xx0464 gen 7.9  10 x 9 10 9 x E-form 8.4
@@ -41,8 +41,8 @@ Esus2    xx2452 D-form 5.8  024400 gen 6.3  x79977 A-form 6.8
 Esus4    022200 open 0.3  xx2455 D-form 5.8  x 7 9 9 10 7 A-form 8.3
 Edim     0120xx gen 5.5  01x0xx gen 6  0120x0 gen 6.5
 Eaug     xx2110 gen 6.5  032110 gen 7  0321xx gen 7
-E6       022120 gen 6.5  042100 gen 6.5  xx2120 gen 6.5
-Em6      022020 gen 5.3  042000 gen 5.3  xx2020 gen 5.3
+E6       022120 gen 6.5  042100 gen 6.5  046400 gen 6.9
+Em6      022020 gen 5.3  042000 gen 5.3  045000 gen 5.4
 Eadd9    022102 gen 6.5  024100 gen 6.5  xx2102 gen 6.5
 E9       020102 gen 5.5  0x0102 gen 6.5  020132 gen 7
 E7sus4   020200 E-form 1.3  000200 gen 3.3  x 7 9 7 10 7 A-form 7.3
@@ -58,10 +58,10 @@ Fsus2    xx3563 D-form 6.1  xx301x gen 6.5  x 8 10 10 8 8 A-form 7.1
 Fsus4    133311 E-form 5.5  xx3566 D-form 6.1  x 8 10 10 11 8 A-form 8.6
 Fdim     xx310x gen 6.5  xx3101 gen 7  xx3404 gen 7.1
 Faug     xx322x gen 7.3  10322x gen 7.5  10x22x gen 8
-F6       100xxx gen 4.5  1002xx gen 5.5  10021x gen 6
-Fm6      1301xx gen 7  1x01xx gen 7  13011x gen 7.5
-Fadd9    1030xx gen 6  10x0xx gen 6  10301x gen 6.5
-F9       1010xx gen 5  10101x gen 5.5  101011 gen 6
+F6       10021x gen 6  100211 gen 6.5  100x1x gen 6.5
+Fm6      1301xx gen 7  13011x gen 7.5  13013x gen 7.5
+Fadd9    10301x gen 6.5  10x01x gen 6.5  103011 gen 7
+F9       10101x gen 5.5  101011 gen 6  101013 gen 7
 F7sus4   131311 E-form 4.5  111311 gen 6.5  x 8 10 8 11 8 A-form 7.6
 F5       133xxx gen 7.5  xx356x gen 8.6  xx3x11 gen 9
 Fm7b5    1x110x E-form 4.5  x8989x A-form 6.6  12110x gen 7
@@ -75,11 +75,11 @@ Gsus2    3000xx gen 4.6  xx5785 D-form 6.7  x 10 12 12 10 10 A-form 7.7
 Gsus4    355533 E-form 6.1  xx5788 D-form 6.7  x 10 12 12 13 10 A-form 9.2
 Gdim     xx532x gen 8.3  31x02x gen 8.5  3453xx gen 8.6
 Gaug     32100x gen 6.5  321003 gen 7  3210xx gen 7
-G6       xxx000 gen 3.5  320000 gen 4.8  xx5000 gen 5.2
+G6       320000 gen 4.8  xxx000 gen 5.5  3x0000 gen 5.6
 Gm6      310030 gen 6  3100x0 gen 7  310330 gen 7
 Gadd9    30000x gen 4.1  300003 gen 4.6  30020x gen 5.3
-G9       300001 gen 5  30300x gen 5.1  303003 gen 5.6
-G7sus4   353533 E-form 5.1  xxx011 gen 5.5  x 10 12 10 13 10 A-form 8.2
+G9       300001 gen 5  300201 gen 6  300401 gen 6.5
+G7sus4   353533 E-form 5.1  330011 gen 7  x 10 12 10 13 10 A-form 8.2
 G5       xxx033 gen 6.1  3x00xx gen 6.6  3500xx gen 6.6
 Gm7b5    3x332x E-form 6.3  x 10 11 10 11 x A-form 7.2  31302x gen 7.5
 Gdim7    3x232x E-form 6.3  312020 gen 7  31202x gen 7.5
@@ -92,11 +92,11 @@ Asus2    x02200 open -0.2  x x 7 9 10 7 D-form 7.3  x 12 14 14 12 12 A-form 8.3
 Asus4    x02230 open 1.3  577755 E-form 6.7  x x 7 9 10 10 D-form 7.3
 Adim     x0121x gen 6.5  x01x1x gen 7  x0x54x gen 8.4
 Aaug     x0322x gen 6.8  xxx221 gen 7  x03221 gen 7.5
-A6       x02222 A-form 3.8  x04220 gen 6.8  xxx222 gen 6.8
-Am6      x02212 open 2  x04550 gen 6.9  x045xx gen 6.9
+A6       x02222 A-form 3.8  x04220 gen 6.8  502222 gen 7.3
+Am6      x02212 open 2  x04550 gen 6.9  x04210 gen 7
 Aadd9    x02420 gen 6.8  x0x600 gen 7  x0242x gen 7.3
 A9       x05600 gen 6.2  545000 gen 6.4  505600 gen 6.7
-A7sus4   x02030 A-form 2.3  x000xx gen 3.5  575755 E-form 5.7
+A7sus4   x02030 A-form 2.3  x00030 gen 4.1  575755 E-form 5.7
 A5       x022xx open 0.8  x022x0 gen 6.8  502xxx gen 7.3
 Am7b5    x0101x A-form 2  x01013 gen 6.5  5x554x E-form 6.9
 Adim7    x01212 A-form 4  5x454x E-form 6.9  x0454x gen 7.4
@@ -109,11 +109,11 @@ Bsus2    x24422 A-form 5.3  xxx422 gen 7.8  x x 9 11 12 9 D-form 7.9
 Bsus4    x24452 A-form 6.8  799977 E-form 7.3  x x 9 11 12 12 D-form 7.9
 Bdim     x20401 gen 7  x20x01 gen 7  x20431 gen 8
 Baug     x2100x gen 5.5  x210xx gen 6  x21003 gen 6.5
-B6       x2110x gen 6.5  x21102 gen 7  x211xx gen 7
-Bm6      x2010x gen 5.5  x20102 gen 6  x201xx gen 6
-Badd9    74444x gen 8.4  x2142x gen 8.5  x21x2x gen 8.5
-B9       x2122x gen 7.5  744445 gen 8.9  7676xx gen 9
-B7sus4   x22200 gen 5.8  x24252 A-form 5.8  797977 E-form 6.3
+B6       x21102 gen 7  x2110x gen 8.5  x2414x gen 8.5
+Bm6      x20102 gen 6  x2010x gen 7.5  x20132 gen 7.5
+Badd9    74444x gen 8.4  744447 gen 8.9  x21x22 gen 9
+B9       744445 gen 8.9  x2122x gen 9.5  744645 gen 9.9
+B7sus4   x24252 A-form 5.8  797977 E-form 6.3  x22202 gen 6.8
 B5       xxx402 gen 6.8  x2440x gen 7.3  x24402 gen 7.8
 Bm7b5    x2323x A-form 4.8  x20201 gen 6  7x776x E-form 7.5
 Bdim7    x20101 gen 6  x20131 gen 7.5  7x676x E-form 7.5
