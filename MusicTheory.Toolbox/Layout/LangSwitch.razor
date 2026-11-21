@@ -1,0 +1,13 @@
+<nav class="tb-lang" aria-label="@Strings.T(State.Lang, "shell.lang")">
+    @foreach (var lang in new[] { Lang.En, Lang.Fr })
+    {
+        var tag = lang == Lang.Fr ? "fr" : "en";
+        var href = ToolboxUrl.Build(State with { Lang = lang });
+        <a href="@href" lang="@tag" aria-current="@(lang == State.Lang ? "true" : null)">@Strings.T(State.Lang, "shell.lang." + tag)</a>
+    }
+</nav>
+
+@code {
+    /// <summary>The current state; the links change only its language.</summary>
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+}
