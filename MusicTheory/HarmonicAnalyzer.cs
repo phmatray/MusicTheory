@@ -10,7 +10,11 @@ public enum HarmonicFunction
     /// <summary>A major or dominant-7th chord a fifth above a diatonic degree (V/V, V7/vi).</summary>
     SecondaryDominant,
     /// <summary>Anything else; the numeral uses the nearest degree.</summary>
-    Chromatic
+    Chromatic,
+    /// <summary>A major chord on the lowered second degree (N, N6), the Neapolitan.</summary>
+    Neapolitan,
+    /// <summary>A German (dominant 7th) or French (dominant 7th flat 5) augmented sixth on the lowered sixth degree.</summary>
+    AugmentedSixth
 }
 
 /// <summary>
@@ -41,6 +45,11 @@ public sealed record RomanNumeral(
     /// </summary>
     public override string ToString()
     {
+        if (Function == HarmonicFunction.Neapolitan)
+            return "N" + new[] { "", "6", "64" }[Inversion.GetValueOrDefault()];
+        if (Function == HarmonicFunction.AugmentedSixth)
+            return Type == ChordType.Dominant7Flat5 ? "Fr+6" : "Ger+6";
+
         var triad = Diatonic.TriadOf(Type);
         var numeral = Numerals[Degree - 1];
         if (triad is Triad.Minor or Triad.Diminished)
@@ -93,8 +102,8 @@ public sealed record RomanNumeral(
 /// Roman-numeral analysis of chords in a key, by pitch class (so a mis-spelled <c>F##m</c> in Eb is still iii).
 /// </summary>
 /// <remarks>
-/// Rules, in order: diatonic (root and triad quality on a degree); borrowed from the parallel mode;
-/// secondary dominant (major or dominant-7th triad a fifth above degrees 2..7, not onto a diminished
+/// Rules, in order: augmented sixth (German or French, on the lowered sixth degree); diatonic (root and triad quality on a degree); Neapolitan (major chord on the lowered second degree);
+/// borrowed from the parallel mode; secondary dominant (major or dominant-7th triad a fifth above degrees 2..7, not onto a diminished
 /// chord); otherwise chromatic, on the degree whose letter the key spells the root with (Db in C → bII).
 /// Inversions use figured bass for triads (<c>6</c>, <c>64</c>) and seventh chords (<c>65</c>, <c>43</c>, <c>42</c>).
 /// </remarks>
@@ -120,9 +129,15 @@ public static class HarmonicAnalyzer
 
         bool Fits((int Step, Triad Triad) d) => d.Step == interval && (triad == Triad.Any || d.Triad == triad);
 
+        if (interval == 8 && chord.Type is ChordType.Dominant7 or ChordType.Dominant7Flat5)
+            return new RomanNumeral(6, (Alteration)(8 - home[5].Step), chord.Type, inversion, HarmonicFunction.AugmentedSixth, null, key.Mode);
+
         for (int i = 0; i < home.Length; i++)
             if (Fits(home[i]))
                 return Make(i, home, HarmonicFunction.Diatonic);
+
+        if (interval == 1 && chord.Type == ChordType.Major)
+            return new RomanNumeral(2, (Alteration)(1 - home[1].Step), chord.Type, inversion, HarmonicFunction.Neapolitan, null, key.Mode);
 
         var parallel = Diatonic.Degrees(key.Mode == KeyMode.Major ? KeyMode.Minor : KeyMode.Major);
         for (int i = 0; i < parallel.Length; i++)
