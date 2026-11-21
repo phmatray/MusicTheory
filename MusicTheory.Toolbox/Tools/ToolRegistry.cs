@@ -1,5 +1,6 @@
 using MusicTheory.Toolbox.Tools.Analysis;
 using MusicTheory.Toolbox.Tools.Circle;
+using MusicTheory.Toolbox.Tools.Finder;
 using MusicTheory.Toolbox.Tools.Intervals;
 using MusicTheory.Toolbox.Tools.Transposer;
 
@@ -14,6 +15,8 @@ public static class ToolRegistry
     public static IReadOnlyList<ToolInfo> All { get; } =
     [
         new("circle", "circle.title", typeof(CircleTool)),
+        new("finder", "finder.title", typeof(FinderTool)),
+        new("transpose", "transpose.title", typeof(TransposerTool)),
         new("transpose", "transpose.title", typeof(TransposerTool)),
         new("analysis", "analysis.title", typeof(AnalysisTool)),
         new("intervals", "intervals.title", typeof(IntervalDrillTool)),
