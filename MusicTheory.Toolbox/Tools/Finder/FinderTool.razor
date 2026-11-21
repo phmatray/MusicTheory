@@ -1,0 +1,94 @@
+@using MusicTheory.Toolbox.Tools.Finder
+@{
+    var lang = State.Lang;
+    State.Params.TryGetValue("pcs", out var pcsText);
+    State.Params.TryGetValue("chord", out var chordText);
+    State.Params.TryGetValue("scale", out var scaleId);
+    var pcs = FinderModel.ParsePitchClasses(pcsText);
+    var rows = FinderModel.Identify(pcs, lang);
+    var hasChord = !string.IsNullOrWhiteSpace(chordText);
+    var found = hasChord ? FinderModel.ScalesFor(chordText, lang) : null;
+    var chosen = found?.Root is { } root ? FinderModel.ScaleOf(root, scaleId) : null;
+    var modes = chosen is null ? [] : FinderModel.Modes(chosen, lang);
+}
+<PageTitle>@Strings.T(lang, "finder.title") - @Strings.T(lang, "shell.title")</PageTitle>
+
+<h1>@Strings.T(lang, "finder.title")</h1>
+<p>@Strings.T(lang, "finder.blurb")</p>
+
+<h2>@Strings.T(lang, "finder.identify")</h2>
+<PitchClassKeys State="State" Lang="lang" Selected="pcs" />
+@if (pcs.Count < 3)
+{
+    <p class="tb-notice" role="status">@Strings.T(lang, "finder.hint")</p>
+}
+else if (rows.Count == 0)
+{
+    <p class="tb-notice" role="status">@Strings.T(lang, "finder.none")</p>
+}
+else
+{
+    <ol class="tb-results">
+        @foreach (var r in rows)
+        {
+            <li><strong>@r.Symbol</strong> <span>@r.TypeLabel</span>, @(r.ExtraNotes == 0 ? Strings.T(lang, "finder.exact") : Strings.T(lang, "finder.extra", r.ExtraNotes))</li>
+        }
+    </ol>
+}
+
+<h2>@Strings.T(lang, "finder.scales")</h2>
+<form method="get" class="tb-form">
+    <input type="hidden" name="t" value="finder" />
+    <input type="hidden" name="lang" value="@(lang == Lang.Fr ? "fr" : "en")" />
+    <input type="hidden" name="v" value="1" />
+    @if (pcsText is not null)
+    {
+        <input type="hidden" name="pcs" value="@pcsText" />
+    }
+    <label>@Strings.T(lang, "finder.chord")
+        <input type="text" name="chord" value="@chordText" placeholder="Cmaj7" autocomplete="off" />
+    </label>
+    <button type="submit">@Strings.T(lang, "finder.show")</button>
+</form>
+<p>@Strings.T(lang, "finder.chordhint")</p>
+@if (found is { Error: { } error })
+{
+    <p class="tb-notice" role="alert">@Strings.T(lang, "finder.error", error)</p>
+}
+else if (found is not null && found.Scales.Count == 0)
+{
+    <p class="tb-notice" role="status">@Strings.T(lang, "finder.noscales")</p>
+}
+else if (found is not null)
+{
+    <ul class="tb-results">
+        @foreach (var s in found.Scales)
+        {
+            var href = ToolboxUrl.Build(State with { Params = new Dictionary<string, string>(State.Params) { ["scale"] = s.Id } });
+            <li><a href="@href" aria-current="@(chosen?.Type.ToString() == s.Id ? "true" : null)">@s.Label</a> <span>@s.Notes</span></li>
+        }
+    </ul>
+}
+@if (chosen is not null)
+{
+    <h3>@Strings.T(lang, "finder.modes", FinderModel.ScaleLabel(chosen, lang))</h3>
+    @if (modes.Count == 0)
+    {
+        <p>@Strings.T(lang, "finder.nomodes")</p>
+    }
+    else
+    {
+        <ol class="tb-results">
+            @foreach (var m in modes)
+            {
+                <li><strong>@m.Label</strong> <span>@m.Notes</span></li>
+            }
+        </ol>
+    }
+}
+
+<Understand Lang="lang" TextKey="finder.understand" />
+
+@code {
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+}

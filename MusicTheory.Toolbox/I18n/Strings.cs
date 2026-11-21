@@ -1,5 +1,6 @@
 using System.Globalization;
 using MusicTheory.Toolbox.Tools.Circle;
+using MusicTheory.Toolbox.Tools.Finder;
 
 namespace MusicTheory.Toolbox.I18n;
 
@@ -7,7 +8,7 @@ namespace MusicTheory.Toolbox.I18n;
 public static class Strings
 {
     /// <summary>Every table; a new tool adds its own here.</summary>
-    public static IReadOnlyList<IStringTable> Tables { get; } = [new ShellStrings(), new CircleStrings()];
+    public static IReadOnlyList<IStringTable> Tables { get; } = [new ShellStrings(), new CircleStrings(), new FinderStrings()];
 
     /// <summary>The text for <paramref name="key"/>, or <c>[key]</c> so a gap is visible (the parity test fails first).</summary>
     public static string T(Lang lang, string key)

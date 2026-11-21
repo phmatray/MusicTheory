@@ -18,3 +18,8 @@ a { color: var(--sc-accent); }
 .tb-facts dt { font-weight: 600; margin-top: .5rem; }
 .tb-facts dd { margin: 0; }
 .tb-understand { margin-top: 1.5rem; }
+.tb-pcs { display: flex; flex-wrap: wrap; gap: .4rem; }
+.tb-pc { min-width: 3.5rem; padding: .5rem .6rem; text-align: center; border: 1px solid var(--sc-accent); text-decoration: none; color: var(--sc-ink); }
+.tb-pc-on { background: var(--sc-accent); }
+.tb-results span { opacity: .75; }
+.tb-form { display: flex; gap: .5rem; align-items: end; flex-wrap: wrap; }
