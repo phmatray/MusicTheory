@@ -33,6 +33,18 @@ public sealed record TempoMap
 
     private TempoMap(TempoChange[] changes) => _changes = changes;
 
+    /// <summary>Two maps are equal when they hold the same changes in the same order.</summary>
+    public bool Equals(TempoMap? other) => other is not null && _changes.SequenceEqual(other._changes);
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+        foreach (var c in _changes)
+            hash.Add(c);
+        return hash.ToHashCode();
+    }
+
     /// <summary>
     /// Gets the tempo changes in position order; the first one is at position 0.
     /// </summary>

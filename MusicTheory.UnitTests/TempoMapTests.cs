@@ -7,6 +7,16 @@ public class TempoMapTests
     private static TempoMap Changing() => new TempoMap(120).WithChange(Rational.Of(2), 90);
 
     [Fact]
+    public void Equality_IsByValue()
+    {
+        Changing().ShouldBe(Changing());
+        Changing().GetHashCode().ShouldBe(Changing().GetHashCode());
+        Changing().Equals(null).ShouldBeFalse();
+        Changing().ShouldNotBe(new TempoMap(120));
+        Changing().ShouldNotBe(new TempoMap(120).WithChange(Rational.Of(2), 91));
+    }
+
+    [Fact]
     public void SecondsAt_OneQuarterBar_IsTwoSeconds()
     {
         new TempoMap(120).SecondsAt(Rational.One).ShouldBe(2.0, 1e-12);
