@@ -16,6 +16,14 @@ public class ChordProTransposeTests
     }
 
     [Fact]
+    public void Theoretical_key_zero_is_identity_and_two_is_practical()
+    {
+        const string text = "{key: A#}\n[A#]a [D#]b";
+        ChordProDocument.Parse(text).Transpose(0).ToString().ShouldBe(text);
+        ChordProDocument.Parse(text).Transpose(2).ToString().ShouldBe("{key: C}\n[C]a [F]b");
+    }
+
+    [Fact]
     public void To_Bb_spells_flats()
     {
         ChordProDocument.Parse(Grace).Transpose(new KeySignature(Note.Parse("Bb"), KeyMode.Major)).ToString()

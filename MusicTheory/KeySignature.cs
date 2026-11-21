@@ -112,6 +112,7 @@ public sealed record KeySignature
     /// <summary>
     /// Parses a key name: a tonic (any case, ASCII or Unicode accidentals) optionally followed by
     /// <c>m</c>/<c>min</c>/<c>minor</c> or <c>maj</c>/<c>major</c>/<c>M</c>, e.g. <c>Eb</c>, <c>E♭ minor</c>, <c>F#m</c>, <c>C major</c>.
+    /// Theoretical keys such as <c>G#</c> (eight sharps) parse, up to fourteen accidentals.
     /// </summary>
     /// <exception cref="FormatException">The text is not a key.</exception>
     public static KeySignature Parse(string text) =>
@@ -132,7 +133,7 @@ public sealed record KeySignature
             "m" or "min" or "minor" => KeyMode.Minor,
             _ => null,
         };
-        if (mode is null || Math.Abs(PositionOf(tonic, mode.Value)) > 7)
+        if (mode is null || Math.Abs(PositionOf(tonic, mode.Value)) > 14) // the constructor's limit
             return false;
 
         key = new KeySignature(tonic, mode.Value);
