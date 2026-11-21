@@ -21,6 +21,27 @@ public class GuitarVoicingProviderTests
     }
 
     [Fact]
+    public void Ukulele_FirstVoicingOfC_IsOpenC()
+    {
+        Voicings("C", new VoicingOptions(Tuning.Ukulele))[0].ToTab().ShouldBe("0003");
+    }
+
+    [Theory]
+    [InlineData("G", "0232")]
+    [InlineData("Am", "2000")]
+    [InlineData("F", "2010")]
+    public void Ukulele_IncludesTheCommonShapes(string chord, string tab)
+    {
+        Voicings(chord, new VoicingOptions(Tuning.Ukulele)).Select(v => v.ToTab()).ShouldContain(tab);
+    }
+
+    [Fact]
+    public void Mandolin_G_IncludesOpenShape()
+    {
+        Voicings("G", new VoicingOptions(Tuning.Mandolin)).Select(v => v.ToTab()).ShouldContain("0023");
+    }
+
+    [Fact]
     public void F_IsAFullBarre()
     {
         var f = Voicings("F")[0];
