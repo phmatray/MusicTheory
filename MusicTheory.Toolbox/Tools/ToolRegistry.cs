@@ -18,7 +18,6 @@ public static class ToolRegistry
         new("analysis", "analysis.title", typeof(AnalysisTool)),
         new("intervals", "intervals.title", typeof(IntervalDrillTool)),
     ];
-    ];
 
     public static ToolInfo? Find(string id) => All.FirstOrDefault(t => t.Id == id);
 }
