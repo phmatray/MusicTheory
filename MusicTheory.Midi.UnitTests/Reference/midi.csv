@@ -1,0 +1,7 @@
+file,meter,key,notes
+scale-4-4.mid,4/4,,C4:1/4 D4:1/4 r:1/4 F4:1/4 G4:1
+waltz-d.mid,3/4,D,D4:1/4 F#4:1/2 A4:1/2 r:1/4 D5:3/4
+jig-6-8.mid,6/8,G,G4:1/8 A4:1/8 B4:1/8 D5:3/8 r:1/8 B4:1/4 D5:3/8
+chords-f.mid,4/4,F,F3+A3+C4:1/2 Bb3+D4+F4:1/2 C4+E4+G4:1
+tie-bar.mid,4/4,,C4:3/4 E4:1/4~ E4:1/4 G4:3/4
+tempo-change.mid,2/4,Bb,Bb3:1/4 D4:1/4 F4:1/4 Bb4:1/4

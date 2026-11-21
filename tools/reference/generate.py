@@ -17,7 +17,7 @@ import sys
 import music21
 from fractions import Fraction
 
-from music21 import chord, duration, interval, key, meter, note, scale, stream
+from music21 import chord, converter, duration, interval, key, meter, note, scale, stream
 
 OUT = pathlib.Path(__file__).resolve().parents[2] / "MusicTheory.UnitTests" / "Reference"
 LETTERS = "CDEFGAB"
@@ -353,6 +353,59 @@ def beams():
     write("beatgroups.csv", ["meter", "groups"], rows)
 
 
+MIDI_CASES = [
+    # name, meter, key, tempo (bpm), items: (pitches or "r", quarterLength)
+    ("scale-4-4", "4/4", None, 120, [("C4", 1), ("D4", 1), ("r", 1), ("F4", 1), ("G4", 4)]),
+    ("waltz-d", "3/4", "D", 100, [("D4", 1), ("F#4", 2), ("A4", 2), ("r", 1), ("D5", 3)]),
+    ("jig-6-8", "6/8", "G", 120, [("G4", 0.5), ("A4", 0.5), ("B4", 0.5), ("D5", 1.5), ("r", 0.5), ("B4", 1), ("D5", 1.5)]),
+    ("chords-f", "4/4", "F", 90, [("F3 A3 C4", 2), ("Bb3 D4 F4", 2), ("C4 E4 G4", 4)]),
+    ("tie-bar", "4/4", None, 120, [("C4", 3), ("E4", 2), ("G4", 3)]),
+    ("tempo-change", "2/4", "Bb", 80, [("Bb3", 1), ("D4", 1), ("F4", 1), ("Bb4", 1)]),
+]
+
+
+def midi():
+    from music21 import tempo as m21tempo
+    out = OUT.parents[1] / "MusicTheory.Midi.UnitTests" / "Reference"
+    out.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for name, m, k, bpm, items in MIDI_CASES:
+        s = stream.Stream()
+        s.insert(0, meter.TimeSignature(m))
+        if k:
+            s.insert(0, key.Key(k))
+        s.insert(0, m21tempo.MetronomeMark(number=bpm))
+        items = list(items)
+        for p, q in items:
+            if p == "r":
+                n = note.Rest()
+            elif " " in p:
+                n = chord.Chord(p.split())
+            else:
+                n = note.Note(p)
+            n.quarterLength = q
+            s.append(n)
+        if name == "tempo-change":
+            s.insert(2, m21tempo.MetronomeMark(number=60))
+        fp = out / f"{name}.mid"
+        s.write("midi", fp=str(fp))
+        parsed = converter.parse(str(fp))
+        entries = []
+        for n in parsed.recurse().notesAndRests:
+            if n.isRest:
+                name_ = "r"
+            else:
+                name_ = "+".join(ours(p) for p in n.pitches)
+            tie = "~" if n.tie is not None and n.tie.type in ("start", "continue") else ""
+            entries.append(f"{name_}:{Fraction(n.quarterLength) / 4}{tie}")
+        rows.append([f"{name}.mid", m, k or "", " ".join(entries)])
+    with open(out / "midi.csv", "w", newline="") as f:
+        w = csv.writer(f, lineterminator="\n")
+        w.writerow(["file", "meter", "key", "notes"])
+        w.writerows(rows)
+    print(f"midi.csv: {len(rows)} rows")
+
+
 def abc():
     """Parses the hand-written folk tunes with music21 into abc.csv (file, meter, key_sharps, notes).
 
@@ -455,5 +508,6 @@ if __name__ == "__main__":
     measures()
     tempo()
     beams()
+    midi()
     abc()
     musicxml()
