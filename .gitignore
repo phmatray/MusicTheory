@@ -21,3 +21,7 @@ build.log
 TestResults/
 StrykerOutput/
 _site/
+
+# agent worktrees
+.claude/worktrees/
+.worktrees/
