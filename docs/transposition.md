@@ -49,7 +49,13 @@ Console.WriteLine(ChordTransposer.Transpose("Bb7", 2));                        /
 Console.WriteLine(ChordTransposer.Transpose("F#m7", -1));                      // Fm7
 Console.WriteLine(ChordTransposer.Transpose("N.C.", 3));                       // N.C.
 Console.WriteLine(ChordTransposer.Transpose("C", 1, KeySignature.Parse("E"))); // C#
+Console.WriteLine(ChordTransposer.Transpose("Cfoo/E", 2));                     // Cfoo/E
+Console.WriteLine(ChordTransposer.Transpose("Cfoo/E", 2, suffix: SuffixHandling.KeepUnparsed)); // Dfoo/F#
 ```
+
+The default leaves text it cannot read alone, because a word like `Chorus` also starts with a root. When the
+input is known to be chords, pass `SuffixHandling.KeepUnparsed` to move the root and the slash bass and keep
+the rest as written.
 
 Moving a whole song from one key to another spells every chord in the target key:
 

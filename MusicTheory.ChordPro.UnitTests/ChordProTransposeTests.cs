@@ -50,6 +50,16 @@ public class ChordProTransposeTests
     }
 
     [Fact]
+    public void KeepUnparsed_moves_root_and_bass_of_unreadable_chords()
+    {
+        const string text = "{key: G}\n[Gfoo/B]a [*Riff] [N.C.]";
+        ChordProDocument.Parse(text).Transpose(2, SuffixHandling.KeepUnparsed).ToString().ShouldBe("{key: A}\n[Afoo/C#]a [*Riff] [N.C.]");
+        ChordProDocument.Parse(text).Transpose(2).ToString().ShouldBe("{key: A}\n[Gfoo/B]a [*Riff] [N.C.]");
+        ChordProDocument.Parse(text).Transpose(new KeySignature(Note.Parse("Bb"), KeyMode.Major), SuffixHandling.KeepUnparsed).ToString()
+            .ShouldBe("{key: Bb}\n[Bbfoo/D]a [*Riff] [N.C.]");
+    }
+
+    [Fact]
     public void Key_target_without_key_throws()
     {
         Should.Throw<InvalidOperationException>(() => ChordProDocument.Parse("[G]a").Transpose(new KeySignature(Note.Parse("A"), KeyMode.Major)));
