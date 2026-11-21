@@ -13,8 +13,9 @@ permissions:
   pages: write
   id-token: write
 
+# Deploys from dev share one queue; each pull request gets its own, so a PR build is never cancelled by another PR.
 concurrency:
-  group: pages
+  group: pages-${{ github.event_name == 'pull_request' && github.head_ref || 'deploy' }}
   cancel-in-progress: false
 
 jobs:
