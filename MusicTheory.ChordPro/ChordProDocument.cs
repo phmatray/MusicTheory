@@ -55,6 +55,46 @@ public sealed record ChordProDocument(IReadOnlyList<ChordProLine> Lines)
     /// <summary>The document text, with <c>\n</c> between lines.</summary>
     public override string ToString() => string.Join('\n', Lines.Select(l => l.Raw));
 
+    /// <summary>Transposes every chord and the <c>{key}</c> directive by <paramref name="semitones"/>. Chords are spelled in the new key when <see cref="Key"/> is known.</summary>
+    /// <param name="semitones">Semitones up (positive) or down (negative).</param>
+    public ChordProDocument Transpose(int semitones)
+    {
+        var target = Key?.TransposeBySemitones(semitones);
+        return Map(c => ChordTransposer.Transpose(c, semitones, target), target);
+    }
+
+    /// <summary>Transposes from <see cref="Key"/> to <paramref name="to"/>, spelling every chord in <paramref name="to"/>.</summary>
+    /// <param name="to">The target key.</param>
+    /// <exception cref="InvalidOperationException">The document has no parseable <c>{key}</c>.</exception>
+    public ChordProDocument Transpose(KeySignature to)
+    {
+        var from = Key ?? throw new InvalidOperationException("Transposing to a key needs a {key:} directive the document can parse.");
+        return Map(c => ChordTransposer.Transpose(c, from, to), to);
+    }
+
+    // Rebuilds only the lines that change; annotations ([*Riff]) are not chords.
+    private ChordProDocument Map(Func<string, string> chord, KeySignature? newKey) =>
+        new(Lines.Select(line => line switch
+        {
+            LyricLine l => MapLyric(l, chord),
+            DirectiveLine { Name: "key" } d when newKey is not null => d with { Raw = $"{{key: {newKey}}}" + Tail(d.Raw) },
+            _ => line,
+        }).ToList());
+
+    private static ChordProLine MapLyric(LyricLine line, Func<string, string> chord)
+    {
+        var segments = line.Segments.Select(s => s.Chord is null || s.Chord.StartsWith('*') ? s : s with { Chord = chord(s.Chord) }).ToList();
+        if (segments.SequenceEqual(line.Segments))
+        {
+            return line;
+        }
+
+        var text = string.Concat(segments.Select(s => s.Chord is null ? s.Lyric : $"[{s.Chord}]{s.Lyric}"));
+        return new LyricLine(text + Tail(line.Raw), segments);
+    }
+
+    private static string Tail(string raw) => raw[raw.TrimEnd('\r').Length..]; // the trailing \r of a CRLF line
+
     private string? Directive(string name) =>
         Lines.OfType<DirectiveLine>().FirstOrDefault(d => d.Name == name)?.Value;
 

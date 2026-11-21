@@ -16,7 +16,7 @@ import pathlib
 import music21
 from fractions import Fraction
 
-from music21 import duration, interval, key, note, scale
+from music21 import chord, duration, interval, key, note, scale
 
 OUT = pathlib.Path(__file__).resolve().parents[2] / "MusicTheory.UnitTests" / "Reference"
 LETTERS = "CDEFGAB"
@@ -145,6 +145,15 @@ def durations():
     write("durations.csv", ["type", "dots", "actual", "normal", "whole_notes"], rows)
 
 
+def pcsets():
+    rows = []
+    for mask in range(1, 4096):
+        c = chord.Chord([pc for pc in range(12) if mask >> pc & 1])
+        join = lambda xs: " ".join(str(x) for x in xs)
+        rows.append([mask, join(c.normalOrder), join(c.primeForm), join(c.intervalVector)])
+    write("pcsets.csv", ["pcs", "normal", "prime", "icv"], rows)
+
+
 if __name__ == "__main__":
     print("music21", music21.__version__)
     OUT.mkdir(parents=True, exist_ok=True)
@@ -154,3 +163,4 @@ if __name__ == "__main__":
     modes()
     keys()
     durations()
+    pcsets()

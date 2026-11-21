@@ -20,21 +20,14 @@ public class TimeSignatureTests
     }
 
     [Theory]
-    [InlineData(4, 4, 1.0)]      // 4/4 = 1 whole note
-    [InlineData(3, 4, 0.75)]     // 3/4 = 3/4 whole note
-    [InlineData(6, 8, 0.75)]     // 6/8 = 6/8 whole note = 3/4
-    [InlineData(2, 2, 1.0)]      // 2/2 = 1 whole note
-    [InlineData(5, 4, 1.25)]     // 5/4 = 5/4 whole note
-    public void TimeSignature_GetMeasureDuration_ShouldReturnCorrectValue(int numerator, int denominator, double expectedDuration)
+    [InlineData(4, 4, 1, 1)]
+    [InlineData(3, 4, 3, 4)]
+    [InlineData(6, 8, 3, 4)]
+    [InlineData(2, 2, 1, 1)]
+    [InlineData(5, 4, 5, 4)]
+    public void TimeSignature_MeasureLength_ShouldBeExact(int numerator, int denominator, int n, int d)
     {
-        // Arrange
-        var timeSignature = new TimeSignature(numerator, denominator);
-        
-        // Act
-        var duration = timeSignature.GetMeasureDuration();
-        
-        // Assert
-        duration.ShouldBe(expectedDuration);
+        new TimeSignature(numerator, denominator).MeasureLength.ShouldBe(Rational.Of(n, d));
     }
 
     [Theory]
@@ -150,6 +143,8 @@ public class TimeSignatureTests
         // Act & Assert
         ts1.Equals(ts2).ShouldBeTrue();
         ts1.Equals(ts3).ShouldBeFalse();
+        ts1.Equals(null).ShouldBeFalse();
+        ts1.GetHashCode().ShouldBe(ts2.GetHashCode());
         (ts1 == ts2).ShouldBeTrue();
         (ts1 != ts3).ShouldBeTrue();
     }

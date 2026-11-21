@@ -76,13 +76,11 @@ catch (ArgumentException e)
 
 ## Durations and measures
 
-A measure is `numerator/denominator` of a whole note. Divide a duration's `Value` by it to get measures:
+A measure is `MeasureLength` long, an exact `Rational` of whole notes. Divide a duration's `Value` by it to get measures:
 
 ```csharp
-Rational Measure(TimeSignature ts) => Rational.Of(ts.Numerator, ts.Denominator);
-
-Console.WriteLine(new Duration(DurationType.Half).Value / Measure(TimeSignature.CommonTime));   // 1/2
-Console.WriteLine(new Duration(DurationType.Whole).Value / Measure(waltz));                     // 4/3
+Console.WriteLine(new Duration(DurationType.Half).Value / TimeSignature.CommonTime.MeasureLength);   // 1/2
+Console.WriteLine(new Duration(DurationType.Whole).Value / waltz.MeasureLength);                     // 4/3
 ```
 
 Durations are not added. Add their `Value`s, then turn the `Rational` back into notatable durations:
