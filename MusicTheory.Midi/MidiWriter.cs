@@ -51,7 +51,7 @@ public static class MidiWriter
         foreach (var change in tempo.Changes)
         {
             double quartersPerBeat = (change.BeatUnit?.Value ?? Rational.Of(1, 4)).ToDouble() * 4;
-            long micros = (long)Math.Round(60_000_000 / (change.Bpm * quartersPerBeat));
+            long micros = (long)Math.Round(60_000_000 / (change.Bpm * quartersPerBeat), MidpointRounding.AwayFromZero);
             if (micros is < 1 or > 0xFFFFFF)
                 throw new ArgumentException($"A tempo of {change.Bpm} bpm does not fit a MIDI Set Tempo event.", nameof(tempo));
             meta.Add((Ticks(change.Position, tpq, "tempo change"), 2,
@@ -104,9 +104,13 @@ public static class MidiWriter
         long total = Ticks(position, tpq, "end of the score");
         var ordered = notes.OrderBy(n => n.Tick).ThenBy(n => n.Order).Select(n => (n.Tick, n.Data));
         var sortedMeta = meta.OrderBy(m => m.Tick).ThenBy(m => m.Order).Select(m => (m.Tick, m.Data)).ToList();
-        SmfEncoder.WriteHeader(output, 2, tpq);
-        SmfEncoder.WriteTrack(output, sortedMeta, sortedMeta[^1].Tick);
-        SmfEncoder.WriteTrack(output, ordered, total);
+        // Buffered so that a failure while encoding leaves nothing on the caller's stream.
+        using var buffer = new MemoryStream();
+        SmfEncoder.WriteHeader(buffer, 2, tpq);
+        SmfEncoder.WriteTrack(buffer, sortedMeta, sortedMeta[^1].Tick);
+        SmfEncoder.WriteTrack(buffer, ordered, total);
+        buffer.Position = 0;
+        buffer.CopyTo(output);
     }
 
     private static string Describe(RhythmEvent e) =>

@@ -122,6 +122,51 @@ public class MidiWriterTests
         Should.Throw<ArgumentException>(() => Write([Bar(Ev(Q, false, C4))], new TempoMap(120).WithChange(Rational.Of(10_000_000), 90), options: new(32767)));
 
     [Fact]
+    public void FailedWrite_LeavesTheStreamUntouched()
+    {
+        using var ms = new MemoryStream();
+        var tempo = new TempoMap(120).WithChange(Rational.Of(10_000_000), 90);
+        Should.Throw<ArgumentException>(() => MidiWriter.Write(ms, [Bar(Ev(Q, false, C4))], tempo, null, new(32767)));
+        ms.Length.ShouldBe(0);
+    }
+
+    [Fact]
+    public void PickupBar_AdvancesByItsCapacity()
+    {
+        var pickup = new Measure(TimeSignature.CommonTime, [Ev(Q, false, C4)], Rational.Of(1, 4));
+        // The next bar starts at tick 480, so its note-on follows the pickup's note-off with delta 0.
+        Write([pickup, Bar(Ev(Q, false, E4))]).ShouldContain("8360803C00" + "0090405A");
+    }
+
+    [Fact]
+    public void CompoundMeter_WritesDenominatorAsPowerOfTwo() =>
+        Write([new Measure(new TimeSignature(6, 8), [Ev(new Duration(DurationType.Half, 1), false, C4)])])
+            .ShouldContain("00FF58040603180800FF51");
+
+    [Fact]
+    public void KeysWithSevenAccidentals_AreAccepted()
+    {
+        Write([Bar(Ev(Q, false, C4))], key: new KeySignature(Note.Parse("C#4"), KeyMode.Major)).ShouldContain("00FF59020700");
+        Write([Bar(Ev(Q, false, C4))], key: new KeySignature(Note.Parse("Cb4"), KeyMode.Major)).ShouldContain("00FF5902F900");
+    }
+
+    [Fact]
+    public void TieAcrossABarline_MakesOneNote()
+    {
+        var hex = Write([Bar(Ev(new Duration(DurationType.Whole), true, C4)), Bar(Ev(Q, false, C4))]);
+        hex.Split("903C5A").Length.ShouldBe(2);
+        hex.ShouldContain("00903C5A" + "9260" + "803C00");
+    }
+
+    [Fact]
+    public void LongDeltaTimes_UseThreeByteQuantities() =>
+        Write([Bar(Ev(Q, false, C4))], options: new(32767)).ShouldContain("00903C5A" + "81FF7F" + "803C00");
+
+    [Fact]
+    public void PitchOutsideMidiRange_Throws() =>
+        Should.Throw<InvalidOperationException>(() => Write([Bar(Ev(Q, false, Note.Parse("A9")))]));
+
+    [Fact]
     public void NullArguments_Throw()
     {
         var bars = new[] { Bar(Ev(Q, false, C4)) };
