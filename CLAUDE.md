@@ -4,78 +4,68 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-### Build and Test
 ```bash
-# Build the solution
-dotnet build
+dotnet build                                   # .NET 11 SDK (global.json)
+dotnet test                                    # all suites: core, guitar, docs
+dotnet test --project MusicTheory.UnitTests --filter-method "*Interval*"   # MTP filter syntax
 
-# Run all tests
-dotnet test
+# Coverage gate (CI fails below 100% lines and branches on the three libraries)
+dotnet test --project MusicTheory.UnitTests --coverage --coverage-output-format cobertura --coverage-output $PWD/TestResults/core.xml
+dotnet test --project MusicTheory.Guitar.UnitTests --coverage --coverage-output-format cobertura --coverage-output $PWD/TestResults/guitar.xml
+python3 tools/coverage/check.py TestResults/*.xml
 
-# Run tests with detailed output
-dotnet test --logger "console;verbosity=detailed"
+# Mutation testing (run from the test project folder; thresholds in its stryker-config.json)
+dotnet tool restore && (cd MusicTheory.UnitTests && dotnet stryker)
 
-# Run a specific test
-dotnet test --filter "FullyQualifiedName~ScaleTests.Scale_ShouldGenerateCorrectNotes_ForGMajor"
+# Site: docs/*.md + API reference + evaluated home page -> _site/
+dotnet run --project tools/SiteGen -- . _site
 
-# Run tests for a specific class
-dotnet test --filter "ClassName=NoteTests"
+# music21 reference tables (only when changing what is checked)
+python3 -m venv .venv && .venv/bin/pip install -r tools/reference/requirements.txt && .venv/bin/python tools/reference/generate.py
 ```
 
-### Development Workflow
-1. Write failing test in `MusicTheory.UnitTests/`
-2. Implement minimal code in `MusicTheory/`
-3. Run `dotnet test` to verify
-4. Refactor if needed
-5. Commit using conventional commits: `feat(domain): description`
+On macOS 27 the DaisyBlazor tailwind binary cached under `~/Library/Application Support/daisyblazor` has an
+invalid signature and is killed at launch, which breaks the GuitarChords build. Point
+`DaisyBlazorTailwindPath` at an ad-hoc signed copy (`codesign --force -s -`).
 
 ## Architecture
 
-### Core Domain Model
-The library models music theory concepts as immutable domain objects:
+Packages: `MusicTheory` (the theory), `MusicTheory.Guitar` (voicings, tunings, diagram geometry),
+`MusicTheory.Guitar.Blazor` (playback). `GuitarChords` is a demo app, not packed.
 
-- **Note**: Musical note with `NoteName`, `Alteration`, `Octave`. Calculates frequency using A4=440Hz.
-- **Interval**: Distance between notes with `IntervalQuality` and numeric size. Includes static factory `Interval.Between()`.
-- **Scale**: Generates notes following interval patterns (W-W-H-W-W-W-H for major).
-- **Chord**: Built from root note and `ChordQuality`, supports extensions via fluent API.
+- **Spelled values.** `Note`, `Interval`, `Chord`, `Scale`, `KeySignature`, `ChordSymbol` are sealed records
+  with value equality and constructor validation. Everything is built by interval from a root, never by
+  semitone arithmetic, so spelling is exact.
+- **`Interval`** carries quality (13 values, quintuply diminished to quintuply augmented), number and
+  direction; names follow music21 (`M3`, `M-3`, `dd2`). `Between` follows the staff and never throws.
+- **`Note.Transpose`** moves the letter by the interval number and throws `InvalidOperationException` for
+  results needing more than two accidentals. Never clamp or respell silently.
+- **One chord-type table**: `ChordTypes` in `Chord.cs` (intervals + ASCII suffix). `ChordFinder` patterns are
+  derived from it. Spoken names live in `MusicTheory.Guitar/VoicingDescriber.cs`.
+- Every `Parse` throws `FormatException`; every `TryParse` never throws.
+- `MusicTheoryUtilities` and `MusicTheoryConstants` are internal.
 
-### Key Design Patterns
-- **Immutable Objects**: All properties are read-only, set via constructor
-- **Calculated Properties**: `Note.Frequency`, `Interval.Semitones` computed on-demand
-- **Fluent Interface**: `Chord.AddExtension()` returns self for chaining
-- **Factory Methods**: `Interval.Between()` creates intervals from two notes
-- **Interval Inversion**: `Interval.Invert()` returns the inverted interval following music theory rules
+## Tests
 
-### Testing Strategy
-- **Framework**: xUnit with FluentAssertions
-- **Structure**: One test file per domain class
-- **Pattern**: Arrange-Act-Assert with descriptive test names
-- **Global Usings**: FluentAssertions available in all tests via project file
+- `MusicTheory.UnitTests`: xUnit v3 + Shouldly. `ReferenceTests` replays the music21 tables in
+  `Reference/*.csv`. `ContractTests` pins error messages (they are part of the API).
+- `MusicTheory.Guitar.UnitTests`: `GoldenTests` compare the provider and diagram output with
+  `Golden/*.txt`. `UPDATE_GOLDEN=1 dotnet test ...` accepts an intended change; review the diff.
+- `MusicTheory.DocTests`: runs every `csharp` block of `docs/*.md` in page order (blocks share state like
+  notebook cells). When every `Console.WriteLine` of a block has a trailing `// comment`, the comments are
+  the expected output. Write expected output that way in docs.
+- Coverage must stay at 100%. Prefer deleting an unreachable branch to testing around it.
+- Stryker cannot activate mutants inside `static readonly` initialisers; keep tables that need testing in
+  methods. Equivalent mutants are marked `// Stryker disable once <Mutator>: <why>`.
 
-### Enums and Constants
-- `NoteName`: C, D, E, F, G, A, B (0-6)
-- `Alteration`: DoubleFlat=-2 to DoubleSharp=2
-- `IntervalQuality`: Diminished, Minor, Major, Perfect, Augmented
-- `ChordQuality`: Major, Minor, Diminished, Augmented
-- `ScaleType`: Major, NaturalMinor, HarmonicMinor, MelodicMinor
+## Site
 
-### Semitone Calculations
-- Notes use array `[0,2,4,5,7,9,11]` for C to B semitones
-- Total semitones = `Octave * 12 + semitonesFromC[NoteName] + Alteration`
-- Intervals handle perfect (1,4,5,8) vs major/minor (2,3,6,7) distinctions
+`site/` holds the hand-authored home page (scroll-craft engine, vendored, never edited: `scrollcraft.js`,
+`scrollcraft.css`), tokens, fonts (OFL) and the docs template `_page.html`. `site/_brief.md` is the
+scroll-craft brief. Home-page samples are `<figure class="sample" data-eval>` blocks whose output SiteGen
+computes; never type an output by hand. Visible copy uses no em dashes.
 
-## Next Features to Implement
+## Roadmap
 
-### High Priority
-1. **Key Signature class** - Track sharps/flats for each key
-2. **Chord Progressions** - Roman numeral analysis and common progressions  
-3. **Transposition methods** - Transpose notes, intervals, and chords
-4. **Chord Inversions** - First, second, third inversions
-
-### Medium Priority
-5. **Modal Scales** - Dorian, Phrygian, Lydian, Mixolydian, Aeolian, Locrian
-6. **Circle of Fifths** - Navigate key relationships
-7. **MIDI conversion** - Convert notes to/from MIDI numbers
-8. **Enharmonic equivalence** - Handle C# = Db relationships
-9. **Time Signature class** - Represent meter
-10. **Rhythm/Duration classes** - Note values and timing
+Feature families are tracked as GitHub issues #117 to #156 (parents: #118, #121, #125, #128, #133, #138,
+#142, #147, #152; solfège is #117).

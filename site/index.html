@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MusicTheory · music theory for .NET that spells every note</title>
+<meta name="description" content="A .NET library for notes, intervals, scales, chords, keys and harmony. Every spelling checked against music21.">
+<meta name="theme-color" content="#f4efe3">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="scrollcraft.css">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="home.css">
+<script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<aside class="folio" aria-hidden="true">
+  <a class="folio__mark" href="#top" tabindex="-1">MusicTheory</a>
+  <span class="folio__chapter"><span data-folio-numeral>&nbsp;</span> <span data-folio-title>Title page</span></span>
+</aside>
+
+<main id="main">
+
+  <section id="top" class="title-page sc-section" data-chapter="" data-chapter-title="Title page">
+    <div class="sc-wrap title-page__inner sc-stack" data-sc-in data-sc-stagger="70">
+      <h1 class="title-page__title">MusicTheory</h1>
+      <p class="title-page__promise">Music theory for .NET that spells every note correctly, from a single pitch to an analysed progression.</p>
+      <p class="title-page__install"><code>dotnet add package MusicTheory</code></p>
+      <p class="title-page__links"><a href="docs/getting-started.html">Read the documentation</a></p>
+    </div>
+  </section>
+
+  <section id="note" data-sc-act="flow" class="chapter sc-section" data-chapter="I" data-chapter-title="The note">
+    <div class="sc-wrap chapter__grid">
+      <header class="chapter__head" data-sc-reveal="up" data-sc-reveal-at="0 0.35">
+        <span class="chapter__numeral">I</span>
+        <h2 class="chapter__title">The note</h2>
+      </header>
+      <div class="chapter__body sc-stack" data-sc-in data-sc-stagger="60">
+        <p>A note is a letter, an accidental and an octave. Middle C is C4. Two notes are equal when all three match, so C♯4 and D♭4 are different notes that happen to sound the same.</p>
+        <figure class="sample" data-eval>
+          <pre><code>Note.Parse("A4").Frequency</code></pre>
+          <output></output>
+        </figure>
+        <p>Concert pitch is a parameter, not a constant. Orchestras tune higher, baroque ensembles lower.</p>
+        <figure class="sample" data-eval>
+          <pre><code>Note.Parse("A4").GetFrequency(415)</code></pre>
+          <output></output>
+        </figure>
+        <figure class="sample" data-eval>
+          <pre><code>Note.Parse("C#4").IsEnharmonicWith(Note.Parse("Db4"))</code></pre>
+          <output></output>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="interval" data-sc-act="flow" class="chapter sc-section" data-chapter="II" data-chapter-title="The interval">
+    <div class="sc-wrap chapter__grid">
+      <header class="chapter__head" data-sc-reveal="up" data-sc-reveal-at="0 0.35">
+        <span class="chapter__numeral">II</span>
+        <h2 class="chapter__title">The interval</h2>
+      </header>
+      <div class="chapter__body sc-stack" data-sc-in data-sc-stagger="60">
+        <p>Six semitones can be an augmented fourth or a diminished fifth. The letters decide, and the library counts letters. C up to F𝄪 is not a tritone: it is a doubly augmented fourth.</p>
+        <figure class="sample" data-eval>
+          <pre><code>Interval.Between(Note.Parse("C4"), Note.Parse("F##4"))</code></pre>
+          <output></output>
+        </figure>
+        <figure class="sample" data-eval>
+          <pre><code>Interval.Between(Note.Parse("C4"), Note.Parse("Gb4"))</code></pre>
+          <output></output>
+        </figure>
+        <p>Intervals have a direction. E down to C is a descending major third, written the way music21 writes it.</p>
+        <figure class="sample" data-eval>
+          <pre><code>Interval.Between(Note.Parse("E4"), Note.Parse("C4"))</code></pre>
+          <output></output>
+        </figure>
+        <p class="aside">Every one of the 3,669 spelled intervals between two octaves is checked against music21 in the test suite.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="scale" data-sc-act="flow" class="chapter sc-section" data-chapter="III" data-chapter-title="The scale">
+    <div class="sc-wrap chapter__grid">
+      <header class="chapter__head" data-sc-reveal="up" data-sc-reveal-at="0 0.35">
+        <span class="chapter__numeral">III</span>
+        <h2 class="chapter__title">The scale</h2>
+      </header>
+      <div class="chapter__body sc-stack" data-sc-in data-sc-stagger="60">
+        <p>A scale is a set of intervals above a tonic. Built that way, F♯ major cannot come out with an F natural: its seventh degree is E♯.</p>
+        <figure class="sample" data-eval>
+          <pre><code>new Scale(Note.Parse("F#4"), ScaleType.Major).GetNotes()</code></pre>
+          <output></output>
+        </figure>
+        <figure class="sample" data-eval>
+          <pre><code>new Scale(Note.Parse("Gb4"), ScaleType.Major).GetNotes()</code></pre>
+          <output></output>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="chord" data-sc-act="flow" class="chapter sc-section" data-chapter="IV" data-chapter-title="The chord">
+    <div class="sc-wrap chapter__grid">
+      <header class="chapter__head" data-sc-reveal="up" data-sc-reveal-at="0 0.35">
+        <span class="chapter__numeral">IV</span>
+        <h2 class="chapter__title">The chord</h2>
+      </header>
+      <div class="chapter__body sc-stack" data-sc-in data-sc-stagger="60">
+        <p>Read a lead sheet the way a pianist does. The symbol is parsed into a type and its tensions, then every tone is spelled from the root.</p>
+        <figure class="sample" data-eval>
+          <pre><code>ChordSymbol.Parse("C7b9#11").ToChord().GetNotes()</code></pre>
+          <output></output>
+        </figure>
+        <figure class="sample" data-eval>
+          <pre><code>ChordSymbol.Parse("E7#9").Voice(3)</code></pre>
+          <output></output>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="silence sc-section" data-chapter="IV" data-chapter-title="The chord">
+    <p class="silence__line sc-wrap" data-sc-in>Every key is a place on one circle.</p>
+  </section>
+
+  <section id="key" class="key" data-sc-act="pin" data-sc-span="5" data-chapter="V" data-chapter-title="The key">
+    <div data-sc-stage class="key__stage">
+      <header class="key__head">
+        <span class="chapter__numeral">V</span>
+        <h2 class="chapter__title">The key</h2>
+      </header>
+
+      <div class="key__live" aria-live="polite">
+        <svg class="circle" viewBox="-200 -200 400 400" role="img" aria-labelledby="circle-title">
+          <title id="circle-title">The circle of fifths</title>
+          <g class="circle__ring" data-circle-ring></g>
+          <circle class="circle__pointer" cx="0" cy="-168" r="22"></circle>
+        </svg>
+
+        <div class="key__readout">
+          <p class="key__name"><span data-key-major>C</span> major <span class="key__minor">relative <span data-key-minor>Am</span></span></p>
+          <svg class="staff" viewBox="0 0 320 120" role="img" aria-labelledby="staff-title">
+            <title id="staff-title">Key signature on a treble staff</title>
+            <g class="staff__lines"></g>
+            <text class="staff__clef" x="6" y="92">𝄞</text>
+            <g data-staff-accidentals></g>
+          </svg>
+          <p class="key__signature" data-key-signature>no sharps or flats</p>
+          <p class="key__scale" data-key-scale>C D E F G A B</p>
+        </div>
+      </div>
+
+      <div class="circle-fallback">
+        <p>The fifteen major keys from seven flats to seven sharps, with their relative minors, as the library computes them:</p>
+        {{circle:table}}
+      </div>
+    </div>
+  </section>
+
+  <section id="harmony" data-sc-act="flow" class="chapter sc-section after-pin" data-chapter="VI" data-chapter-title="Harmony">
+    <div class="sc-wrap chapter__grid">
+      <header class="chapter__head" data-sc-reveal="up" data-sc-reveal-at="0 0.35">
+        <span class="chapter__numeral">VI</span>
+        <h2 class="chapter__title">Harmony</h2>
+      </header>
+      <div class="chapter__body sc-stack" data-sc-in data-sc-stagger="60">
+        <p>Put chords in a key and read them back as Roman numerals. The analysis works by pitch class, so a careless spelling on the lead sheet still lands on the right degree.</p>
+        <figure class="sample" data-eval>
+          <pre><code>HarmonicAnalyzer.Analyze(new[] { "Dm7", "G7", "Cmaj7" }.Select(ChordSymbol.Parse), KeySignature.Parse("C"))</code></pre>
+          <output></output>
+        </figure>
+        <p>Or ask which key a progression is in. Am F C G starts and ends near A minor.</p>
+        <figure class="sample" data-eval>
+          <pre><code>KeyDetector.Infer(new[] { "Am", "F", "C", "G" }.Select(ChordSymbol.Parse))[0].Key</code></pre>
+          <output></output>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <footer class="colophon sc-section" data-chapter="" data-chapter-title="Colophon">
+    <div class="sc-wrap colophon__inner sc-stack" data-sc-in data-sc-stagger="60">
+      <h2 class="colophon__title">Colophon</h2>
+      <p>Every output on this page was computed by the library when the page was built. The suite checks it against music21, covers all three packages at 100% of lines and branches, and runs Stryker.NET mutation testing on every pull request.</p>
+      <p>Install it with <code>dotnet add package MusicTheory</code>, then <a href="docs/getting-started.html">read the documentation</a> or browse the <a href="api/index.html">API reference</a>.</p>
+      <p class="colophon__small">Set in Newsreader, JetBrains Mono and Noto Music. MIT licensed. Source on <a href="https://github.com/phmatray/MusicTheory">GitHub</a>, packages on <a href="https://www.nuget.org/packages/MusicTheory">NuGet</a>.</p>
+    </div>
+  </footer>
+
+</main>
+
+<script type="application/json" id="circle-data">{{circle:json}}</script>
+<script src="scrollcraft.js"></script>
+<script src="home.js"></script>
+</body>
+</html>

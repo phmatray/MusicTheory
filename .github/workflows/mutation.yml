@@ -1,0 +1,35 @@
+name: Mutation testing
+
+# Stryker.NET mutates the libraries and fails when the test suite stops killing enough of the mutants.
+# Thresholds live in each test project's stryker-config.json. The HTML reports are uploaded.
+on:
+  pull_request:
+  push:
+    branches: [ dev ]
+  workflow_dispatch:
+
+jobs:
+  stryker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        tests: [MusicTheory.UnitTests, MusicTheory.Guitar.UnitTests]
+    steps:
+    - uses: actions/checkout@v7
+    - uses: actions/setup-dotnet@v6
+      with:
+        dotnet-version: '11.0.x'
+        global-json-file: global.json
+    - name: Restore tools
+      run: dotnet tool restore
+    - name: Run Stryker
+      working-directory: ${{ matrix.tests }}
+      run: dotnet stryker
+    - name: Upload report
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: stryker-${{ matrix.tests }}
+        path: ${{ matrix.tests }}/StrykerOutput/**/reports/

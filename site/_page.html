@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}} · MusicTheory</title>
+<meta name="description" content="{{description}}">
+<meta name="theme-color" content="#f4efe3">
+<link rel="icon" href="{{root}}favicon.svg" type="image/svg+xml">
+<link rel="preload" href="{{root}}fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{root}}fonts/fonts.css">
+<link rel="stylesheet" href="{{root}}scrollcraft.css">
+<link rel="stylesheet" href="{{root}}tokens.css">
+<link rel="stylesheet" href="{{root}}docs.css">
+</head>
+<body class="docs">
+<a class="skip" href="#content">Skip to content</a>
+<header class="docs-bar">
+  <a class="docs-bar__mark" href="{{root}}index.html">MusicTheory</a>
+  <a class="docs-bar__link" href="{{root}}docs/getting-started.html">Docs</a>
+  <a class="docs-bar__link" href="{{root}}api/index.html">API</a>
+  <a class="docs-bar__link" href="https://github.com/phmatray/MusicTheory">GitHub</a>
+</header>
+<div class="docs-layout">
+  <details class="docs-menu" open>
+    <summary>Contents</summary>
+    {{nav}}
+  </details>
+  <script>if (matchMedia("(max-width: 760px)").matches) document.querySelector(".docs-menu").removeAttribute("open");</script>
+  <main id="content" class="docs-content">
+    <article>
+      {{content}}
+    </article>
+  </main>
+  <aside class="docs-aside">{{toc}}</aside>
+</div>
+<footer class="docs-foot">
+  <p>MusicTheory is MIT licensed. Every code block on this page is compiled and run by the test suite.</p>
+</footer>
+</body>
+</html>

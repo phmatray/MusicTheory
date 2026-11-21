@@ -1,0 +1,58 @@
+/* MusicTheory design tokens, shared by the home page and the docs.
+   Paper, ink and one accent: the red of rehearsal marks in an engraved score.
+   Fonts are self-hosted (fonts/fonts.css, SIL OFL): Newsreader for text and display (optical sizes),
+   JetBrains Mono for code, Noto Music as the fallback that draws accidentals and clefs. */
+:root {
+  --sc-canvas:     #f4efe3;
+  --sc-surface:    #ebe4d4;
+  --sc-ink:        #1c1915;
+  --sc-ink-soft:   #5b5246;
+  --sc-accent:     #a3271b;
+  --sc-accent-ink: #fbf6ec;
+
+  --mt-rule:       color-mix(in oklab, var(--sc-ink) 72%, transparent);
+  --mt-staff:      color-mix(in oklab, var(--sc-ink) 55%, transparent);
+  --mt-code-bg:    #ece5d5;
+
+  --sc-font-display: "Newsreader", "Noto Music", Georgia, serif;
+  --sc-font-text:    "Newsreader", "Noto Music", Georgia, serif;
+  --sc-font-mono:    "JetBrains Mono", "Noto Music", ui-monospace, monospace;
+
+  --sc-shadow-color: 36 30% 30%;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sc-canvas:     #15130f;
+    --sc-surface:    #1e1b16;
+    --sc-ink:        #efe8da;
+    --sc-ink-soft:   #b3a894;
+    --sc-accent:     #ec7b6b;
+    --sc-accent-ink: #15130f;
+    --mt-code-bg:    #1f1c17;
+    --sc-shadow-color: 36 30% 2%;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --sc-canvas:     #15130f;
+  --sc-surface:    #1e1b16;
+  --sc-ink:        #efe8da;
+  --sc-ink-soft:   #b3a894;
+  --sc-accent:     #ec7b6b;
+  --sc-accent-ink: #15130f;
+  --mt-code-bg:    #1f1c17;
+  --sc-shadow-color: 36 30% 2%;
+  color-scheme: dark;
+}
+
+body { background: var(--sc-canvas); color: var(--sc-ink); }
+
+/* Build-time C# highlighting (tools/SiteGen/Highlight.cs). */
+.c { color: var(--sc-ink-soft); font-style: italic; }
+.s { color: color-mix(in oklab, var(--sc-accent) 80%, var(--sc-ink)); }
+.k { color: var(--sc-ink); font-weight: 600; }
+.t { color: color-mix(in oklab, var(--sc-ink) 78%, #2f5e8c); }
+.n { color: var(--sc-accent); }
