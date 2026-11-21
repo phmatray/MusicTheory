@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <None Include="../MusicTheory.Guitar.Blazor/wwwroot/chord-audio.js" Link="chord-audio.js" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Golden/*.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

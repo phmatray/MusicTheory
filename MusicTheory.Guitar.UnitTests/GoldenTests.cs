@@ -139,10 +139,13 @@ public class GoldenTests
         var sb = new StringBuilder();
         write(sb);
         var actual = sb.ToString().ReplaceLineEndings("\n");
-        var path = Path.Combine(Path.GetDirectoryName(source)!, "Golden", file);
-        if (Environment.GetEnvironmentVariable("UPDATE_GOLDEN") == "1" || !File.Exists(path))
-            File.WriteAllText(path, actual);
-        var expected = File.ReadAllText(path).ReplaceLineEndings("\n");
+        // The golden files are copied next to the binary: CI builds map source paths (/_/...), so the
+        // caller's file path only serves UPDATE_GOLDEN, which runs on a developer machine.
+        if (Environment.GetEnvironmentVariable("UPDATE_GOLDEN") == "1")
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(source)!, "Golden", file), actual);
+        var expected = Environment.GetEnvironmentVariable("UPDATE_GOLDEN") == "1"
+            ? actual
+            : File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Golden", file)).ReplaceLineEndings("\n");
         var diff = expected.Split('\n').Zip(actual.Split('\n')).Select((p, i) => (p, i)).FirstOrDefault(x => x.p.First != x.p.Second);
         actual.ShouldBe(expected, $"{file} differs at line {diff.i + 1}:\n- {diff.p.First}\n+ {diff.p.Second}\nRun with UPDATE_GOLDEN=1 if the change is intended.");
     }
