@@ -353,6 +353,35 @@ def beams():
     write("beatgroups.csv", ["meter", "groups"], rows)
 
 
+def abc():
+    """Parses the hand-written folk tunes with music21 into abc.csv (file, meter, key_sharps, notes).
+
+    music21 does not carry an accidental to the end of the bar, so the fixtures never rely on it.
+    """
+    abc_dir = pathlib.Path(__file__).resolve().parents[2] / "MusicTheory.Abc.UnitTests" / "Reference"
+    rows = []
+    for path in sorted(abc_dir.glob("*.abc")):
+        s = music21.converter.parse(str(path), format="abc")
+        flat = s.flatten()
+        toks = []
+        for n in flat.notesAndRests:
+            d = Fraction(n.quarterLength).limit_denominator(1000) / 4
+            name = "r" if n.isRest else "+".join(ours(p) for p in n.pitches)
+            tied = not n.isRest and n.tie is not None and n.tie.type in ("start", "continue")
+            toks.append(f"{name}/{d.numerator}/{d.denominator}{'~' if tied else ''}")
+        ks = flat.getElementsByClass(key.KeySignature)[0]
+        rows.append([path.name, flat.getElementsByClass(meter.TimeSignature)[0].ratioString, ks.sharps, " ".join(toks)])
+    write_into(abc_dir, "abc.csv", ["file", "meter", "key_sharps", "notes"], rows)
+
+
+def write_into(directory, name, header, rows):
+    with open(directory / name, "w", newline="") as f:
+        w = csv.writer(f, lineterminator="\n")
+        w.writerow(header)
+        w.writerows(rows)
+    print(f"{name}: {len(rows)} rows")
+
+
 def musicxml():
     """Single-part MusicXML files written by music21, plus the notes the MusicTheory reader must recover."""
     out = OUT.parent.parent / "MusicTheory.MusicXml.UnitTests" / "Reference"
@@ -426,4 +455,5 @@ if __name__ == "__main__":
     measures()
     tempo()
     beams()
+    abc()
     musicxml()
