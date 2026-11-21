@@ -22,6 +22,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.ChordPro", "Mus
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.ChordPro.UnitTests", "MusicTheory.ChordPro.UnitTests\MusicTheory.ChordPro.UnitTests.csproj", "{F4A38A3D-2D32-4FE5-8150-C28307898201}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.Abc", "MusicTheory.Abc\MusicTheory.Abc.csproj", "{9A2E9AE1-9245-45D4-B014-5BBBAFE53061}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.Abc.UnitTests", "MusicTheory.Abc.UnitTests\MusicTheory.Abc.UnitTests.csproj", "{E90336CF-E52A-4CB8-AACB-D0E2F56B9073}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -152,6 +156,30 @@ Global
 		{F4A38A3D-2D32-4FE5-8150-C28307898201}.Release|x64.Build.0 = Release|Any CPU
 		{F4A38A3D-2D32-4FE5-8150-C28307898201}.Release|x86.ActiveCfg = Release|Any CPU
 		{F4A38A3D-2D32-4FE5-8150-C28307898201}.Release|x86.Build.0 = Release|Any CPU
+		{9A2E9AE1-9245-45D4-B014-5BBBAFE53061}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A2E9AE1-9245-45D4-B014-5BBBAFE53061}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A2E9AE1-9245-45D4-B014-5BBBAFE53061}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9A2E9AE1-9245-45D4-B014-5BBBAFE53061}.Debug|x64.Build.0 = Debug|Any CPU
+		{9A2E9AE1-9245-45D4-B014-5BBBAFE53061}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9A2E9AE1-9245-45D4-B014-5BBBAFE53061}.Debug|x86.Build.0 = Debug|Any CPU
+		{9A2E9AE1-9245-45D4-B014-5BBBAFE53061}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A2E9AE1-9245-45D4-B014-5BBBAFE53061}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A2E9AE1-9245-45D4-B014-5BBBAFE53061}.Release|x64.ActiveCfg = Release|Any CPU
+		{9A2E9AE1-9245-45D4-B014-5BBBAFE53061}.Release|x64.Build.0 = Release|Any CPU
+		{9A2E9AE1-9245-45D4-B014-5BBBAFE53061}.Release|x86.ActiveCfg = Release|Any CPU
+		{9A2E9AE1-9245-45D4-B014-5BBBAFE53061}.Release|x86.Build.0 = Release|Any CPU
+		{E90336CF-E52A-4CB8-AACB-D0E2F56B9073}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E90336CF-E52A-4CB8-AACB-D0E2F56B9073}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E90336CF-E52A-4CB8-AACB-D0E2F56B9073}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E90336CF-E52A-4CB8-AACB-D0E2F56B9073}.Debug|x64.Build.0 = Debug|Any CPU
+		{E90336CF-E52A-4CB8-AACB-D0E2F56B9073}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E90336CF-E52A-4CB8-AACB-D0E2F56B9073}.Debug|x86.Build.0 = Debug|Any CPU
+		{E90336CF-E52A-4CB8-AACB-D0E2F56B9073}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E90336CF-E52A-4CB8-AACB-D0E2F56B9073}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E90336CF-E52A-4CB8-AACB-D0E2F56B9073}.Release|x64.ActiveCfg = Release|Any CPU
+		{E90336CF-E52A-4CB8-AACB-D0E2F56B9073}.Release|x64.Build.0 = Release|Any CPU
+		{E90336CF-E52A-4CB8-AACB-D0E2F56B9073}.Release|x86.ActiveCfg = Release|Any CPU
+		{E90336CF-E52A-4CB8-AACB-D0E2F56B9073}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
