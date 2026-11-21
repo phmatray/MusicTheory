@@ -1,0 +1,116 @@
+@using System.Globalization
+@inject NavigationManager Nav
+@{
+    var lang = State.Lang;
+    State.Params.TryGetValue("root", out var root);
+    State.Params.TryGetValue("type", out var type);
+    State.Params.TryGetValue("hand", out var handText);
+    State.Params.TryGetValue("oct", out var octText);
+    State.Params.TryGetValue("triad", out var triadText);
+    var left = string.Equals(handText, "lh", StringComparison.OrdinalIgnoreCase);
+    var triad = triadText == "1";
+    var oct = int.TryParse(octText, NumberStyles.None, CultureInfo.InvariantCulture, out var o) ? o : string.IsNullOrEmpty(octText) ? 1 : -1;
+    var view = PianoModel.For(root, type, left ? Hand.Left : Hand.Right, oct, lang, triad);
+    var rootIds = new[] { "C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B" };
+    const double kw = 28, kh = 120, bh = 72, pad = 4;
+    var whites = view.Keys.Count(k => !k.IsBlack);
+    var width = whites * kw + 2 * pad;
+    var rootPc = (Note.TryParse((root ?? "C") + "4", out var rn) ? rn : Note.Parse("C4")).PitchClass;
+    var label = Strings.T(lang, "piano.keyboard", view.Marks.Count) + ": " + string.Join(", ", view.Marks.Select(m => m.Label + " " + m.Finger));
+    var byMidi = view.Marks.ToDictionary(m => m.Midi);
+    string Num(double v) => v.ToString("0.##", CultureInfo.InvariantCulture);
+}
+<PageTitle>@Strings.T(lang, "piano.title") - @Strings.T(lang, "shell.title")</PageTitle>
+
+<h1>@Strings.T(lang, "piano.title")</h1>
+<p>@Strings.T(lang, "piano.blurb")</p>
+@if (view.Notice is not null)
+{
+    <p class="tb-notice" role="status">@view.Notice</p>
+}
+
+<div class="tb-controls">
+    <label>@Strings.T(lang, "piano.root")
+        <select @onchange='e => Set("root", e.Value?.ToString())'>
+            @foreach (var r in rootIds)
+            {
+                <option value="@r" selected="@(Note.Parse(r + "4").PitchClass == rootPc)">@NoteNames.Format(Note.Parse(r + "4"), lang)</option>
+            }
+        </select>
+    </label>
+    <label>@Strings.T(lang, "piano.type")
+        <select @onchange='e => Set("type", e.Value?.ToString())'>
+            @foreach (var t in PianoModel.ScaleTypes)
+            {
+                <option value="@t" selected="@(string.Equals(t.ToString(), type, StringComparison.OrdinalIgnoreCase) || (type is null && t == ScaleType.Major))">@Strings.T(lang, "piano.scale." + t)</option>
+            }
+        </select>
+    </label>
+    <label>@Strings.T(lang, "piano.hand")
+        <select @onchange='e => Set("hand", e.Value?.ToString())'>
+            <option value="rh" selected="@(!left)">@Strings.T(lang, "piano.hand.rh")</option>
+            <option value="lh" selected="@left">@Strings.T(lang, "piano.hand.lh")</option>
+        </select>
+    </label>
+    <label>@Strings.T(lang, "piano.oct")
+        <select disabled="@triad" @onchange='e => Set("oct", e.Value?.ToString())'>
+            @for (var n = 1; n <= PianoModel.MaxOctaves; n++)
+            {
+                <option value="@n" selected="@(n == (oct is >= 1 and <= PianoModel.MaxOctaves ? oct : 1))">@n</option>
+            }
+        </select>
+    </label>
+    <label class="tb-check">
+        <input type="checkbox" checked="@triad" @onchange="SetTriad" />
+        @Strings.T(lang, "piano.triad")
+    </label>
+</div>
+
+<div class="tb-neck-wrap">
+<svg class="tb-neck tb-piano" style="min-width:@(Num(width))px" viewBox="0 0 @Num(width) @Num(kh + 2 * pad)" role="img" aria-label="@label">
+    <g transform="translate(@Num(pad) @Num(pad))">
+        @foreach (var k in view.Keys.Where(k => !k.IsBlack))
+        {
+            <rect class="tb-key-white" x="@Num(k.X * kw)" y="0" width="@Num(kw)" height="@Num(kh)" />
+        }
+        @foreach (var k in view.Keys.Where(k => k.IsBlack))
+        {
+            <rect class="tb-key-black" x="@Num(k.X * kw)" y="0" width="@Num(k.Width * kw)" height="@Num(bh)" />
+        }
+        @foreach (var k in view.Keys.Where(k => byMidi.ContainsKey(k.Midi)))
+        {
+            var m = byMidi[k.Midi];
+            var cx = (k.X + k.Width / 2) * kw;
+            var cy = k.IsBlack ? bh - 40 : kh - 36;
+            <g>
+                <title>@m.Label</title>
+                <circle class="tb-dot tb-dot-root" cx="@Num(cx)" cy="@Num(cy)" r="9" />
+                <g><text class="tb-dot-label tb-dot-label-root tb-finger" x="@Num(cx)" y="@Num(cy)" text-anchor="middle" dominant-baseline="central">@m.Finger</text></g>
+                @if (!k.IsBlack)
+                {
+                    <g><text class="tb-open" x="@Num(cx)" y="@Num(kh - 8)" text-anchor="middle">@m.Label</text></g>
+                }
+                else
+                {
+                    <g><text class="tb-open tb-key-black-label" x="@Num(cx)" y="@Num(bh - 12)" text-anchor="middle">@m.Label</text></g>
+                }
+            </g>
+        }
+    </g>
+</svg>
+</div>
+
+<Understand Lang="lang" TextKey="piano.understand" />
+
+@code {
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+
+    private void SetTriad(ChangeEventArgs e) => Set("triad", e.Value is true ? "1" : null);
+
+    private void Set(string key, string? value)
+    {
+        var next = new Dictionary<string, string>(State.Params);
+        if (string.IsNullOrEmpty(value)) next.Remove(key); else next[key] = value;
+        Nav.NavigateTo(ToolboxUrl.Build(State with { Params = next }));
+    }
+}
