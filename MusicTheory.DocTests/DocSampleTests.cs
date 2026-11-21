@@ -18,6 +18,17 @@ public partial class DocSampleTests
 
     public static TheoryData<string> Pages() => new(Directory.GetFiles(Docs, "*.md").Select(Path.GetFileName).Order()!);
 
+    /// <summary>The options every doc block runs with; a page opts into an I/O package with a <c>using</c> line.</summary>
+    internal static ScriptOptions Options() => ScriptOptions.Default
+        .AddReferences(
+            typeof(Note).Assembly,
+            typeof(Guitar.Tuning).Assembly,
+            typeof(ChordPro.ChordProDocument).Assembly,
+            typeof(Midi.MidiWriter).Assembly,
+            typeof(MusicXml.MusicXmlWriter).Assembly,
+            typeof(Abc.AbcTune).Assembly)
+        .AddImports("System", "System.Linq", "System.Collections.Generic", "MusicTheory");
+
     [GeneratedRegex(@"^```csharp[ \t]*\n(.*?)^```[ \t]*$", RegexOptions.Singleline | RegexOptions.Multiline)]
     private static partial Regex CSharpBlock();
 
@@ -28,9 +39,7 @@ public partial class DocSampleTests
     [MemberData(nameof(Pages))]
     public async Task EveryCodeBlockCompilesRunsAndPrintsWhatItSays(string page)
     {
-        var options = ScriptOptions.Default
-            .AddReferences(typeof(Note).Assembly)
-            .AddImports("System", "System.Linq", "System.Collections.Generic", "MusicTheory");
+        var options = Options();
         var text = (await File.ReadAllTextAsync(Path.Combine(Docs, page), TestContext.Current.CancellationToken)).ReplaceLineEndings("\n");
         var blocks = CSharpBlock().Matches(text).Select(m => m.Groups[1].Value).ToList();
         blocks.ShouldNotBeEmpty($"{page} has no C# block; a docs page without code is not tested here.");
