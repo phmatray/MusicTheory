@@ -198,4 +198,56 @@ public class TimeSignatureTests
         sevenEight.GetCommonName().ShouldBeNull();
         elevenEight.GetCommonName().ShouldBeNull();
     }
+
+    public static TheoryData<int, int, string> DefaultGroups => new()
+    {
+        { 4, 4, "1/4 1/4 1/4 1/4" },
+        { 2, 2, "1/2 1/2" },
+        { 6, 8, "3/8 3/8" },
+        { 12, 8, "3/8 3/8 3/8 3/8" },
+        { 6, 4, "3/4 3/4" },
+        { 3, 8, "3/8" },
+        { 5, 4, "1/4 1/4 1/4 1/4 1/4" },
+        { 5, 8, "1/4 3/8" },
+        { 7, 8, "1/4 1/4 3/8" },
+        { 11, 8, "1/4 1/4 1/4 1/4 3/8" },
+    };
+
+    [Theory]
+    [MemberData(nameof(DefaultGroups))]
+    public void BeatGroups_FollowTheMeter(int numerator, int denominator, string expected) =>
+        string.Join(" ", new TimeSignature(numerator, denominator).BeatGroups).ShouldBe(expected);
+
+    [Fact]
+    public void BeatGroups_ExplicitGrouping_IsKept() =>
+        string.Join(" ", new TimeSignature(7, 8, [3, 2, 2]).BeatGroups).ShouldBe("3/8 1/4 1/4");
+
+    [Theory]
+    [InlineData(new int[] { 3, 3 })]
+    [InlineData(new int[] { })]
+    [InlineData(new int[] { 8, -1 })]
+    public void BeatGroups_BadGrouping_Throws(int[] groups) =>
+        Should.Throw<ArgumentException>(() => new TimeSignature(7, 8, groups));
+
+    [Fact]
+    public void BeatGroups_NullGrouping_Throws() =>
+        Should.Throw<ArgumentNullException>(() => new TimeSignature(7, 8, null!));
+
+    [Fact]
+    public void GetBeatsPerMeasure_CountsGroups()
+    {
+        new TimeSignature(7, 8).GetBeatsPerMeasure().ShouldBe(3);
+        new TimeSignature(6, 8).GetBeatsPerMeasure().ShouldBe(2);
+    }
+
+    [Fact]
+    public void Equality_ComparesGroupsByValue()
+    {
+        new TimeSignature(7, 8).ShouldBe(new TimeSignature(7, 8, [2, 2, 3]));
+        new TimeSignature(7, 8).GetHashCode().ShouldBe(new TimeSignature(7, 8, [2, 2, 3]).GetHashCode());
+        new TimeSignature(7, 8).ShouldNotBe(new TimeSignature(7, 8, [3, 2, 2]));
+        new TimeSignature(7, 8).ShouldNotBe(new TimeSignature(7, 4));
+        new TimeSignature(7, 8).ShouldNotBe(new TimeSignature(5, 8));
+        new TimeSignature(7, 8).Equals(null).ShouldBeFalse();
+    }
 }

@@ -60,6 +60,54 @@ public sealed record TimeSignature
 
         Numerator = numerator;
         Denominator = denominator;
+        BeatGroups = ToRationals(DefaultGroups(numerator, denominator), denominator);
+    }
+
+    /// <summary>
+    /// Initializes a time signature with an explicit additive grouping, such as 7/8 as 3+2+2.
+    /// </summary>
+    /// <param name="numerator">The numerator (beats per measure).</param>
+    /// <param name="denominator">The denominator (note value that gets the beat).</param>
+    /// <param name="beatGroups">The length of each beat group in denominator units; they must sum to <paramref name="numerator"/>.</param>
+    /// <exception cref="ArgumentException">Thrown when values are invalid, or the groups are empty, not positive, or do not sum to the numerator.</exception>
+    public TimeSignature(int numerator, int denominator, IReadOnlyList<int> beatGroups)
+        : this(numerator, denominator)
+    {
+        ArgumentNullException.ThrowIfNull(beatGroups);
+        if (beatGroups.Count == 0 || beatGroups.Any(g => g <= 0) || beatGroups.Sum() != numerator)
+            throw new ArgumentException($"Beat groups must be positive and sum to {numerator}.", nameof(beatGroups));
+
+        BeatGroups = ToRationals(beatGroups, denominator);
+    }
+
+    /// <summary>
+    /// Gets the length of each beat group of the bar in whole notes. Without an explicit grouping the
+    /// default follows the meter: one group per beat in simple time, threes in compound time, a single
+    /// group for 3/8 and 3/16, and twos then a final three for odd numerators over 8 or 16
+    /// (5/8 is 2+3, 7/8 is 2+2+3), as music21 beams them.
+    /// </summary>
+    public IReadOnlyList<Rational> BeatGroups { get; }
+
+    /// <inheritdoc />
+    public bool Equals(TimeSignature? other) =>
+        other is not null && Numerator == other.Numerator && Denominator == other.Denominator
+        && BeatGroups.SequenceEqual(other.BeatGroups);
+
+    /// <inheritdoc />
+    public override int GetHashCode() => HashCode.Combine(Numerator, Denominator, BeatGroups.Count);
+
+    private static Rational[] ToRationals(IEnumerable<int> groups, int denominator) =>
+        groups.Select(g => Rational.Of(g, denominator)).ToArray();
+
+    private static IEnumerable<int> DefaultGroups(int numerator, int denominator)
+    {
+        if (numerator == 3 && denominator >= 8)
+            return [3];
+        if (numerator > 3 && numerator % 3 == 0)
+            return Enumerable.Repeat(3, numerator / 3);
+        if (numerator > 3 && numerator % 2 != 0 && denominator >= 8)
+            return Enumerable.Repeat(2, (numerator - 3) / 2).Append(3);
+        return Enumerable.Repeat(1, numerator);
     }
 
     /// <summary>
@@ -71,16 +119,7 @@ public sealed record TimeSignature
     /// Gets the number of beats per measure.
     /// </summary>
     /// <returns>The number of beats.</returns>
-    public int GetBeatsPerMeasure()
-    {
-        if (IsCompound)
-        {
-            // Compound meters group beats in threes
-            return Numerator / 3;
-        }
-        
-        return Numerator;
-    }
+    public int GetBeatsPerMeasure() => BeatGroups.Count;
 
     /// <summary>
     /// Gets the common name for this time signature.
