@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 
 namespace MusicTheory;
@@ -94,6 +95,49 @@ public sealed record PitchClassSet
 
     /// <summary>Whether <paramref name="other"/> is this set moved by some Tn or TnI (the same prime form).</summary>
     public bool IsTranspositionOrInversionOf(PitchClassSet other) => PrimeForm.SequenceEqual(other.PrimeForm);
+
+    /// <summary>
+    /// Forte's name for the set class (TnI, no A/B suffix): <c>3-11</c> for major and minor triads, <c>4-Z15</c>,
+    /// <c>0-1</c> for <see cref="Empty"/>, <c>12-1</c> for <see cref="Chromatic"/>. Generated from music21 in
+    /// <c>ForteCatalog</c>.
+    /// </summary>
+    public string ForteName => ForteCatalog.NameOf(PrimeMask)!;
+
+    /// <summary>Whether the set class shares its interval-class vector with another, not related by Tn or TnI.</summary>
+    public bool IsZRelated => ForteName.Contains('Z');
+
+    /// <summary>The prime form of the Z-partner set class (<c>4-Z15</c> and <c>4-Z29</c>), or null when not Z-related.</summary>
+    public PitchClassSet? ZPartner => !IsZRelated ? null : ForteCatalog.All()
+        .Select(row => new PitchClassSet(row.PrimeMask))
+        .Single(p => p.Cardinality == Cardinality && p.PrimeMask != PrimeMask && p.IntervalClassVector.SequenceEqual(IntervalClassVector));
+
+    /// <summary>
+    /// The prime form of the named set class, for example <c>4-Z15</c> gives <c>{0,1,4,6}</c>. The <c>Z</c> may be
+    /// lower case.
+    /// </summary>
+    /// <exception cref="ArgumentNullException"><paramref name="name"/> is null.</exception>
+    /// <exception cref="FormatException">The name is not in the catalogue; the message suggests a missing <c>Z</c>.</exception>
+    public static PitchClassSet FromForteName(string name)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+        if (TryFromForteName(name, out var set))
+            return set;
+        var dash = name.IndexOf('-');
+        var hint = dash >= 0 && ForteCatalog.PrimeMaskOf(name.Insert(dash + 1, "Z")) is not null
+            ? $" Did you mean \"{name.Insert(dash + 1, "Z")}\"?"
+            : "";
+        throw new FormatException($"\"{name}\" is not a Forte set class name.{hint}");
+    }
+
+    /// <summary>Like <see cref="FromForteName"/> but returns false instead of throwing.</summary>
+    public static bool TryFromForteName(string? name, [NotNullWhen(true)] out PitchClassSet? set)
+    {
+        var mask = name is null ? null : ForteCatalog.PrimeMaskOf(name.ToUpperInvariant());
+        set = mask is { } m ? new PitchClassSet(m) : null;
+        return set is not null;
+    }
+
+    private ushort PrimeMask => (ushort)PrimeForm.Sum(pc => 1 << pc);
 
     /// <summary>The set as <c>{0,4,7}</c>.</summary>
     public override string ToString() => $"{{{string.Join(",", Members(_mask))}}}";
