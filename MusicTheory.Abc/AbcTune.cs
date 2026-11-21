@@ -14,6 +14,27 @@ namespace MusicTheory.Abc;
 public sealed record AbcTune(int ReferenceNumber, string? Title, TimeSignature TimeSignature,
     Rational UnitLength, KeySignature Key, TempoMap? Tempo, IReadOnlyList<Measure> Measures)
 {
+    /// <summary>Two tunes are equal when their header fields and measures are equal.</summary>
+    public bool Equals(AbcTune? other) =>
+        other is not null && ReferenceNumber == other.ReferenceNumber && Title == other.Title
+        && TimeSignature == other.TimeSignature && UnitLength == other.UnitLength && Key == other.Key
+        && Equals(Tempo, other.Tempo) && Measures.SequenceEqual(other.Measures);
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+        hash.Add(ReferenceNumber);
+        hash.Add(Title);
+        hash.Add(TimeSignature);
+        hash.Add(UnitLength);
+        hash.Add(Key);
+        hash.Add(Tempo);
+        foreach (var m in Measures)
+            hash.Add(m);
+        return hash.ToHashCode();
+    }
+
     /// <summary>Parses the first tune of <paramref name="text"/>.</summary>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is null.</exception>
     /// <exception cref="FormatException">A missing <c>X:</c> or <c>K:</c>, or text that is not ABC.</exception>

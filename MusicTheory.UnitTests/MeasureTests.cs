@@ -78,4 +78,26 @@ public class MeasureTests
         moved.Duration.Value.ShouldBe(Rational.Of(1, 2));
         Should.Throw<ArgumentException>(() => (Ev(DurationType.Quarter) with { TiedToNext = true }) with { Pitches = [] });
     }
+
+    [Fact]
+    public void EqualContent_IsEqualWithEqualHash()
+    {
+        var a = new Measure(TimeSignature.CommonTime, [Ev(DurationType.Half), Ev(DurationType.Quarter)]);
+        var b = new Measure(TimeSignature.CommonTime, [Ev(DurationType.Half), Ev(DurationType.Quarter)]);
+        (a == b).ShouldBeTrue();
+        a.GetHashCode().ShouldBe(b.GetHashCode());
+        Ev(DurationType.Half).GetHashCode().ShouldBe(Ev(DurationType.Half).GetHashCode());
+    }
+
+    [Fact]
+    public void DifferentContent_IsNotEqual()
+    {
+        var a = new Measure(TimeSignature.CommonTime, [Ev(DurationType.Half)]);
+        (a == new Measure(TimeSignature.CommonTime, [Ev(DurationType.Quarter)])).ShouldBeFalse();
+        (a == new Measure(TimeSignature.CommonTime, [Ev(DurationType.Half)], Rational.Of(3, 4))).ShouldBeFalse();
+        a.Equals(null).ShouldBeFalse();
+        Ev(DurationType.Half).Equals(null).ShouldBeFalse();
+        Ev(DurationType.Half).ShouldNotBe(new RhythmEvent([C4, Note.Parse("E4")], new Duration(DurationType.Half)));
+        Ev(DurationType.Half).ShouldNotBe(Ev(DurationType.Half) with { TiedToNext = true });
+    }
 }
