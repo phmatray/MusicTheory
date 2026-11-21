@@ -17,6 +17,18 @@ public class ScaleModesTests
             "C4 MelodicMinor, D4 DorianFlat2, Eb4 LydianAugmented, F4 LydianDominant, G4 MixolydianFlat6, A4 LocrianNatural2, B4 Altered");
 
     [Fact]
+    public void HarmonicMinor_ListsItsModes() =>
+        Render(S("C4", ScaleType.HarmonicMinor)).ShouldBe(
+            "C4 HarmonicMinor, D4 LocrianNatural6, Eb4 IonianAugmented, F4 DorianSharp4, G4 PhrygianDominant, Ab4 LydianSharp2, B4 Ultralocrian");
+
+    [Fact]
+    public void FirstMode_IsTheScaleItself()
+    {
+        var dorian = S("D4", ScaleType.Dorian);
+        dorian.GetModes()[0].ShouldBe(dorian);
+    }
+
+    [Fact]
     public void Aliases_ResolveToTheirFamily()
     {
         S("A4", ScaleType.NaturalMinor).GetModes()[2].ToString().ShouldBe("C5 Ionian");

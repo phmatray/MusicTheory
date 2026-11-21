@@ -181,7 +181,7 @@ public sealed record Scale
         _ => Type,
     };
 
-    /// <summary>The scale's modes, one per degree: mode k starts on degree k. Mode 1 is this scale.</summary>
+    /// <summary>The scale's modes, one per degree: index i starts on degree i + 1. Index 0 is this scale.</summary>
     /// <exception cref="InvalidOperationException">The type is not in a heptatonic mode family.</exception>
     public IReadOnlyList<Scale> GetModes()
     {
