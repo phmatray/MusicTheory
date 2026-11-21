@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- MusicXml chord sheets: parse and round-trip. -->
+    <PackageId>MusicTheory.MusicXml</PackageId>
+    <Product>MusicTheory.MusicXml</Product>
+    <Description>MusicXML for MusicTheory: writes measures, key, meter and title as partwise MusicXML 4.0 with System.Xml.Linq.</Description>
+    <PackageTags>music;theory;musicxml;notation;score;music-theory;dotnet</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <!-- No baseline: the package has not been published yet. -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\icon.png" Pack="true" PackagePath="" />
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MusicTheory\MusicTheory.csproj" />
+  </ItemGroup>
+
+</Project>
