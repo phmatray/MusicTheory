@@ -22,7 +22,9 @@
 
     protected override void OnParametersSet()
     {
-        _keys = PianoLayout.Keys(Low, High);
+        // A keyboard starts and ends on a white key, or a black key at the edge hangs outside it.
+        static bool Black(int midi) => (midi % 12) is 1 or 3 or 6 or 8 or 10;
+        _keys = PianoLayout.Keys(Black(Low) ? Low - 1 : Low, Black(High) ? High + 1 : High);
         _whites = _keys.Count(k => !k.IsBlack);
     }
 }

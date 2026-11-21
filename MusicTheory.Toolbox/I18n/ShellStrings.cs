@@ -13,6 +13,15 @@ public sealed class ShellStrings : IStringTable
         ["shell.lang.fr"] = "Français",
         ["shell.unknown"] = "Unknown tool.",
         ["understand.label"] = "Understand",
+        ["shell.brand"] = "Toolbox",
+        ["shell.library"] = "The library",
+        ["shell.menu"] = "Tools",
+        ["shell.close"] = "Close",
+        ["shell.skip"] = "Skip to the tool",
+        ["shell.group.practise"] = "Practise",
+        ["shell.group.explore"] = "Explore",
+        ["shell.group.work"] = "Analyse and transpose",
+        ["shell.more"] = "About",
     };
 
     public IReadOnlyDictionary<string, string> Fr { get; } = new Dictionary<string, string>
@@ -25,5 +34,14 @@ public sealed class ShellStrings : IStringTable
         ["shell.lang.fr"] = "Français",
         ["shell.unknown"] = "Outil inconnu.",
         ["understand.label"] = "Comprendre",
+        ["shell.brand"] = "Boîte à outils",
+        ["shell.library"] = "La bibliothèque",
+        ["shell.menu"] = "Outils",
+        ["shell.close"] = "Fermer",
+        ["shell.skip"] = "Aller à l'outil",
+        ["shell.group.practise"] = "S'exercer",
+        ["shell.group.explore"] = "Explorer",
+        ["shell.group.work"] = "Analyser et transposer",
+        ["shell.more"] = "À propos",
     };
 }

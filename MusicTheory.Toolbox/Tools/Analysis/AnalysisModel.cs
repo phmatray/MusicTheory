@@ -33,7 +33,7 @@ public static class AnalysisModel
     public static AnalysisResult Run(string chordsText, string? key, Lang lang)
     {
         var chords = new List<ChordSymbol>();
-        var tokens = (chordsText ?? "").Split([' ', '\t', '\r', '\n', '|'], StringSplitOptions.RemoveEmptyEntries);
+        var tokens = (chordsText ?? "").Split([' ', '\t', '\r', '\n', '|', ','], StringSplitOptions.RemoveEmptyEntries);
         if (tokens.Length > MaxChords) return Fail(Strings.T(lang, "analysis.toomany", MaxChords));
         foreach (var token in tokens)
         {

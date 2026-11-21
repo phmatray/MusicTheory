@@ -3,25 +3,62 @@
 @inject NavigationManager Nav
 @inject ToolboxSession Session
 
-@{ var state = Session.Current; }
-<header class="tb-header">
-    <a class="tb-title" href="@ToolboxUrl.Build(new ToolState("", state.Lang, new Dictionary<string, string>()))">@Strings.T(state.Lang, "shell.title")</a>
-    <nav class="tb-nav" aria-label="@Strings.T(state.Lang, "shell.nav")">
-        @foreach (var tool in ToolRegistry.All)
+@{ var state = Session.Current; var lang = state.Lang; }
+<a class="tb-skip" href="#tb-main">@Strings.T(lang, "shell.skip")</a>
+<div class="tb-app @(_menuOpen ? "tb-menu-open" : null)">
+    <header class="tb-top">
+        <a class="tb-brand" href="@Link("", lang)">
+            <span class="tb-brand-mark">MusicTheory</span>
+            <span class="tb-brand-name">@Strings.T(lang, "shell.brand")</span>
+        </a>
+        <button type="button" class="tb-menu-toggle" aria-expanded="@(_menuOpen ? "true" : "false")" aria-controls="tb-side" @onclick="ToggleMenu">
+            <svg aria-hidden="true" viewBox="0 0 20 20" width="18" height="18"><path d="@(_menuOpen ? "M5 5l10 10M15 5L5 15" : "M3 6h14M3 10h14M3 14h14")" /></svg>
+            @Strings.T(lang, _menuOpen ? "shell.close" : "shell.menu")
+        </button>
+        <div class="tb-top-end">
+            <a class="tb-library" href="../">@Strings.T(lang, "shell.library")</a>
+            <LangSwitch State="state" />
+        </div>
+    </header>
+
+    <nav id="tb-side" class="tb-side" aria-label="@Strings.T(lang, "shell.nav")">
+        @foreach (var group in ToolGroups.All)
         {
-            <a href="@ToolboxUrl.Build(new ToolState(tool.Id, state.Lang, new Dictionary<string, string>()))">@Strings.T(state.Lang, tool.TitleKey)</a>
+            <section class="tb-side-group">
+                <h2>@Strings.T(lang, group.TitleKey)</h2>
+                <ul>
+                    @foreach (var tool in ToolGroups.Tools(group))
+                    {
+                        <li><a href="@Link(tool.Id, lang)" aria-current="@(tool.Id == state.Tool ? "page" : null)">@Strings.T(lang, tool.TitleKey)</a></li>
+                    }
+                </ul>
+            </section>
         }
+        <ul class="tb-side-foot">
+            <li><a href="@Link(ToolGroups.HelpId, lang)" aria-current="@(state.Tool == ToolGroups.HelpId ? "page" : null)">@Strings.T(lang, "help.title")</a></li>
+        </ul>
     </nav>
-    <LangSwitch State="state" />
-</header>
-<main class="tb-main">
-    @Body
-</main>
+
+    <main id="tb-main" class="tb-main" tabindex="-1">
+        @Body
+    </main>
+</div>
 
 @code {
+    private bool _menuOpen;
+
+    private static string Link(string tool, Lang lang) =>
+        ToolboxUrl.Build(new ToolState(tool, lang, new Dictionary<string, string>()));
+
+    private void ToggleMenu() => _menuOpen = !_menuOpen;
+
     protected override void OnInitialized() => Nav.LocationChanged += OnChanged;
 
-    private void OnChanged(object? sender, LocationChangedEventArgs e) => InvokeAsync(StateHasChanged);
+    private void OnChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _menuOpen = false;
+        InvokeAsync(StateHasChanged);
+    }
 
     public void Dispose() => Nav.LocationChanged -= OnChanged;
 }
