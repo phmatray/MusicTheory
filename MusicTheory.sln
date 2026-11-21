@@ -12,6 +12,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.Guitar.UnitTest
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.Guitar.Blazor", "MusicTheory.Guitar.Blazor\MusicTheory.Guitar.Blazor.csproj", "{66001022-B83B-4D8E-8390-030827BB8F4E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicTheory.DocTests", "MusicTheory.DocTests\MusicTheory.DocTests.csproj", "{70D3ADE6-CDCB-47DF-AD85-A36AB855697E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{07C2787E-EAC7-C090-1BA3-A61EC2A24D84}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteGen", "tools\SiteGen\SiteGen.csproj", "{D23CA0B5-2B9D-4025-AAEB-AE727F081459}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -94,8 +100,35 @@ Global
 		{66001022-B83B-4D8E-8390-030827BB8F4E}.Release|x64.Build.0 = Release|Any CPU
 		{66001022-B83B-4D8E-8390-030827BB8F4E}.Release|x86.ActiveCfg = Release|Any CPU
 		{66001022-B83B-4D8E-8390-030827BB8F4E}.Release|x86.Build.0 = Release|Any CPU
+		{70D3ADE6-CDCB-47DF-AD85-A36AB855697E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70D3ADE6-CDCB-47DF-AD85-A36AB855697E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70D3ADE6-CDCB-47DF-AD85-A36AB855697E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{70D3ADE6-CDCB-47DF-AD85-A36AB855697E}.Debug|x64.Build.0 = Debug|Any CPU
+		{70D3ADE6-CDCB-47DF-AD85-A36AB855697E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{70D3ADE6-CDCB-47DF-AD85-A36AB855697E}.Debug|x86.Build.0 = Debug|Any CPU
+		{70D3ADE6-CDCB-47DF-AD85-A36AB855697E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70D3ADE6-CDCB-47DF-AD85-A36AB855697E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70D3ADE6-CDCB-47DF-AD85-A36AB855697E}.Release|x64.ActiveCfg = Release|Any CPU
+		{70D3ADE6-CDCB-47DF-AD85-A36AB855697E}.Release|x64.Build.0 = Release|Any CPU
+		{70D3ADE6-CDCB-47DF-AD85-A36AB855697E}.Release|x86.ActiveCfg = Release|Any CPU
+		{70D3ADE6-CDCB-47DF-AD85-A36AB855697E}.Release|x86.Build.0 = Release|Any CPU
+		{D23CA0B5-2B9D-4025-AAEB-AE727F081459}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D23CA0B5-2B9D-4025-AAEB-AE727F081459}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D23CA0B5-2B9D-4025-AAEB-AE727F081459}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D23CA0B5-2B9D-4025-AAEB-AE727F081459}.Debug|x64.Build.0 = Debug|Any CPU
+		{D23CA0B5-2B9D-4025-AAEB-AE727F081459}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D23CA0B5-2B9D-4025-AAEB-AE727F081459}.Debug|x86.Build.0 = Debug|Any CPU
+		{D23CA0B5-2B9D-4025-AAEB-AE727F081459}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D23CA0B5-2B9D-4025-AAEB-AE727F081459}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D23CA0B5-2B9D-4025-AAEB-AE727F081459}.Release|x64.ActiveCfg = Release|Any CPU
+		{D23CA0B5-2B9D-4025-AAEB-AE727F081459}.Release|x64.Build.0 = Release|Any CPU
+		{D23CA0B5-2B9D-4025-AAEB-AE727F081459}.Release|x86.ActiveCfg = Release|Any CPU
+		{D23CA0B5-2B9D-4025-AAEB-AE727F081459}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D23CA0B5-2B9D-4025-AAEB-AE727F081459} = {07C2787E-EAC7-C090-1BA3-A61EC2A24D84}
 	EndGlobalSection
 EndGlobal

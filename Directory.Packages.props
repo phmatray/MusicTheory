@@ -18,6 +18,9 @@
     <!-- Code coverage through Microsoft.Testing.Platform (dotnet test with the coverage switch). -->
     <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.12.0" />
     <PackageVersion Include="DaisyBlazor.Components" Version="0.12.0" />
+    <!-- Documentation: the doc-sample tests run every C# block of docs/*.md; SiteGen renders the site. -->
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="5.12.0" />
+    <PackageVersion Include="Markdig" Version="1.6.0" />
   </ItemGroup>
 
 </Project>
