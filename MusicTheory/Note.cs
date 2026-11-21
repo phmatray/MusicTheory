@@ -331,13 +331,13 @@ public sealed record Note
             return false;
         if (consumed == s.Length)
         {
-            note = pitch;
+            note = pitch!;
             return true;
         }
         if (s[consumed] == '+' || !int.TryParse(s[consumed..], System.Globalization.NumberStyles.AllowLeadingSign,
                 System.Globalization.CultureInfo.InvariantCulture, out var octave) || octave is < MinOctave or > MaxOctave)
             return false;
-        note = new Note(pitch.Name, pitch.Alteration, octave);
+        note = new Note(pitch!.Name, pitch.Alteration, octave);
         return true;
     }
 
