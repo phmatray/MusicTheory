@@ -9,7 +9,7 @@
     p.TryGetValue("root", out var root);
     p.TryGetValue("type", out var type);
     p.TryGetValue("frets", out var fretsText);
-    var frets = int.TryParse(fretsText, NumberStyles.None, CultureInfo.InvariantCulture, out var f) ? f : FretboardModel.DefaultFrets;
+    var frets = int.TryParse(fretsText, NumberStyles.None, CultureInfo.InvariantCulture, out var f) ? f : string.IsNullOrEmpty(fretsText) ? FretboardModel.DefaultFrets : -1;
     var view = FretboardModel.Build(tuning, frets, show, root, type, lang);
     var mode = show is "scale" or "chord" ? show : "note";
     var types = FretboardModel.TypeIds(mode);
@@ -55,7 +55,7 @@
         <select @onchange='e => Set("root", e.Value?.ToString())'>
             @foreach (var r in rootIds)
             {
-                <option value="@r" selected="@(r == (root ?? "C"))">@NoteNames.Format(Note.Parse(r + "4"), lang)</option>
+                <option value="@r" selected="@string.Equals(r, root ?? "C", StringComparison.OrdinalIgnoreCase)">@NoteNames.Format(Note.Parse(r + "4"), lang)</option>
             }
         </select>
     </label>
@@ -73,7 +73,7 @@
 </div>
 
 <div class="tb-neck-wrap">
-<svg class="tb-neck" viewBox="0 0 @width @height" role="img" aria-label="@Strings.T(lang, "fretboard.neck", n, view.Frets)">
+<svg class="tb-neck" style="min-width:@(width)px" viewBox="0 0 @width @height" role="img" aria-label="@Strings.T(lang, "fretboard.neck", n, view.Frets)">
     @for (var s = 0; s < n; s++)
     {
         <line class="tb-string" x1="@Num(nutX)" x2="@Num(nutX + view.Frets * fretW)" y1="@Num(RowY(s))" y2="@Num(RowY(s))" />

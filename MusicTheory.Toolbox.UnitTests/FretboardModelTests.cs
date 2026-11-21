@@ -60,6 +60,16 @@ public class FretboardModelTests
         FretboardModel.Build("standard", 12, "scale", "C", "Bogus", Lang.En).Notice!.ShouldContain("type");
     }
 
+    [Theory]
+    [InlineData("chord", "G##", "Augmented")]
+    [InlineData("scale", "G##", "Major")]
+    public void A_root_the_library_cannot_spell_falls_back_instead_of_throwing(string show, string root, string type)
+    {
+        var v = FretboardModel.Build("standard", 12, show, root, type, Lang.En);
+        v.Notice.ShouldNotBeNull();
+        v.Dots.ShouldNotBeEmpty();
+    }
+
     [Fact]
     public void Every_listed_type_has_a_label_in_both_languages()
     {

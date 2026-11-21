@@ -40,13 +40,19 @@ public static class FretboardModel
         if (parsed is null && !string.IsNullOrEmpty(root)) bad.Add("root");
 
         var board = new Guitar.Fretboard(preset.Tuning, frets);
+        var scaleType = Pick(ScaleTypes, type, mode == "scale" ? bad : new List<string>());
+        var chordType = Pick(ChordTypeList, type, mode == "chord" ? bad : new List<string>());
+        IReadOnlyList<FretPosition> Find(Note t) => mode == "scale" ? board.Positions(new Scale(t, scaleType))
+            : mode == "chord" ? board.Positions(new Chord(t, chordType))
+            : board.Positions(t);
         IReadOnlyList<FretPosition> positions;
-        if (mode == "scale")
-            positions = board.Positions(new Scale(tonic, Pick(ScaleTypes, type, bad)));
-        else if (mode == "chord")
-            positions = board.Positions(new Chord(tonic, Pick(ChordTypeList, type, bad)));
-        else
-            positions = board.Positions(tonic);
+        try { positions = Find(tonic); }
+        catch (Exception e) when (e is InvalidOperationException or ArgumentException)
+        {
+            // A root with double accidentals can need triple ones for some tones: the library refuses, so show C.
+            bad.Add("root");
+            positions = Find(Note.Parse("C4"));
+        }
 
         var dots = positions
             .Select(p => new FretDot(p.String, p.Fret, NoteNames.Format(p.Note, lang), p.Degree, p.Degree is null or 1))
