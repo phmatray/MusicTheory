@@ -1,6 +1,7 @@
 using MusicTheory.Toolbox.Tools.Analysis;
 using MusicTheory.Toolbox.Tools.Circle;
 using MusicTheory.Toolbox.Tools.Dictation;
+using MusicTheory.Toolbox.Tools.Finder;
 using MusicTheory.Toolbox.Tools.Intervals;
 using MusicTheory.Toolbox.Tools.Transposer;
 
@@ -17,6 +18,8 @@ public static class ToolRegistry
         new("circle", "circle.title", typeof(CircleTool)),
         new("dictation", "dictation.title", typeof(DictationTool)),
         new("intervals", "intervals.title", typeof(IntervalDrillTool)),
+        new("finder", "finder.title", typeof(FinderTool)),
+        new("transpose", "transpose.title", typeof(TransposerTool)),
         new("transpose", "transpose.title", typeof(TransposerTool)),
         new("analysis", "analysis.title", typeof(AnalysisTool)),
         new("intervals", "intervals.title", typeof(IntervalDrillTool)),
