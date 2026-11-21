@@ -1,0 +1,18 @@
+<div class="tb-pcs" role="group" aria-label="@Strings.T(Lang, "finder.keys")">
+    @for (var pc = 0; pc < 12; pc++)
+    {
+        var on = Selected.Contains(pc);
+        var next = FinderModel.FormatPitchClasses(FinderModel.Toggle(Selected, pc));
+        var p = new Dictionary<string, string>(State.Params);
+        p.Remove("pcs");
+        if (next is not null) p["pcs"] = next;
+        <a href="@ToolboxUrl.Build(State with { Params = p })" class="@(on ? "tb-pc tb-pc-on" : "tb-pc")"
+           aria-current="@(on ? "true" : null)">@NoteNames.Format(Note.FromMidiNumber(60 + pc), Lang)</a>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+    [Parameter, EditorRequired] public Lang Lang { get; set; }
+    [Parameter, EditorRequired] public IReadOnlyList<int> Selected { get; set; } = [];
+}
