@@ -47,7 +47,7 @@ anything it cannot spell instead of returning a wrong note.
 Console.WriteLine(Note.Parse("H", NoteNotation.German));   // B4
 ```
 
-## What changed in version 2?
+## What changed in versions 2 and 3?
 
 - `Note`, `Interval`, `Chord`, `Scale` and `KeySignature` are immutable records with value equality, and
   they validate their arguments.
@@ -64,9 +64,9 @@ Console.WriteLine(Note.Parse("H", NoteNotation.German));   // B4
   and `Interval.Semitones` instead.
 - The library targets .NET 11.
 
-### Since 2.0.0
+### What changed in 3.0.0
 
-Changes merged to `dev` after the 2.0.0 release in `CHANGELOG.md`, so they ship in the next release.
+3.0.0 breaks the rhythm API only; the rest is additive. `CHANGELOG.md` has the full list.
 
 - **Rhythm break.** `Duration` is an exact sealed record on `Rational`, and `TimeSignature` is a record
   with an exact `MeasureLength`. `Duration.Add`, `Duration.Divide` and `CompoundDuration` are removed;
