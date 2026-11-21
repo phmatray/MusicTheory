@@ -32,6 +32,21 @@ public sealed record Measure
         Onsets = onsets;
     }
 
+    /// <summary>Two measures are equal when they have the same time signature, capacity and events.</summary>
+    public bool Equals(Measure? other) =>
+        other is not null && TimeSignature == other.TimeSignature && Capacity == other.Capacity && Events.SequenceEqual(other.Events);
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+        hash.Add(TimeSignature);
+        hash.Add(Capacity);
+        foreach (var e in Events)
+            hash.Add(e);
+        return hash.ToHashCode();
+    }
+
     /// <summary>The bar's time signature.</summary>
     public TimeSignature TimeSignature { get; }
 

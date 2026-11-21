@@ -52,4 +52,16 @@ public class AbcRoundTripTests
         AbcTune.Parse("X:5\nK:C").ToString().ShouldBe("X:5\nM:4/4\nL:1/8\nK:C");
         AbcTune.Parse("X:5\nQ:90\nK:Em\nE|").ToString().ShouldContain("Q:1/4=90\nK:Em\nE|]");
     }
+
+    [Fact]
+    public void ParsedWrittenTuneEqualsTheOriginal()
+    {
+        var tune = AbcTune.Parse("X:1\nT:t\nM:4/4\nL:1/8\nQ:1/4=120\nK:G\nGABc dedB|dedB dedB|");
+        var back = AbcTune.Parse(tune.ToString());
+        back.ShouldBe(tune);
+        back.GetHashCode().ShouldBe(tune.GetHashCode());
+        back.Measures.SequenceEqual(tune.Measures).ShouldBeTrue();
+        (tune with { Measures = tune.Measures.Take(1).ToList() }).ShouldNotBe(tune);
+        tune.Equals(null).ShouldBeFalse();
+    }
 }

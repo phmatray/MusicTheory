@@ -104,14 +104,12 @@ Console.WriteLine(tune.UnitLength);                  // 1/8
 Console.WriteLine(tune.Measures.Count);              // 2
 ```
 
-`ToString()` writes the canonical ABC form, and parsing it back gives the same measures and the same header
-fields. `Measures` is a list, so `==` on two tunes compares it by reference; compare the parts instead:
+`ToString()` writes the canonical ABC form, and parsing it back gives an equal tune. `Measure` and `AbcTune` have value equality:
 
 ```csharp
 var again = AbcTune.Parse(tune.ToString());
-Console.WriteLine(again.Measures.Count == tune.Measures.Count);            // True
-Console.WriteLine(again.Key == tune.Key && again.UnitLength == tune.UnitLength);   // True
-Console.WriteLine(again.ToString() == tune.ToString());                    // True
+Console.WriteLine(again == tune);                              // True
+Console.WriteLine(again.Measures.SequenceEqual(tune.Measures));    // True
 Console.WriteLine(AbcTune.TryParse("not a tune", out _));    // False
 ```
 

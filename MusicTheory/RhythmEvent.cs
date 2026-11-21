@@ -22,6 +22,21 @@ public sealed record RhythmEvent(IReadOnlyList<Note> Pitches, Duration Duration,
         init => field = CheckTie(Pitches, value);
     } = CheckTie(Pitches, TiedToNext);
 
+    /// <summary>Two events are equal when they have the same pitches in order, duration and tie.</summary>
+    public bool Equals(RhythmEvent? other) =>
+        other is not null && Duration == other.Duration && TiedToNext == other.TiedToNext && Pitches.SequenceEqual(other.Pitches);
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+        hash.Add(Duration);
+        hash.Add(TiedToNext);
+        foreach (var p in Pitches)
+            hash.Add(p);
+        return hash.ToHashCode();
+    }
+
     /// <summary>True when the event has no pitches.</summary>
     public bool IsRest => Pitches.Count == 0;
 
