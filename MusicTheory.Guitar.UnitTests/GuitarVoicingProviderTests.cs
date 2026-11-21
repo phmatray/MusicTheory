@@ -36,6 +36,15 @@ public class GuitarVoicingProviderTests
     }
 
     [Fact]
+    public void Ukulele_SlashBass_AlwaysSounds()
+    {
+        // Re-entrant tunings drop the lowest-note rule, but a slash bass outside the chord must still be played.
+        var voicings = Voicings("C/D", new VoicingOptions(Tuning.Ukulele));
+        voicings.ShouldNotBeEmpty();
+        voicings.ShouldAllBe(v => v.ToMidi(Tuning.Ukulele, 0).Any(m => m % 12 == 2));
+    }
+
+    [Fact]
     public void Mandolin_G_IncludesOpenShape()
     {
         Voicings("G", new VoicingOptions(Tuning.Mandolin)).Select(v => v.ToTab()).ShouldContain("0023");

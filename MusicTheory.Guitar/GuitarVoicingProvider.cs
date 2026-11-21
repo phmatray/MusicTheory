@@ -14,7 +14,7 @@ public interface IGuitarVoicingProvider
 /// </summary>
 /// <remarks>
 /// Every voicing is checked the same way whatever its source: sounding pitch classes are chord tones (plus a
-/// slash bass), on non-re-entrant tunings the lowest string sounds the root or the slash bass, all required tones sound (root, 3rd or sus
+/// slash bass), on non-re-entrant tunings the lowest string sounds the root or the slash bass (on re-entrant tunings it sounds somewhere), all required tones sound (root, 3rd or sus
 /// tones, 7th, alterations and the top extension; the perfect 5th, and the 9th/11th of 11th/13th chords, may be
 /// left out), at most one muted string sits between sounding strings, and a fingering with fingers 1–4 (index
 /// barre allowed) exists. Curated and movable shapes are only used in standard tuning.
@@ -193,7 +193,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
                 return null;
 
             var pcs = sounding.Select(s => Pc(s, frets[s]!.Value)).ToList();
-            if ((!_reentrant && pcs[0] != _bass) || !pcs.All(_allowed.Contains) || !_required.IsSubsetOf(pcs))
+            if ((_reentrant ? !pcs.Contains(_bass) : pcs[0] != _bass) || !pcs.All(_allowed.Contains) || !_required.IsSubsetOf(pcs))
                 return null;
 
             int innerMutes = sounding[^1] - sounding[0] + 1 - sounding.Count;
