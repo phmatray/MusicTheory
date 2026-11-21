@@ -8,7 +8,10 @@ public sealed record ToolInfo(string Id, string TitleKey, Type Component);
 public static class ToolRegistry
 {
     /// <summary>Every tool; a new tool adds itself here and in <c>Strings.Tables</c>.</summary>
-    public static IReadOnlyList<ToolInfo> All { get; } = [new("circle", "circle.title", typeof(CircleTool))];
+    public static IReadOnlyList<ToolInfo> All { get; } = [
+        new("circle", "circle.title", typeof(CircleTool)),
+        new("fretboard", "fretboard.title", typeof(Fretboard.FretboardTool)),
+    ];
 
     public static ToolInfo? Find(string id) => All.FirstOrDefault(t => t.Id == id);
 }

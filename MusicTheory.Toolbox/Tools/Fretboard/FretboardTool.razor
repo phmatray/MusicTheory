@@ -1,0 +1,124 @@
+@using System.Globalization
+@using MusicTheory.Toolbox.Tools.Fretboard
+@inject NavigationManager Nav
+@{
+    var lang = State.Lang;
+    var p = State.Params;
+    p.TryGetValue("tuning", out var tuning);
+    p.TryGetValue("show", out var show);
+    p.TryGetValue("root", out var root);
+    p.TryGetValue("type", out var type);
+    p.TryGetValue("frets", out var fretsText);
+    var frets = int.TryParse(fretsText, NumberStyles.None, CultureInfo.InvariantCulture, out var f) ? f : FretboardModel.DefaultFrets;
+    var view = FretboardModel.Build(tuning, frets, show, root, type, lang);
+    var mode = show is "scale" or "chord" ? show : "note";
+    var types = FretboardModel.TypeIds(mode);
+    var rootIds = new[] { "C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B" };
+    const int nutX = 44, fretW = 40, rowH = 26, top = 20;
+    var n = view.Strings.Count;
+    var width = nutX + view.Frets * fretW + 12;
+    var height = top + (n - 1) * rowH + 34;
+    string Num(double v) => v.ToString("0.##", CultureInfo.InvariantCulture);
+    double RowY(int s) => top + (n - 1 - s) * rowH;   // first listed string at the bottom; no pitch ordering assumed
+    double DotX(int fret) => fret == 0 ? nutX - 20 : nutX + (fret - 0.5) * fretW;
+}
+<PageTitle>@Strings.T(lang, "fretboard.title") - @Strings.T(lang, "shell.title")</PageTitle>
+
+<h1>@Strings.T(lang, "fretboard.title")</h1>
+<p>@Strings.T(lang, "fretboard.blurb")</p>
+@if (view.Notice is not null)
+{
+    <p class="tb-notice" role="status">@view.Notice</p>
+}
+
+<div class="tb-controls">
+    <label>@Strings.T(lang, "fretboard.tuning")
+        <select @onchange='e => Set("tuning", e.Value?.ToString())'>
+            @foreach (var t in TuningPresets.All)
+            {
+                <option value="@t.Id" selected="@(t.Id == (TuningPresets.Find(tuning)?.Id ?? "standard"))">@(lang == Lang.Fr ? t.Fr : t.En)</option>
+            }
+        </select>
+    </label>
+    <label>@Strings.T(lang, "fretboard.frets")
+        <input type="number" min="1" max="@FretboardModel.MaxFrets" value="@view.Frets" @onchange='e => Set("frets", e.Value?.ToString())' />
+    </label>
+    <label>@Strings.T(lang, "fretboard.show")
+        <select @onchange="e => SetShow(e.Value?.ToString())">
+            @foreach (var m in new[] { "note", "scale", "chord" })
+            {
+                <option value="@m" selected="@(m == mode)">@Strings.T(lang, "fretboard.show." + m)</option>
+            }
+        </select>
+    </label>
+    <label>@Strings.T(lang, "fretboard.root")
+        <select @onchange='e => Set("root", e.Value?.ToString())'>
+            @foreach (var r in rootIds)
+            {
+                <option value="@r" selected="@(r == (root ?? "C"))">@NoteNames.Format(Note.Parse(r + "4"), lang)</option>
+            }
+        </select>
+    </label>
+    @if (types.Count > 0)
+    {
+        <label>@Strings.T(lang, "fretboard.type")
+            <select @onchange='e => Set("type", e.Value?.ToString())'>
+                @foreach (var t in types)
+                {
+                    <option value="@t" selected="@(string.Equals(t, type, StringComparison.OrdinalIgnoreCase) || (type is null && t == types[0]))">@Strings.T(lang, "fretboard." + mode + "." + t)</option>
+                }
+            </select>
+        </label>
+    }
+</div>
+
+<div class="tb-neck-wrap">
+<svg class="tb-neck" viewBox="0 0 @width @height" role="img" aria-label="@Strings.T(lang, "fretboard.neck", n, view.Frets)">
+    @for (var s = 0; s < n; s++)
+    {
+        <line class="tb-string" x1="@Num(nutX)" x2="@Num(nutX + view.Frets * fretW)" y1="@Num(RowY(s))" y2="@Num(RowY(s))" />
+        <g><text class="tb-open" x="4" y="@Num(RowY(s))" dominant-baseline="central">@view.Strings[s]</text></g>
+    }
+    @for (var k = 0; k <= view.Frets; k++)
+    {
+        <line class="@(k == 0 ? "tb-nut" : "tb-fret")" x1="@Num(nutX + k * fretW)" x2="@Num(nutX + k * fretW)" y1="@Num(top)" y2="@Num(top + (n - 1) * rowH)" />
+    }
+    @for (var k = 1; k <= view.Frets; k++)
+    {
+        if (k is 3 or 5 or 7 or 9 or 12 or 15 or 17 or 19 or 21 or 24)
+        {
+            <g><text class="tb-marker" x="@Num(nutX + (k - 0.5) * fretW)" y="@Num(top + (n - 1) * rowH + 22)" text-anchor="middle">@k</text></g>
+        }
+    }
+    @foreach (var d in view.Dots)
+    {
+        <g>
+            <title>@d.Label@(d.Degree is { } deg ? " (" + Strings.T(lang, "fretboard.degree", deg) + ")" : "")</title>
+            <circle cx="@Num(DotX(d.Fret))" cy="@Num(RowY(d.String))" r="10" class="@(d.IsRoot ? "tb-dot tb-dot-root" : "tb-dot")" />
+            <text x="@Num(DotX(d.Fret))" y="@Num(RowY(d.String))" text-anchor="middle" dominant-baseline="central" class="@(d.IsRoot ? "tb-dot-label tb-dot-label-root" : "tb-dot-label")">@d.Label</text>
+        </g>
+    }
+</svg>
+</div>
+
+<Understand Lang="lang" TextKey="fretboard.understand" />
+
+@code {
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+
+    private void Set(string key, string? value)
+    {
+        var next = new Dictionary<string, string>(State.Params);
+        if (string.IsNullOrEmpty(value)) next.Remove(key); else next[key] = value;
+        Nav.NavigateTo(ToolboxUrl.Build(State with { Params = next }));
+    }
+
+    // Changing what to show resets the type, which belongs to the previous mode's list.
+    private void SetShow(string? value)
+    {
+        var next = new Dictionary<string, string>(State.Params);
+        next.Remove("type");
+        if (string.IsNullOrEmpty(value)) next.Remove("show"); else next["show"] = value;
+        Nav.NavigateTo(ToolboxUrl.Build(State with { Params = next }));
+    }
+}
