@@ -21,10 +21,10 @@ public static class PianoFingering
     public static IReadOnlyList<int> ForScale(Scale scale, Hand hand, int octaves = 1)
     {
         ArgumentNullException.ThrowIfNull(scale);
+        ArgumentOutOfRangeException.ThrowIfLessThan(octaves, 1);
         var all = scale.GetNotes().ToList();
         if (all.Count != 8)
             throw new ArgumentException($"{scale.Type} is not a heptatonic scale, so it has no standard fingering.", nameof(scale));
-        ArgumentOutOfRangeException.ThrowIfLessThan(octaves, 1);
 
         // The left hand reads the scale descending from the top tonic.
         var notes = all.Take(7).ToList();
@@ -65,7 +65,7 @@ public static class PianoFingering
         ArgumentNullException.ThrowIfNull(notes);
         if (notes.Count != 3)
             throw new ArgumentException("A triad fingering needs exactly three notes.", nameof(notes));
-        var midi = notes.Select(n => n.MidiNumber).Order().ToArray();
+        var midi = notes.Select(n => n.Semitones).Order().ToArray();
         if (midi.Distinct().Count() != 3 || midi[2] - midi[0] > 12)
             throw new ArgumentException("A triad fingering needs three distinct pitches spanning at most an octave.", nameof(notes));
 

@@ -47,6 +47,26 @@ public class PianoFingeringTests
     }
 
     [Fact]
+    public void ForScale_LeftHandTwoOctaves()
+    {
+        PianoFingering.ForScale(new Scale(Note.Parse("C"), ScaleType.Major), Hand.Left, octaves: 2)
+            .ShouldBe([5, 4, 3, 2, 1, 3, 2, 1, 4, 3, 2, 1, 3, 2, 1]);
+    }
+
+    [Fact]
+    public void ForScale_NaturalMinorEbRightHand()
+    {
+        PianoFingering.ForScale(new Scale(Note.Parse("Eb"), ScaleType.NaturalMinor), Hand.Right)
+            .ShouldBe([3, 1, 2, 3, 4, 1, 2, 3]);
+    }
+
+    [Fact]
+    public void ForTriad_NotesOutsideMidiRange()
+    {
+        PianoFingering.ForTriad([new Note(NoteName.C, Alteration.Flat, -1), new Note(NoteName.E, Alteration.Flat, -1), new Note(NoteName.G, Alteration.Flat, -1)], Hand.Right).ShouldBe([1, 3, 5]);
+    }
+
+    [Fact]
     public void ForScale_RejectsBadInput()
     {
         Should.Throw<ArgumentException>(() => PianoFingering.ForScale(new Scale(Note.Parse("C"), ScaleType.PentatonicMajor), Hand.Right));
