@@ -17,7 +17,7 @@ import sys
 import music21
 from fractions import Fraction
 
-from music21 import chord, duration, interval, key, note, scale
+from music21 import chord, duration, interval, key, meter, note, scale, stream
 
 OUT = pathlib.Path(__file__).resolve().parents[2] / "MusicTheory.UnitTests" / "Reference"
 LETTERS = "CDEFGAB"
@@ -216,6 +216,76 @@ internal static class ForteCatalog
     print(f"ForteCatalog.cs: {len(catalog)} entries")
 
 
+# (meter, whole-note values; an "r" prefix is a rest)
+BARRING = [
+    ("4/4", "3/4 1/2"), ("4/4", "1/4 1/4 1/4 1/4"), ("4/4", "1/2 1/2 1/2"), ("4/4", "1/1 1/1"),
+    ("4/4", "1/4 1/2 1/2"), ("4/4", "3/8 3/4 1/8"), ("4/4", "1/2 3/4 3/4"), ("4/4", "3/4 3/4 3/4"),
+    ("2/4", "1/1"), ("2/4", "3/4 1/4"), ("2/4", "1/4 1/2 1/4"), ("2/4", "r1/1"), ("2/4", "1/4 r1/2 1/4"),
+    ("3/4", "1/2 1/2 1/2"), ("3/4", "1/1"), ("3/4", "3/4 3/4"), ("3/4", "1/4 3/4 1/2"), ("3/4", "r1/2 r1/2 1/4"),
+    ("6/8", "1/4 1/4 1/4"), ("6/8", "3/4 3/8"), ("6/8", "1/2 1/2"), ("6/8", "1/8 3/4 1/8"),
+    ("5/4", "1/1 1/2"), ("5/4", "1/2 1/2 1/2 1/2"), ("5/4", "3/4 3/4 3/4"),
+]
+
+
+def measures():
+    def fmt(n):
+        return str(Fraction(n) / 4)
+
+    rows = []
+    for i, (m, spec) in enumerate(BARRING, 1):
+        s = stream.Stream()
+        s.insert(0, meter.TimeSignature(m))
+        for tok in spec.split():
+            rest = tok.startswith("r")
+            ql = Fraction(tok.lstrip("r")) * 4
+            n = note.Rest() if rest else note.Note("C4")
+            n.quarterLength = ql
+            s.append(n)
+        bars = s.makeMeasures()
+        bars.makeTies(inPlace=True)
+        out = []
+        for bar in bars.getElementsByClass(stream.Measure):
+            toks = []
+            for n in bar.notesAndRests:
+                tied = not n.isRest and n.tie is not None and n.tie.type in ("start", "continue")
+                # music21 keeps a complex duration (5/8) as one note; split it the way Duration.Decompose does.
+                parts = n.duration.components
+                for j, c in enumerate(parts):
+                    toks.append(fmt(c.quarterLength) + ("~" if not n.isRest and (j < len(parts) - 1 or tied) else ""))
+            out.append(" ".join(toks))
+        rows.append([f"case{i}", m, spec, "|".join(out)])
+    write("measures.csv", ["case", "meter", "input", "expected"], rows)
+
+
+def tempo():
+    from fractions import Fraction
+    from music21 import stream, tempo as m21tempo
+
+    layouts = [
+        [(Fraction(0), 120)],
+        [(Fraction(0), 120), (Fraction(2), 90)],
+        [(Fraction(0), 60), (Fraction(1, 2), 100), (Fraction(3), 45)],
+        [(Fraction(0), 90), (Fraction(5, 4), 150)],  # mid-bar change
+        [(Fraction(0), 100), (Fraction(1), 80), (Fraction(5, 2), 140)],
+    ]
+    rows = []
+    for layout in layouts:
+        s = stream.Stream()
+        for pos, bpm in layout:
+            s.insert(float(pos * 4), m21tempo.MetronomeMark(number=bpm, referent=note.Note(type="quarter")))
+        for i in range(0, 64):  # one quarter note every 1/8 whole note, off the grid of changes too
+            n = note.Note("C4", quarterLength=0.5)
+            s.insert(i * 0.5, n)
+        changes = " ".join(f"{p.numerator}/{p.denominator}@{b}" for p, b in layout)
+        for m in s.secondsMap:
+            n = m["element"]
+            if not isinstance(n, note.Note):
+                continue
+            pos = Fraction(n.offset).limit_denominator(64) / 4
+            rows.append([changes, f"{pos.numerator}/{pos.denominator}", repr(float(m["offsetSeconds"]))])
+    write("tempo.csv", ["changes", "position", "seconds"], rows)
+
+
 if __name__ == "__main__":
     print("music21", music21.__version__)
     OUT.mkdir(parents=True, exist_ok=True)
@@ -229,3 +299,5 @@ if __name__ == "__main__":
     catalog = pcsets()
     if "--csharp-forte" in sys.argv:
         forte_catalog(catalog)
+    measures()
+    tempo()
