@@ -64,7 +64,6 @@ public class HarmonicAnalyzerTests
     }
 
     [Theory]
-    [InlineData("C", "Db", "bII")]
     [InlineData("C", "F#m", "#iv")]
     [InlineData("Am", "F#", "#VI")]
     public void Analyze_Chromatic_UsesKeySpelling(string key, string chord, string expected)
@@ -72,5 +71,41 @@ public class HarmonicAnalyzerTests
         var rn = One(key, chord);
         rn.Function.ShouldBe(HarmonicFunction.Chromatic);
         rn.ToString().ShouldBe(expected);
+    }
+
+    [Theory]
+    [InlineData("C", "Db", "N")]
+    [InlineData("C", "Db/F", "N6")]
+    [InlineData("C", "Db/Ab", "N64")]
+    [InlineData("Am", "Bb/D", "N6")]
+    public void Analyze_Neapolitan(string key, string chord, string expected)
+    {
+        var rn = One(key, chord);
+        rn.ToString().ShouldBe(expected);
+        rn.Function.ShouldBe(HarmonicFunction.Neapolitan);
+        rn.Degree.ShouldBe(2);
+        rn.DegreeAlteration.ShouldBe(Alteration.Flat);
+        One("C", "Db7").Function.ShouldNotBe(HarmonicFunction.Neapolitan);
+    }
+
+    [Theory]
+    [InlineData("C", "Ab7", "Ger+6")]
+    [InlineData("C", "Ab7b5", "Fr+6")]
+    [InlineData("Am", "F7", "Ger+6")]
+    [InlineData("Am", "F7b5", "Fr+6")]
+    public void Analyze_AugmentedSixth(string key, string chord, string expected)
+    {
+        var rn = One(key, chord);
+        rn.ToString().ShouldBe(expected);
+        rn.Function.ShouldBe(HarmonicFunction.AugmentedSixth);
+        rn.Degree.ShouldBe(6);
+    }
+
+    [Fact]
+    public void Analyze_FlatSixthTriad_StaysBorrowed()
+    {
+        var rn = One("C", "Ab");
+        rn.ToString().ShouldBe("bVI");
+        rn.Function.ShouldBe(HarmonicFunction.Borrowed);
     }
 }
