@@ -21,4 +21,40 @@ public static class Reharmonizer
         var a4 = dominant.Transpose(Interval.Parse("A4"));
         return Math.Abs((int)a4.Root.Alteration) < Math.Abs((int)d5.Root.Alteration) ? a4 : d5;
     }
+
+    /// <summary>The ii and V of a target: Cmaj7 gives [Dm7, G7]; Am gives [Bm7b5, E7].</summary>
+    /// <param name="target">A major or minor chord; the slash bass is ignored.</param>
+    /// <returns>The ii then the V, both in root position.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="target"/> is null.</exception>
+    /// <exception cref="ArgumentException"><paramref name="target"/> is diminished or augmented.</exception>
+    public static IReadOnlyList<ChordSymbol> TwoFiveTo(ChordSymbol target)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        var ii = target.ToChord().Quality switch
+        {
+            ChordQuality.Major or ChordQuality.Suspended or ChordQuality.Power => ChordType.Minor7,
+            ChordQuality.Minor => ChordType.HalfDiminished7,
+            _ => throw new ArgumentException($"{target} is diminished or augmented and has no ii-V.", nameof(target)),
+        };
+
+        return
+        [
+            new ChordSymbol(target.Root.Transpose(Interval.Parse("M2")), ii),
+            new ChordSymbol(target.Root.Transpose(Interval.Parse("P5")), ChordType.Dominant7),
+        ];
+    }
+
+    /// <summary>A copy of <paramref name="chords"/> with the ii-V of the chord at <paramref name="targetIndex"/> inserted before it.</summary>
+    /// <param name="chords">The progression; not modified.</param>
+    /// <param name="targetIndex">Index of the chord to approach.</param>
+    /// <returns>The longer progression.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="chords"/> is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="targetIndex"/> is outside the list.</exception>
+    public static IReadOnlyList<ChordSymbol> InsertTwoFive(IReadOnlyList<ChordSymbol> chords, int targetIndex)
+    {
+        ArgumentNullException.ThrowIfNull(chords);
+        ArgumentOutOfRangeException.ThrowIfNegative(targetIndex);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(targetIndex, chords.Count);
+        return [.. chords.Take(targetIndex), .. TwoFiveTo(chords[targetIndex]), .. chords.Skip(targetIndex)];
+    }
 }
