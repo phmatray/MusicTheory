@@ -37,7 +37,7 @@ doubly augmented fourth.
   concert pitch (`GetFrequency(415)`); enharmonic respelling.
 - **Intervals**: every quality from quintuply diminished to quintuply augmented, direction, compound
   intervals, inversion, music21 names (`M3`, `M-3`, `dd2`) with `Parse`.
-- **Chords**: 42 chord types, extensions, inversions, and lead-sheet symbols with tensions (`C7b9#11`).
+- **Chords**: 44 chord types, extensions, inversions, and lead-sheet symbols with tensions (`C7b9#11`).
 - **Scales**: major, three minors, seven modes, pentatonics, blues, whole tone and chromatic, spelled by interval.
   Also the melodic-minor and harmonic-minor modes (`ScaleType.Altered`, `LydianDominant`, `PhrygianDominant`),
   bebop scales (`BebopDominant`) and world scales (`HungarianMinor`, `Hirajoshi`), 22 in all.

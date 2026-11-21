@@ -23,10 +23,10 @@ internal static class Diatonic
     public static Triad TriadOf(ChordType type) => type switch
     {
         ChordType.Minor or ChordType.Minor7 or ChordType.MinorMajor7 or ChordType.Minor6 or ChordType.Minor9
-            or ChordType.Minor11 or ChordType.Minor13 or ChordType.MinorAdd9 or ChordType.MinorAdd11 => Triad.Minor,
+            or ChordType.Minor11 or ChordType.Minor13 or ChordType.MinorAdd9 or ChordType.MinorAdd11 or ChordType.MinorMajor9 => Triad.Minor,
         ChordType.Diminished or ChordType.HalfDiminished7 or ChordType.Diminished7 => Triad.Diminished,
         ChordType.Augmented or ChordType.Augmented7 or ChordType.AugmentedMajor7 => Triad.Augmented,
-        ChordType.Sus2 or ChordType.Sus4 or ChordType.Sus2Sus4 or ChordType.Dominant7Sus4 or ChordType.Power5 => Triad.Any,
+        ChordType.Sus2 or ChordType.Sus4 or ChordType.Sus2Sus4 or ChordType.Dominant7Sus4 or ChordType.Power5 or ChordType.Dominant7Sus2 => Triad.Any,
         _ => Triad.Major,
     };
 }

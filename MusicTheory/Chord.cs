@@ -107,7 +107,11 @@ public enum ChordType
     /// <summary>Dominant 7th altered (1-3-♭5-♯5-♭7-♭9)</summary>
     Dominant7Alt,
     /// <summary>Power chord (1-5)</summary>
-    Power5
+    Power5,
+    /// <summary>Dominant 7th suspended 2nd (1-2-5-♭7)</summary>
+    Dominant7Sus2,
+    /// <summary>Minor-major 9th (1-♭3-5-7-9)</summary>
+    MinorMajor9
 }
 
 /// <summary>
@@ -159,6 +163,8 @@ internal static class ChordTypes
         [ChordType.Dominant7Sharp5Sharp9] = (Of("M3 A5 m7 A9"), "7#5#9"),
         [ChordType.Dominant7Alt] = (Of("M3 d5 A5 m7 m9"), "7alt"),
         [ChordType.Power5] = (Of("P5"), "5"),
+        [ChordType.Dominant7Sus2] = (Of("M2 P5 m7"), "7sus2"),
+        [ChordType.MinorMajor9] = (Of("m3 P5 M7 M9"), "mMaj9"),
     };
 
     private static Interval[] Of(string names) => names.Split(' ').Select(Interval.Parse).ToArray();

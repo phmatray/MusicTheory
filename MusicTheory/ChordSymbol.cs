@@ -147,9 +147,9 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null, I
             if (add)
                 i += 3;
             var match = TensionNames.Keys
-                .Where(k => (!add || char.IsAsciiDigit(k[0])) && text.AsSpan(i).StartsWith(k))
+                .Where(k => text.AsSpan(i).StartsWith(k))
                 .MaxBy(k => k.Length);
-            // A bare 5 is not a tension, and "add" only takes a natural degree.
+            // A bare 5 is not a tension.
             if (match is null)
                 return false;
             tensions.Add(TensionNames[match]);
@@ -167,6 +167,7 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null, I
              .Replace("ø7", "m7b5").Replace("ø", "m7b5")
              .Replace("°", "dim").Replace("+", "aug")
              .Replace("Maj", "maj").Replace("ma7", "maj7").Replace("ma9", "maj9").Replace("ma13", "maj13");
+        if (s.StartsWith("mi")) s = "m" + s[2..];
         if (s is "o" or "o7") s = s.Replace("o", "dim");
         // A capital M followed by a digit means major (M7, mM7); lone "M" is a major triad.
         s = System.Text.RegularExpressions.Regex.Replace(s, "M(?=\\d)", "maj");
@@ -258,7 +259,7 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null, I
     {
         ArgumentNullException.ThrowIfNull(style);
         var suffix = (style.UseJazzGlyphs && JazzGlyphs.TryGetValue(Type, out var glyph) ? glyph : ChordTypes.Suffix(Type))
-            + string.Concat(Tensions.Select(t => TensionText(t)));
+            + string.Concat(Tensions.Select((t, i) => TensionText(t, i == 0 && ChordTypes.Suffix(Type).Length == 0)));
         if (style.Accidentals == AccidentalStyle.Unicode)
             suffix = suffix.Replace('b', '♭').Replace('#', '♯');
         var text = Spell(Root, style.Accidentals) + suffix;
@@ -278,10 +279,11 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null, I
     public override int GetHashCode() =>
         HashCode.Combine(Type, Root.Name, Root.Alteration, Bass?.Name, Bass?.Alteration, Tensions.Count);
 
-    private static string TensionText(Interval tension)
+    private static string TensionText(Interval tension, bool firstOnPlainMajor)
     {
         var name = TensionNames.First(kv => kv.Value == tension).Key;
-        return char.IsAsciiDigit(name[0]) ? "add" + name : name;
+        // "C#11" would re-parse as a different chord, so an altered first tension on a bare triad keeps "add".
+        return char.IsAsciiDigit(name[0]) || firstOnPlainMajor ? "add" + name : name;
     }
 
     private static bool SameSpelling(Note a, Note b) => a.Name == b.Name && a.Alteration == b.Alteration;
