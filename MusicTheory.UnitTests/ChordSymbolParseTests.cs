@@ -42,6 +42,13 @@ public class ChordSymbolParseTests
     [InlineData("Cm(maj7)", ChordType.MinorMajor7)]
     [InlineData("CmM7", ChordType.MinorMajor7)]
     [InlineData("Cm(add9)", ChordType.MinorAdd9)]
+    [InlineData("C7sus2", ChordType.Dominant7Sus2)]
+    [InlineData("Am(maj9)", ChordType.MinorMajor9)]
+    [InlineData("AmMaj9", ChordType.MinorMajor9)]
+    [InlineData("AmM9", ChordType.MinorMajor9)]
+    [InlineData("Cmi", ChordType.Minor)]
+    [InlineData("Cmi7", ChordType.Minor7)]
+    [InlineData("Cmi(maj7)", ChordType.MinorMajor7)]
     public void Parse_Aliases(string text, ChordType expected)
     {
         ChordSymbol.Parse(text).Type.ShouldBe(expected);

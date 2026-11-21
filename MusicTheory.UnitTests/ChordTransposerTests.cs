@@ -22,6 +22,7 @@ public class ChordTransposerTests
     [InlineData("F#m", 2, "A", "G#m")]
     [InlineData("C/E", 3, "Eb", "Eb/G")]
     [InlineData("Am/G", -2, "G", "Gm/F")]
+    [InlineData("Cmi7", 2, "D", "Dm7")]
     public void Transpose_BySemitones_InTargetKey(string chord, int semitones, string key, string expected)
     {
         ChordTransposer.Transpose(chord, semitones, K(key)).ShouldBe(expected);
