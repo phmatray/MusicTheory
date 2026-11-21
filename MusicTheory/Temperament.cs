@@ -58,6 +58,12 @@ public sealed class Temperament
         return note.GetFrequency(a4) * Math.Pow(2, cents / 1200);
     }
 
+    /// <summary>Two temperaments are equal when they are the same tuning system (the constructor is private, so the name identifies it).</summary>
+    public override bool Equals(object? obj) => obj is Temperament other && other.Name == Name;
+
+    /// <inheritdoc />
+    public override int GetHashCode() => Name.GetHashCode(StringComparison.Ordinal);
+
     /// <inheritdoc />
     public override string ToString() => Name;
 

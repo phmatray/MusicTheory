@@ -99,4 +99,13 @@ public class TemperamentTests
 
     [Fact]
     public void ToString_IsName() => Temperament.JustIntonation.ToString().ShouldBe(Temperament.JustIntonation.Name);
+
+    [Fact]
+    public void Temperaments_HaveValueEquality()
+    {
+        Temperament.Pythagorean.ShouldBe(Temperament.Pythagorean);
+        Temperament.Pythagorean.GetHashCode().ShouldBe(Temperament.Pythagorean.GetHashCode());
+        Temperament.Pythagorean.ShouldNotBe(Temperament.JustIntonation);
+        Temperament.Equal.Equals("Equal").ShouldBeFalse();
+    }
 }
