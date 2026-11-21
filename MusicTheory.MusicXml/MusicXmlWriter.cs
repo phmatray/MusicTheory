@@ -49,7 +49,8 @@ public static class MusicXmlWriter
                     new XElement("beats", measure.TimeSignature.Numerator),
                     new XElement("beat-type", measure.TimeSignature.Denominator)));
             meter = measure.TimeSignature;
-            element.Add(attributes);
+            if (attributes.HasElements)
+                element.Add(attributes);
 
             foreach (var e in measure.Events)
             {

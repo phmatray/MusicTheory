@@ -128,7 +128,7 @@ public class MusicXmlWriterTests
         var measures = doc.XPathSelectElements("//measure").ToList();
         measures[0].XPathSelectElement("attributes/time/beats")!.Value.ShouldBe("4");
         measures[0].XPathSelectElement("attributes/time/beat-type")!.Value.ShouldBe("4");
-        measures[1].Element("attributes")!.Element("time").ShouldBeNull();
+        measures[1].Element("attributes").ShouldBeNull();
         measures[2].XPathSelectElement("attributes/time/beats")!.Value.ShouldBe("3");
         measures[2].XPathSelectElement("attributes/divisions").ShouldBeNull();
     }
