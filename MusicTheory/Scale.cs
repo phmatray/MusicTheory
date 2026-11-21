@@ -89,7 +89,8 @@ public enum ScaleType
 /// <remarks>Every scale's notes run from the tonic to the tonic an octave above, both included.</remarks>
 public sealed record Scale
 {
-    private static readonly Dictionary<ScaleType, Interval[]> Formulas = new()
+    // A method, not a static readonly field: Stryker cannot activate mutants inside static initialisers.
+    private static Dictionary<ScaleType, Interval[]> Formulas() => new()
     {
         [ScaleType.Major] = Of("M2 M3 P4 P5 M6 M7"),
         [ScaleType.Ionian] = Of("M2 M3 P4 P5 M6 M7"),
@@ -131,7 +132,7 @@ public sealed record Scale
         [ScaleType.PentatonicMinor] = Of("m3 P4 P5 m7"),
     };
 
-    private static Interval[] Formula(ScaleType type) => Formulas[type]; // the constructor rejects undefined types
+    private static Interval[] Formula(ScaleType type) => Formulas()[type]; // the constructor rejects undefined types
 
     private static Interval[] Of(string names) =>
         $"P1 {names} P8".Split(' ').Select(Interval.Parse).ToArray();
