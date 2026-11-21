@@ -41,6 +41,8 @@
     <dd>@string.Join(" ", current.ScaleNotes)</dd>
 </dl>
 
+<Staff Abc="@view.ScaleAbc" Alt="@Strings.T(lang, "circle.staff.alt", current.Title, string.Join(" ", current.ScaleNotes))" />
+
 <Understand Lang="lang" TextKey="circle.understand" />
 
 @code {

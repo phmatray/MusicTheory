@@ -1,0 +1,30 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime Js
+
+<button type="button" class="tb-btn tb-share" @onclick="CopyAsync">@Strings.T(Lang, "intervals.share")</button>
+@if (_message is not null)
+{
+    <span class="tb-copied" role="status">@Strings.T(Lang, _message)</span>
+}
+
+@code {
+    /// <summary>The exact link to copy (the teacher key is never part of it).</summary>
+    [Parameter, EditorRequired] public string Url { get; set; } = "";
+    [Parameter, EditorRequired] public Lang Lang { get; set; }
+
+    private string? _message;
+
+    private async Task CopyAsync()
+    {
+        try
+        {
+            await Js.InvokeVoidAsync("navigator.clipboard.writeText", Url);
+            _message = "intervals.copied";
+        }
+        catch (JSException)
+        {
+            // No clipboard (insecure context, permission): the address bar already holds the link.
+            _message = "intervals.copyfail";
+        }
+    }
+}

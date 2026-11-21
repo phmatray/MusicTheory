@@ -1,0 +1,70 @@
+@{
+    var lang = State.Lang;
+    State.Params.TryGetValue("inst", out var instId);
+    State.Params.TryGetValue("dir", out var dirId);
+    State.Params.TryGetValue("key", out var keyText);
+    State.Params.TryGetValue("chords", out var chordsText);
+    var instrument = Instruments.Find(instId);
+    var direction = dirId == "wc" ? TransposeDirection.WrittenToConcert : TransposeDirection.ConcertToWritten;
+    var keyOk = KeySignature.TryParse(keyText ?? "C", out var key);
+    key ??= KeySignature.Parse("C");
+    var result = TransposerModel.Run(instrument, direction, key, chordsText ?? "", lang);
+    var target = result.TargetKey;
+    var n = target.AccidentalCount;
+    var tonic = NoteNames.Format(target.Tonic, lang);
+    var title = Strings.T(lang, target.Mode == KeyMode.Minor ? "transpose.minor" : "transpose.major", tonic);
+    var signature = n == 0 ? Strings.T(lang, "transpose.sig.none")
+        : n > 0 ? Strings.T(lang, "transpose.sig.sharps", n) : Strings.T(lang, "transpose.sig.flats", -n);
+}
+<PageTitle>@Strings.T(lang, "transpose.title") - @Strings.T(lang, "shell.title")</PageTitle>
+
+<h1>@Strings.T(lang, "transpose.title")</h1>
+<p>@Strings.T(lang, "transpose.blurb")</p>
+
+<form method="get" class="tb-form">
+    <input type="hidden" name="t" value="transpose" />
+    <input type="hidden" name="lang" value="@(lang == Lang.Fr ? "fr" : "en")" />
+    <input type="hidden" name="v" value="1" />
+    <label for="tb-inst">@Strings.T(lang, "transpose.inst")</label>
+    <select id="tb-inst" name="inst">
+        @foreach (var i in Instruments.All)
+        {
+            <option value="@i.Id" selected="@(i.Id == instrument.Id)">@TransposerModel.Name(i, lang)</option>
+        }
+    </select>
+    <label for="tb-dir">@Strings.T(lang, "transpose.dir")</label>
+    <select id="tb-dir" name="dir">
+        <option value="cw" selected="@(direction == TransposeDirection.ConcertToWritten)">@Strings.T(lang, "transpose.dir.cw")</option>
+        <option value="wc" selected="@(direction == TransposeDirection.WrittenToConcert)">@Strings.T(lang, "transpose.dir.wc")</option>
+    </select>
+    <label for="tb-key">@Strings.T(lang, "transpose.key")</label>
+    <input id="tb-key" name="key" value="@(keyText ?? "C")" size="6" />
+    <label for="tb-chords">@Strings.T(lang, "transpose.chords")</label>
+    <textarea id="tb-chords" name="chords" rows="3" cols="40">@chordsText</textarea>
+    <button type="submit">@Strings.T(lang, "transpose.run")</button>
+</form>
+
+@if (!keyOk)
+{
+    <p class="tb-notice" role="status">@Strings.T(lang, "transpose.invalid", keyText ?? "")</p>
+}
+@foreach (var notice in result.Notices)
+{
+    <p class="tb-notice" role="status">@notice</p>
+}
+
+<h2>@Strings.T(lang, "transpose.result")</h2>
+<dl class="tb-facts">
+    <dt>@Strings.T(lang, "transpose.target")</dt>
+    <dd>@title</dd>
+    <dt>@Strings.T(lang, "transpose.signature")</dt>
+    <dd>@signature</dd>
+    <dt>@Strings.T(lang, "transpose.chords")</dt>
+    <dd>@string.Join(" ", result.Chords)</dd>
+</dl>
+
+<Understand Lang="lang" TextKey="transpose.understand" />
+
+@code {
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+}

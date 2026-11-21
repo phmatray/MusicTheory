@@ -1,0 +1,24 @@
+@namespace MusicTheory.Toolbox.Rendering
+@using Microsoft.JSInterop
+@inject IJSRuntime Js
+<figure class="tb-staff">
+    <div id="@_id" role="img" aria-label="@Alt"></div>
+</figure>
+
+@code {
+    private readonly string _id = "staff-" + Guid.NewGuid().ToString("N")[..8];
+    private string? _drawn;
+
+    /// <summary>The ABC text to draw (see StaffAbc.FromNotes).</summary>
+    [Parameter, EditorRequired] public string Abc { get; set; } = "";
+
+    /// <summary>The text alternative, in the current language.</summary>
+    [Parameter, EditorRequired] public string Alt { get; set; } = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_drawn == Abc) return;
+        _drawn = Abc;
+        await Js.InvokeVoidAsync("toolboxStaff.render", _id, Abc);
+    }
+}
