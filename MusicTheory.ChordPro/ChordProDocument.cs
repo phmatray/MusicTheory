@@ -62,7 +62,8 @@ public sealed record ChordProDocument(IReadOnlyList<ChordProLine> Lines)
     {
         var end = inner.IndexOfAny([':', ' ', '\t']);
         var name = end < 0 ? inner : inner[..end];
-        var value = end < 0 ? "" : inner[end..].TrimStart(' ', '\t', ':');
+        var rest = end < 0 ? "" : inner[end..].TrimStart(' ', '\t');
+        var value = (rest.StartsWith(':') ? rest[1..] : rest).Trim(); // only the first separator colon is dropped
         return new DirectiveLine(raw, LongName(name.ToLowerInvariant()), value.Length == 0 ? null : value);
     }
 
@@ -88,6 +89,11 @@ public sealed record ChordProDocument(IReadOnlyList<ChordProLine> Lines)
         {
             var open = s.IndexOf('[', pos);
             var close = open < 0 ? -1 : s.IndexOf(']', open + 1);
+            if (close >= 0)
+            {
+                open = s.LastIndexOf('[', close, close - pos + 1); // the nearest '[': an earlier unclosed one is lyric text
+            }
+
             if (close < 0)
             {
                 if (chord is not null || pos < s.Length)

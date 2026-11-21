@@ -79,6 +79,22 @@ public class ChordProParseTests
     }
 
     [Fact]
+    public void Earlier_unclosed_bracket_stays_lyric()
+    {
+        var line = (LyricLine)ChordProDocument.Parse("a [C b [G]c").Lines[0];
+
+        line.Segments.ShouldBe([new ChordSegment(null, "a [C b "), new ChordSegment("G", "c")]);
+    }
+
+    [Fact]
+    public void Only_the_first_colon_is_a_separator()
+    {
+        var doc = ChordProDocument.Parse("{c: :-)}\n{c : x}");
+
+        doc.Lines.Cast<DirectiveLine>().Select(d => d.Value).ShouldBe([":-)", "x"]);
+    }
+
+    [Fact]
     public void Short_names_are_normalised()
     {
         var names = new[] { "t", "st", "c", "soc", "eoc", "sov", "eov", "sob", "eob", "sot", "eot", "Define" };
