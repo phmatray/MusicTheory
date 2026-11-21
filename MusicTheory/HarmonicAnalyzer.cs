@@ -46,7 +46,7 @@ public sealed record RomanNumeral(
     public override string ToString()
     {
         if (Function == HarmonicFunction.Neapolitan)
-            return "N" + (Inversion switch { 1 => "6", 2 => "64", _ => "" });
+            return "N" + new[] { "", "6", "64" }[Inversion.GetValueOrDefault()];
         if (Function == HarmonicFunction.AugmentedSixth)
             return Type == ChordType.Dominant7Flat5 ? "Fr+6" : "Ger+6";
 
