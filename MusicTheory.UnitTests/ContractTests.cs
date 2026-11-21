@@ -31,6 +31,7 @@ public class ContractTests
         Message(() => new TimeSignature(4, 0)).ShouldStartWith("Denominator must be positive.");
         Message(() => new TimeSignature(4, 6)).ShouldStartWith("Denominator must be a power of 2.");
         Message(() => ChordSymbol.Parse("H7")).ShouldBe("Not a chord symbol: 'H7'.");
+        Message(() => ChordSymbol.Parse("be", ChordSymbolParseOptions.Lenient)).ShouldBe("Not a chord symbol: 'be'.");
     }
 
     [Theory]

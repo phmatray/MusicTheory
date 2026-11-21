@@ -12,6 +12,31 @@ public class ChordSymbolParseTests
         ChordSymbol.Parse(text).ToString(ChordSymbolStyle.Ascii).ShouldBe(text);
     }
 
+    [Theory]
+    [InlineData("am", "Am")] [InlineData("f#m", "F#m")] [InlineData("bbm7", "Bbm7")] [InlineData("am/e", "Am/E")]
+    public void Lenient_ReadsLowerCaseRoots(string lower, string upper)
+    {
+        var parsed = ChordSymbol.Parse(lower, ChordSymbolParseOptions.Lenient);
+        parsed.ShouldBe(ChordSymbol.Parse(upper));
+        parsed.ToString().ShouldBe(upper);
+        ChordSymbol.TryParse(lower, out _).ShouldBeFalse();
+        ChordSymbol.TryParse(lower, ChordSymbolParseOptions.Strict, out _).ShouldBeFalse();
+    }
+
+    [Theory]
+    [InlineData("be")] [InlineData("and")] [InlineData("bad")] [InlineData("dim")] [InlineData("hello")]
+    [InlineData("h7")] [InlineData("N.C.")] [InlineData("%")] [InlineData("")] [InlineData(null)]
+    public void Lenient_StillRejectsWordsAndNonChords(string? text) =>
+        ChordSymbol.TryParse(text, ChordSymbolParseOptions.Lenient, out _).ShouldBeFalse();
+
+    [Fact]
+    public void Strict_MatchesTheDefault()
+    {
+        ChordSymbol.TryParse("Am", ChordSymbolParseOptions.Strict, out var s).ShouldBeTrue();
+        s.ShouldBe(ChordSymbol.Parse("Am"));
+        Should.Throw<ArgumentNullException>(() => ChordSymbol.TryParse("Am", null!, out _));
+    }
+
     [Fact]
     public void Aliases_NormaliseToTheSameSymbol()
     {
