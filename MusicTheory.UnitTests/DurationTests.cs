@@ -241,41 +241,22 @@ public class DurationTests
     }
 
     [Fact]
-    public void Duration_GetSymbol_WithInvalidDurationType_ShouldReturnQuestionMark()
+    public void Duration_CreateTuplet_WithUndefinedType_ShouldThrow()
     {
-        // Use reflection to create an invalid enum value
-        var duration = new Duration((DurationType)99);
-        
-        // Act
-        var symbol = duration.GetSymbol();
-        
-        // Assert
-        symbol.ShouldBe("?");
+        Should.Throw<ArgumentOutOfRangeException>(() => Duration.CreateTuplet((DurationType)99, 3, 2)).ParamName.ShouldBe("baseType");
+    }
+
+    [Theory]
+    [InlineData(0, 2, "tupletCount")]
+    [InlineData(3, 0, "normalCount")]
+    public void Duration_CreateTuplet_WithCountBelowOne_ShouldThrow(int tupletCount, int normalCount, string param)
+    {
+        Should.Throw<ArgumentOutOfRangeException>(() => Duration.CreateTuplet(DurationType.Eighth, tupletCount, normalCount)).ParamName.ShouldBe(param);
     }
 
     [Fact]
-    public void Duration_GetValueInWholeNotes_WithInvalidDurationType_ShouldThrow()
+    public void Duration_WithUndefinedType_ShouldThrowAtConstruction()
     {
-        // Use reflection to create an invalid enum value
-        var duration = new Duration((DurationType)99);
-        
-        // Act
-        Action act = () => duration.GetValueInWholeNotes();
-        
-        // Assert
-        act.ShouldThrow<ArgumentOutOfRangeException>();
-    }
-
-    [Fact]
-    public void Duration_ToString_WithUnknownDurationType_ShouldReturnUnknown()
-    {
-        // Use reflection to create an invalid enum value
-        var duration = new Duration((DurationType)99);
-        
-        // Act
-        var result = duration.ToString();
-        
-        // Assert
-        result.ShouldBe("unknown");
+        Should.Throw<ArgumentOutOfRangeException>(() => new Duration((DurationType)99)).ParamName.ShouldBe("type");
     }
 }

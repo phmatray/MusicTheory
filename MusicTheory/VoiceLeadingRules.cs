@@ -45,33 +45,10 @@ public enum VoiceLeadingViolationType
 /// <summary>
 /// Represents a voice leading violation.
 /// </summary>
-public class VoiceLeadingViolation
-{
-    /// <summary>
-    /// Gets the type of violation.
-    /// </summary>
-    public VoiceLeadingViolationType Type { get; }
-
-    /// <summary>
-    /// Gets a description of the violation.
-    /// </summary>
-    public string Description { get; }
-
-    /// <summary>
-    /// Gets the voice indices involved in the violation.
-    /// </summary>
-    public (int Voice1, int Voice2)? VoiceIndices { get; }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="VoiceLeadingViolation"/> class.
-    /// </summary>
-    public VoiceLeadingViolation(VoiceLeadingViolationType type, string description, (int, int)? voiceIndices = null)
-    {
-        Type = type;
-        Description = description;
-        VoiceIndices = voiceIndices;
-    }
-}
+/// <param name="Type">The kind of violation.</param>
+/// <param name="Description">A readable description.</param>
+/// <param name="VoiceIndices">The two voices involved, or null for a single-voice violation.</param>
+public sealed record VoiceLeadingViolation(VoiceLeadingViolationType Type, string Description, (int Voice1, int Voice2)? VoiceIndices = null);
 
 /// <summary>
 /// Provides voice leading rules and validation for part-writing.
@@ -236,7 +213,7 @@ public static class VoiceLeadingRules
         }
 
         var interval = Interval.Between(lowerNote, higherNote);
-        return interval.Quality == IntervalQuality.Augmented;
+        return interval.IsAugmented;
     }
 
     /// <summary>
@@ -293,8 +270,12 @@ public static class VoiceLeadingRules
     /// <param name="chord1">The first chord (array of notes from bass to soprano).</param>
     /// <param name="chord2">The second chord (array of notes from bass to soprano).</param>
     /// <returns>A list of voice leading violations.</returns>
-    public static List<VoiceLeadingViolation> ValidateVoiceLeading(Note[] chord1, Note[] chord2)
+    /// <exception cref="ArgumentNullException">A chord is null.</exception>
+    /// <exception cref="ArgumentException">The chords have different voice counts.</exception>
+    public static IReadOnlyList<VoiceLeadingViolation> ValidateVoiceLeading(Note[] chord1, Note[] chord2)
     {
+        ArgumentNullException.ThrowIfNull(chord1);
+        ArgumentNullException.ThrowIfNull(chord2);
         if (chord1.Length != chord2.Length)
             throw new ArgumentException("Both chords must have the same number of voices.");
 

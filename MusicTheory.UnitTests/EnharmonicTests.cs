@@ -9,8 +9,6 @@ public class EnharmonicTests
     [InlineData(NoteName.G, Alteration.Sharp, NoteName.A, Alteration.Flat)] // G# = Ab
     [InlineData(NoteName.A, Alteration.Sharp, NoteName.B, Alteration.Flat)] // A# = Bb
     [InlineData(NoteName.E, Alteration.Sharp, NoteName.F, Alteration.Natural)] // E# = F
-    [InlineData(NoteName.B, Alteration.Sharp, NoteName.C, Alteration.Natural)] // B# = C
-    [InlineData(NoteName.C, Alteration.Flat, NoteName.B, Alteration.Natural)] // Cb = B
     [InlineData(NoteName.F, Alteration.Flat, NoteName.E, Alteration.Natural)] // Fb = E
     public void Note_IsEnharmonicWith_ShouldReturnTrueForEnharmonicNotes(
         NoteName name1, Alteration alteration1, NoteName name2, Alteration alteration2)
@@ -40,14 +38,14 @@ public class EnharmonicTests
     }
 
     [Fact]
-    public void Note_IsEnharmonicWith_ShouldIgnoreOctave()
+    public void Note_IsEnharmonicWith_ComparesSoundingPitch()
     {
-        // Arrange
-        var cSharp3 = new Note(NoteName.C, Alteration.Sharp, 3);
-        var dFlat5 = new Note(NoteName.D, Alteration.Flat, 5);
-        
-        // Act & Assert
-        cSharp3.IsEnharmonicWith(dFlat5).ShouldBeTrue();
+        // As in music21: enharmonic means the same sounding pitch, so the octave matters.
+        new Note(NoteName.C, Alteration.Sharp, 3).IsEnharmonicWith(new Note(NoteName.D, Alteration.Flat, 5)).ShouldBeFalse();
+        new Note(NoteName.C, Alteration.Sharp, 5).IsEnharmonicWith(new Note(NoteName.D, Alteration.Flat, 5)).ShouldBeTrue();
+        new Note(NoteName.B, Alteration.Sharp, 3).IsEnharmonicWith(new Note(NoteName.C, Alteration.Natural, 4)).ShouldBeTrue();
+        new Note(NoteName.C, Alteration.Flat, 5).IsEnharmonicWith(new Note(NoteName.B, Alteration.Natural, 4)).ShouldBeTrue();
+        new Note(NoteName.C).IsEnharmonicWith(null).ShouldBeFalse();
     }
 
     [Theory]

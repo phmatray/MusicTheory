@@ -3,575 +3,319 @@ using System.Diagnostics.CodeAnalysis;
 namespace MusicTheory;
 
 /// <summary>
-/// Represents the seven natural note names in music.
+/// The seven note letters.
 /// </summary>
 public enum NoteName
 {
-    /// <summary>C natural</summary>
+    /// <summary>C</summary>
     C,
-    /// <summary>D natural</summary>
+    /// <summary>D</summary>
     D,
-    /// <summary>E natural</summary>
+    /// <summary>E</summary>
     E,
-    /// <summary>F natural</summary>
+    /// <summary>F</summary>
     F,
-    /// <summary>G natural</summary>
+    /// <summary>G</summary>
     G,
-    /// <summary>A natural</summary>
+    /// <summary>A</summary>
     A,
-    /// <summary>B natural</summary>
+    /// <summary>B</summary>
     B
 }
 
 /// <summary>
-/// Represents alterations that can be applied to a note.
+/// Accidentals, valued in semitones.
 /// </summary>
 public enum Alteration
 {
-    /// <summary>Double flat (♭♭) - lowers the note by two semitones</summary>
+    /// <summary>Double flat (𝄫), two semitones down.</summary>
     DoubleFlat = -2,
-    /// <summary>Flat (♭) - lowers the note by one semitone</summary>
+    /// <summary>Flat (♭), one semitone down.</summary>
     Flat = -1,
-    /// <summary>Natural (♮) - no alteration</summary>
+    /// <summary>Natural (♮).</summary>
     Natural = 0,
-    /// <summary>Sharp (♯) - raises the note by one semitone</summary>
+    /// <summary>Sharp (♯), one semitone up.</summary>
     Sharp = 1,
-    /// <summary>Double sharp (♯♯) - raises the note by two semitones</summary>
+    /// <summary>Double sharp (𝄪), two semitones up.</summary>
     DoubleSharp = 2
 }
 
 /// <summary>
-/// Represents a musical note with a specific name, alteration, and octave.
+/// Note-naming convention accepted by <see cref="Note.Parse(string, NoteNotation)"/>.
 /// </summary>
-public class Note
+public enum NoteNotation
 {
-    /// <summary>
-    /// Gets the name of the note.
-    /// </summary>
+    /// <summary>English letters with accidentals: <c>Bb4</c>, <c>F#</c>, <c>B♭</c>.</summary>
+    English,
+    /// <summary>German names: <c>H</c> is B, <c>B</c> is B♭, suffixes <c>-is</c> and <c>-es</c> (<c>Fis</c>, <c>Es</c>, <c>As</c>, <c>Heses</c>).</summary>
+    German
+}
+
+/// <summary>
+/// A spelled pitch: a letter, an accidental and an octave in scientific pitch notation (middle C is C4).
+/// Two notes are equal when all three match, so <c>C#4</c> and <c>Db4</c> are different notes that are
+/// enharmonic (<see cref="IsEnharmonicWith"/>).
+/// </summary>
+public sealed record Note
+{
+    /// <summary>The lowest octave a note may have (C-1 is MIDI 0).</summary>
+    public const int MinOctave = -1;
+
+    /// <summary>The highest octave a note may have (G9 is MIDI 127).</summary>
+    public const int MaxOctave = 9;
+
+    /// <summary>Concert pitch: A4 = 440 Hz.</summary>
+    public const double StandardA4 = 440.0;
+
+    /// <summary>The letter.</summary>
     public NoteName Name { get; }
 
-    /// <summary>
-    /// Gets the alteration applied to the note.
-    /// </summary>
+    /// <summary>The accidental.</summary>
     public Alteration Alteration { get; }
 
-    /// <summary>
-    /// Gets the octave of the note. Middle C is in octave 4.
-    /// </summary>
+    /// <summary>The octave, from <see cref="MinOctave"/> to <see cref="MaxOctave"/>. Middle C is in octave 4.</summary>
     public int Octave { get; }
 
     /// <summary>
-    /// Gets the frequency of the note in Hz, calculated using equal temperament tuning with A4 = 440 Hz.
+    /// Creates a note.
     /// </summary>
-    public double Frequency => CalculateFrequency();
-
-    /// <summary>
-    /// Gets the MIDI note number (0-127).
-    /// </summary>
-    /// <exception cref="InvalidOperationException">Thrown when the note is outside the valid MIDI range.</exception>
-    public int MidiNumber
+    /// <param name="name">The letter.</param>
+    /// <param name="alteration">The accidental, natural by default.</param>
+    /// <param name="octave">The octave, 4 by default.</param>
+    /// <exception cref="ArgumentOutOfRangeException">An undefined letter or accidental, or an octave outside
+    /// <see cref="MinOctave"/>..<see cref="MaxOctave"/>.</exception>
+    public Note(NoteName name, Alteration alteration = Alteration.Natural, int octave = 4)
     {
-        get
-        {
-            // MIDI note 60 is Middle C (C4)
-            // Calculate semitones from C-1 (MIDI 0)
-            int midiNumber = (Octave + 1) * MusicTheoryConstants.SemitonesPerOctave + 
-                           MusicTheoryConstants.SemitonesFromC[(int)Name] + 
-                           (int)Alteration;
-            
-            if (midiNumber < 0 || midiNumber > 127)
-            {
-                throw new InvalidOperationException($"Note {this} is outside the valid MIDI range (0-127).");
-            }
-            
-            return midiNumber;
-        }
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Note"/> class with natural alteration and octave 4.
-    /// </summary>
-    /// <param name="name">The name of the note.</param>
-    public Note(NoteName name) : this(name, Alteration.Natural, 4)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Note"/> class with a specific alteration and octave 4.
-    /// </summary>
-    /// <param name="name">The name of the note.</param>
-    /// <param name="alteration">The alteration to apply to the note.</param>
-    public Note(NoteName name, Alteration alteration) : this(name, alteration, 4)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Note"/> class with a specific alteration and octave.
-    /// </summary>
-    /// <param name="name">The name of the note.</param>
-    /// <param name="alteration">The alteration to apply to the note.</param>
-    /// <param name="octave">The octave of the note.</param>
-    public Note(NoteName name, Alteration alteration, int octave)
-    {
+        if (!Enum.IsDefined(name))
+            throw new ArgumentOutOfRangeException(nameof(name), name, "Undefined note name.");
+        if (!Enum.IsDefined(alteration))
+            throw new ArgumentOutOfRangeException(nameof(alteration), alteration, "Undefined alteration.");
+        if (octave is < MinOctave or > MaxOctave)
+            throw new ArgumentOutOfRangeException(nameof(octave), octave, $"Octave must be between {MinOctave} and {MaxOctave}.");
         Name = name;
         Alteration = alteration;
         Octave = octave;
     }
 
+    /// <summary>The pitch class, 0 (C) to 11 (B), octave ignored: <c>B#</c> is 0, <c>Cb</c> is 11.</summary>
+    public int PitchClass => MusicTheoryUtilities.Mod12(MusicTheoryConstants.SemitonesFromC[(int)Name] + (int)Alteration);
+
+    /// <summary>Semitones above C0 (negative below it, e.g. Cb0).</summary>
+    internal int Semitones => MusicTheoryUtilities.GetTotalSemitones(this);
+
+    /// <summary>Diatonic steps above C0: the note's line or space on the staff.</summary>
+    internal int Step => Octave * 7 + (int)Name;
+
+    /// <summary>The frequency in Hz in twelve-tone equal temperament at concert pitch (A4 = 440 Hz).</summary>
+    public double Frequency => GetFrequency();
+
     /// <summary>
-    /// Calculates the frequency of the note using equal temperament tuning with A4 = 440 Hz.
+    /// The frequency in Hz in twelve-tone equal temperament, tuned to <paramref name="a4"/>: 442 for many
+    /// orchestras, 415 for baroque pitch.
     /// </summary>
-    /// <returns>The frequency in Hz.</returns>
-    private double CalculateFrequency()
+    /// <param name="a4">The frequency of A4 in Hz.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="a4"/> is not a positive, finite number.</exception>
+    public double GetFrequency(double a4 = StandardA4)
     {
-        // A4 is the reference note at 440 Hz
-        // Calculate semitones from A4
-        int semitonesFromA4 = GetSemitonesFromA4();
-        
-        // Apply equal temperament formula: f = 440 * 2^(n/12)
-        // where n is the number of semitones from A4
-        return MusicTheoryConstants.A4Frequency * Math.Pow(2.0, semitonesFromA4 / 12.0);
+        if (!double.IsFinite(a4) || a4 <= 0)
+            throw new ArgumentOutOfRangeException(nameof(a4), a4, "A4 must be a positive, finite frequency.");
+        const int a4Semitones = 4 * 12 + 9;
+        return a4 * Math.Pow(2.0, (Semitones - a4Semitones) / 12.0);
+    }
+
+    /// <summary>The MIDI note number: C4 (middle C) is 60.</summary>
+    /// <exception cref="InvalidOperationException">The note is outside MIDI's 0..127.</exception>
+    public int MidiNumber
+    {
+        get
+        {
+            int midi = Semitones + 12;
+            if (midi is < 0 or > 127)
+                throw new InvalidOperationException($"{this} is outside the MIDI range 0..127.");
+            return midi;
+        }
     }
 
     /// <summary>
-    /// Gets the number of semitones from A4 to this note.
+    /// Transposes by a spelled interval, honouring its direction: C4 up an augmented 4th is F#4, E4 down a
+    /// major 3rd is C4. The letter moves by the interval number, so the spelling is exact.
     /// </summary>
-    /// <returns>The number of semitones (positive for higher notes, negative for lower).</returns>
-    private int GetSemitonesFromA4()
+    /// <exception cref="ArgumentNullException"><paramref name="interval"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">The result needs more than two accidentals (B## up a major 2nd).</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The result is outside the octave range.</exception>
+    public Note Transpose(Interval interval)
     {
-        // Calculate semitones from C0 to this note
-        int semitonesFromC0 = MusicTheoryUtilities.GetTotalSemitones(this);
-        
-        // A4 is 57 semitones from C0 (4 * 12 + 9 = 57)
-        const int a4SemitonesFromC0 = 57;
-        
-        return semitonesFromC0 - a4SemitonesFromC0;
+        ArgumentNullException.ThrowIfNull(interval);
+        int sign = interval.Direction == Direction.Down ? -1 : 1;
+        return FromStep(Step + sign * (interval.Number - 1), Semitones + sign * interval.Semitones,
+            () => $"{this} transposed by {interval}");
     }
 
     /// <summary>
-    /// Transposes the note by the specified interval.
+    /// Transposes by semitones, spelling black keys with sharps (C#, D#, F#, G#, A#). Use
+    /// <see cref="TransposeBySemitones(int, KeySignature)"/> to spell in a key.
     /// </summary>
-    /// <param name="interval">The interval to transpose by.</param>
-    /// <param name="direction">The direction to transpose (default is Up).</param>
-    /// <returns>A new note transposed by the interval.</returns>
-    public Note Transpose(Interval interval, Direction direction = Direction.Up)
-    {
-        int semitones = interval.Semitones;
-        if (direction == Direction.Down)
-            semitones = -semitones;
-
-        // Calculate the new note name based on the interval number
-        int noteOffset = interval.Number - 1;
-        if (direction == Direction.Down)
-            noteOffset = -noteOffset;
-
-        int newNoteIndex = ((int)Name + noteOffset) % 7;
-        if (newNoteIndex < 0)
-            newNoteIndex += 7;
-
-        var targetNoteName = (NoteName)newNoteIndex;
-
-        // Calculate the actual semitones from C0
-        int currentSemitones = GetTotalSemitones();
-        int targetSemitones = currentSemitones + semitones;
-
-        // Calculate octave
-        int baseOctave = Octave;
-        if (direction == Direction.Up && targetNoteName < Name)
-            baseOctave++;
-        else if (direction == Direction.Down && targetNoteName > Name)
-            baseOctave--;
-
-        // Adjust octave based on total semitone change
-        int octaveAdjustment = 0;
-        if (direction == Direction.Up)
-        {
-            octaveAdjustment = noteOffset / 7;
-        }
-        else
-        {
-            octaveAdjustment = -((-noteOffset + 6) / 7);
-        }
-
-        int targetOctave = baseOctave + octaveAdjustment;
-
-        // Calculate the required alteration
-        int expectedSemitones = targetOctave * MusicTheoryConstants.SemitonesPerOctave + 
-                              MusicTheoryConstants.SemitonesFromC[(int)targetNoteName];
-        int alterationValue = targetSemitones - expectedSemitones;
-
-        // Clamp alteration to valid range
-        if (alterationValue < -2)
-        {
-            alterationValue += MusicTheoryConstants.SemitonesPerOctave;
-            targetOctave--;
-        }
-        else if (alterationValue > 2)
-        {
-            alterationValue -= MusicTheoryConstants.SemitonesPerOctave;
-            targetOctave++;
-        }
-
-        return new Note(targetNoteName, (Alteration)alterationValue, targetOctave);
-    }
-
-    /// <summary>
-    /// Transposes the note by a specific number of semitones.
-    /// </summary>
-    /// <param name="semitones">The number of semitones to transpose (positive for up, negative for down).</param>
-    /// <returns>A new note transposed by the specified semitones.</returns>
     public Note TransposeBySemitones(int semitones)
     {
-        // Calculate target semitones from C0
-        int currentSemitones = GetTotalSemitones();
-        int targetSemitones = currentSemitones + semitones;
-
-        // Calculate octave and note
-        int targetOctave = targetSemitones / MusicTheoryConstants.SemitonesPerOctave;
-        int semitonesInOctave = targetSemitones % MusicTheoryConstants.SemitonesPerOctave;
-
-        // Handle negative modulo
-        if (semitonesInOctave < 0)
+        int target = Semitones + semitones;
+        int pc = MusicTheoryUtilities.Mod12(target);
+        int letter = Array.IndexOf(MusicTheoryConstants.SemitonesFromC, pc);
+        var alteration = Alteration.Natural;
+        if (letter < 0)
         {
-            semitonesInOctave += MusicTheoryConstants.SemitonesPerOctave;
-            targetOctave--;
+            letter = Array.IndexOf(MusicTheoryConstants.SemitonesFromC, pc - 1);
+            alteration = Alteration.Sharp;
         }
-
-        // Find the closest natural note
-        int bestNote = 0;
-        int bestDifference = int.MaxValue;
-
-        for (int i = 0; i < 7; i++)
-        {
-            int difference = Math.Abs(semitonesInOctave - MusicTheoryConstants.SemitonesFromC[i]);
-            if (difference < bestDifference)
-            {
-                bestDifference = difference;
-                bestNote = i;
-            }
-        }
-
-        // Calculate alteration
-        int alterationValue = semitonesInOctave - MusicTheoryConstants.SemitonesFromC[bestNote];
-
-        return new Note((NoteName)bestNote, (Alteration)alterationValue, targetOctave);
+        return new Note((NoteName)letter, alteration, MusicTheoryUtilities.FloorDiv(target - pc, 12));
     }
 
     /// <summary>
-    /// Transposes the note by a number of semitones and spells the result in <paramref name="targetKey"/>
+    /// Transposes by semitones and spells the result in <paramref name="targetKey"/>
     /// (see <see cref="KeySignature.Spell"/>): A +1 in Eb major is Bb, in E major A#.
     /// </summary>
-    /// <param name="semitones">The number of semitones (positive for up, negative for down).</param>
-    /// <param name="targetKey">The key whose spelling the result follows.</param>
-    /// <returns>A new note, in the octave the transposition reaches.</returns>
     public Note TransposeBySemitones(int semitones, KeySignature targetKey)
     {
-        int target = GetTotalSemitones() + semitones;
+        ArgumentNullException.ThrowIfNull(targetKey);
+        int target = Semitones + semitones;
         var spelled = targetKey.Spell(target);
         int offset = MusicTheoryConstants.SemitonesFromC[(int)spelled.Name] + (int)spelled.Alteration;
-        return new Note(spelled.Name, spelled.Alteration, (int)Math.Floor((target - offset) / 12.0));
+        return new Note(spelled.Name, spelled.Alteration, MusicTheoryUtilities.FloorDiv(target - offset, 12));
     }
 
     /// <summary>
-    /// Gets the total semitones from C0 for this note.
+    /// The same pitch written with <paramref name="letter"/>, or null when that takes more than two
+    /// accidentals: C4 respelled with B is B#3, with D is Dbb4, with E is null.
     /// </summary>
-    private int GetTotalSemitones()
+    public Note? Respell(NoteName letter)
     {
-        return MusicTheoryUtilities.GetTotalSemitones(this);
+        if (!Enum.IsDefined(letter))
+            throw new ArgumentOutOfRangeException(nameof(letter), letter, "Undefined note name.");
+        int alteration = MusicTheoryUtilities.Mod12(Semitones - MusicTheoryConstants.SemitonesFromC[(int)letter] + 6) - 6;
+        if (Math.Abs(alteration) > 2)
+            return null;
+        int octave = MusicTheoryUtilities.FloorDiv(Semitones - MusicTheoryConstants.SemitonesFromC[(int)letter] - alteration, 12);
+        return octave is < MinOctave or > MaxOctave ? null : new Note(letter, (Alteration)alteration, octave);
     }
 
     /// <summary>
-    /// Gets the semitones from C in the current octave.
+    /// The note for a MIDI number. Black keys are C#, Eb, F#, Ab, Bb by default, or Db, Eb, Gb, Ab, Bb with
+    /// <paramref name="preferFlats"/>.
     /// </summary>
-    private int GetSemitonesFromC()
-    {
-        return GetTotalSemitones();
-    }
-
-    /// <summary>
-    /// Creates a note from a MIDI note number.
-    /// </summary>
-    /// <param name="midiNumber">The MIDI note number (0-127).</param>
-    /// <param name="preferFlats">Whether to prefer flats over sharps for accidentals.</param>
-    /// <returns>A new Note instance.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when the MIDI number is outside the valid range.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="midiNumber"/> is outside 0..127.</exception>
     public static Note FromMidiNumber(int midiNumber, bool preferFlats = false)
     {
-        if (midiNumber < 0 || midiNumber > 127)
-        {
-            throw new ArgumentOutOfRangeException(nameof(midiNumber), 
-                "MIDI note number must be between 0 and 127.");
-        }
+        if (midiNumber is < 0 or > 127)
+            throw new ArgumentOutOfRangeException(nameof(midiNumber), midiNumber, "MIDI note number must be between 0 and 127.");
 
-        // Calculate octave (C-1 = 0, C0 = 12, C1 = 24, etc.)
-        int octave = (midiNumber / MusicTheoryConstants.SemitonesPerOctave) - 1;
-        int noteInOctave = midiNumber % MusicTheoryConstants.SemitonesPerOctave;
-
-        // Map semitones to note names and alterations
-        if (preferFlats)
+        int octave = midiNumber / 12 - 1;
+        var (name, alteration) = (midiNumber % 12) switch
         {
-            // Prefer flats for black keys
-            return noteInOctave switch
-            {
-                0 => new Note(NoteName.C, Alteration.Natural, octave),
-                1 => new Note(NoteName.D, Alteration.Flat, octave),
-                2 => new Note(NoteName.D, Alteration.Natural, octave),
-                3 => new Note(NoteName.E, Alteration.Flat, octave),
-                4 => new Note(NoteName.E, Alteration.Natural, octave),
-                5 => new Note(NoteName.F, Alteration.Natural, octave),
-                6 => new Note(NoteName.G, Alteration.Flat, octave),
-                7 => new Note(NoteName.G, Alteration.Natural, octave),
-                8 => new Note(NoteName.A, Alteration.Flat, octave),
-                9 => new Note(NoteName.A, Alteration.Natural, octave),
-                10 => new Note(NoteName.B, Alteration.Flat, octave),
-                11 => new Note(NoteName.B, Alteration.Natural, octave),
-                _ => throw new InvalidOperationException($"Invalid note in octave: {noteInOctave}")
-            };
-        }
-        else
-        {
-            // Prefer sharps for black keys (default)
-            return noteInOctave switch
-            {
-                0 => new Note(NoteName.C, Alteration.Natural, octave),
-                1 => new Note(NoteName.C, Alteration.Sharp, octave),
-                2 => new Note(NoteName.D, Alteration.Natural, octave),
-                3 => new Note(NoteName.E, Alteration.Flat, octave),  // Eb is more common than D#
-                4 => new Note(NoteName.E, Alteration.Natural, octave),
-                5 => new Note(NoteName.F, Alteration.Natural, octave),
-                6 => new Note(NoteName.F, Alteration.Sharp, octave),
-                7 => new Note(NoteName.G, Alteration.Natural, octave),
-                8 => new Note(NoteName.A, Alteration.Flat, octave),  // Ab is more common than G#
-                9 => new Note(NoteName.A, Alteration.Natural, octave),
-                10 => new Note(NoteName.B, Alteration.Flat, octave), // Bb is more common than A#
-                11 => new Note(NoteName.B, Alteration.Natural, octave),
-                _ => throw new InvalidOperationException($"Invalid note in octave: {noteInOctave}")
-            };
-        }
-    }
-
-    /// <summary>
-    /// Returns a string representation of the note.
-    /// </summary>
-    /// <returns>A string in the format "NoteName[Alteration]Octave".</returns>
-    public override string ToString()
-    {
-        var alterationSymbol = Alteration switch
-        {
-            Alteration.DoubleFlat => "bb",
-            Alteration.Flat => "b",
-            Alteration.Natural => "",
-            Alteration.Sharp => "#",
-            Alteration.DoubleSharp => "##",
-            _ => ""
+            0 => (NoteName.C, Alteration.Natural),
+            1 => preferFlats ? (NoteName.D, Alteration.Flat) : (NoteName.C, Alteration.Sharp),
+            2 => (NoteName.D, Alteration.Natural),
+            3 => (NoteName.E, Alteration.Flat),
+            4 => (NoteName.E, Alteration.Natural),
+            5 => (NoteName.F, Alteration.Natural),
+            6 => preferFlats ? (NoteName.G, Alteration.Flat) : (NoteName.F, Alteration.Sharp),
+            7 => (NoteName.G, Alteration.Natural),
+            8 => (NoteName.A, Alteration.Flat),
+            9 => (NoteName.A, Alteration.Natural),
+            10 => (NoteName.B, Alteration.Flat),
+            _ => (NoteName.B, Alteration.Natural),
         };
-        
-        return $"{Name}{alterationSymbol}{Octave}";
+        return new Note(name, alteration, octave);
     }
 
-    /// <summary>
-    /// The note name without octave, e.g. <c>Bb</c> or (Unicode) <c>B♭</c>.
-    /// </summary>
-    /// <param name="style">ASCII or Unicode accidentals.</param>
+    /// <summary>The note as <c>C#4</c>, <c>Bb3</c>, <c>F##5</c>.</summary>
+    public override string ToString() => GetName() + Octave;
+
+    /// <summary>The note name without octave, e.g. <c>Bb</c> or (Unicode) <c>B♭</c>.</summary>
     public string GetName(AccidentalStyle style = AccidentalStyle.Ascii) => ChordSymbol.Spell(this, style);
 
     /// <summary>
-    /// Determines if this note is enharmonically equivalent to another note.
-    /// Two notes are enharmonic if they represent the same pitch with different names.
+    /// True when <paramref name="other"/> sounds the same pitch: C#4 and Db4, B#3 and C4. Notes an octave
+    /// apart are not enharmonic.
     /// </summary>
-    /// <param name="other">The other note to compare.</param>
-    /// <returns>True if the notes are enharmonic; otherwise, false.</returns>
-    public bool IsEnharmonicWith(Note? other)
-    {
-        if (other == null) return false;
-        
-        // Two notes are enharmonic if they have the same semitone value
-        // but different note names or alterations
-        var thisSemitones = GetSemitonesFromC();
-        var otherSemitones = other.GetSemitonesFromC();
-        
-        // Normalize to same octave for comparison
-        var thisNormalized = thisSemitones % MusicTheoryConstants.SemitonesPerOctave;
-        var otherNormalized = otherSemitones % MusicTheoryConstants.SemitonesPerOctave;
-        
-        return thisNormalized == otherNormalized;
-    }
+    public bool IsEnharmonicWith(Note? other) => other is not null && Semitones == other.Semitones;
 
     /// <summary>
-    /// Gets the most common enharmonic equivalent of this note.
+    /// The usual alternative spelling of this pitch: C# ↔ Db, E ↔ Fb, B# → C, C## → D, Cbb → Bb.
+    /// Null for D, G and A, which have no common alternative.
     /// </summary>
-    /// <returns>The enharmonic equivalent note, or null if no simple equivalent exists.</returns>
-    public Note? GetEnharmonicEquivalent()
+    public Note? GetEnharmonicEquivalent() => (Name, Alteration) switch
     {
-        // Common enharmonic equivalents
-        return (Name, Alteration) switch
-        {
-            // Sharp to flat conversions
-            (NoteName.C, Alteration.Sharp) => new Note(NoteName.D, Alteration.Flat, Octave),
-            (NoteName.D, Alteration.Sharp) => new Note(NoteName.E, Alteration.Flat, Octave),
-            (NoteName.F, Alteration.Sharp) => new Note(NoteName.G, Alteration.Flat, Octave),
-            (NoteName.G, Alteration.Sharp) => new Note(NoteName.A, Alteration.Flat, Octave),
-            (NoteName.A, Alteration.Sharp) => new Note(NoteName.B, Alteration.Flat, Octave),
-            
-            // Flat to sharp conversions
-            (NoteName.D, Alteration.Flat) => new Note(NoteName.C, Alteration.Sharp, Octave),
-            (NoteName.E, Alteration.Flat) => new Note(NoteName.D, Alteration.Sharp, Octave),
-            (NoteName.G, Alteration.Flat) => new Note(NoteName.F, Alteration.Sharp, Octave),
-            (NoteName.A, Alteration.Flat) => new Note(NoteName.G, Alteration.Sharp, Octave),
-            (NoteName.B, Alteration.Flat) => new Note(NoteName.A, Alteration.Sharp, Octave),
-            
-            // Natural to sharp/flat conversions
-            (NoteName.E, Alteration.Natural) => new Note(NoteName.F, Alteration.Flat, Octave),
-            (NoteName.F, Alteration.Natural) => new Note(NoteName.E, Alteration.Sharp, Octave),
-            (NoteName.B, Alteration.Natural) => new Note(NoteName.C, Alteration.Flat, Octave + 1),
-            (NoteName.C, Alteration.Natural) => new Note(NoteName.B, Alteration.Sharp, Octave - 1),
-            
-            // Sharp/flat to natural conversions
-            (NoteName.E, Alteration.Sharp) => new Note(NoteName.F, Alteration.Natural, Octave),
-            (NoteName.F, Alteration.Flat) => new Note(NoteName.E, Alteration.Natural, Octave),
-            (NoteName.B, Alteration.Sharp) => new Note(NoteName.C, Alteration.Natural, Octave + 1),
-            (NoteName.C, Alteration.Flat) => new Note(NoteName.B, Alteration.Natural, Octave - 1),
-            
-            // Double alterations to simpler equivalents
-            (NoteName.C, Alteration.DoubleSharp) => new Note(NoteName.D, Alteration.Natural, Octave),
-            (NoteName.D, Alteration.DoubleFlat) => new Note(NoteName.C, Alteration.Natural, Octave),
-            (NoteName.D, Alteration.DoubleSharp) => new Note(NoteName.E, Alteration.Natural, Octave),
-            (NoteName.E, Alteration.DoubleFlat) => new Note(NoteName.D, Alteration.Natural, Octave),
-            (NoteName.E, Alteration.DoubleSharp) => new Note(NoteName.F, Alteration.Sharp, Octave),
-            (NoteName.F, Alteration.DoubleFlat) => new Note(NoteName.E, Alteration.Flat, Octave),
-            (NoteName.F, Alteration.DoubleSharp) => new Note(NoteName.G, Alteration.Natural, Octave),
-            (NoteName.G, Alteration.DoubleFlat) => new Note(NoteName.F, Alteration.Natural, Octave),
-            (NoteName.G, Alteration.DoubleSharp) => new Note(NoteName.A, Alteration.Natural, Octave),
-            (NoteName.A, Alteration.DoubleFlat) => new Note(NoteName.G, Alteration.Natural, Octave),
-            (NoteName.A, Alteration.DoubleSharp) => new Note(NoteName.B, Alteration.Natural, Octave),
-            (NoteName.B, Alteration.DoubleFlat) => new Note(NoteName.A, Alteration.Natural, Octave),
-            (NoteName.B, Alteration.DoubleSharp) => new Note(NoteName.C, Alteration.Sharp, Octave + 1),
-            
-            // No simple equivalent for natural D, G, A
-            _ => null
-        };
-    }
+        (NoteName.D or NoteName.G or NoteName.A, Alteration.Natural) => null,
+        (_, Alteration.Sharp) when Name is not (NoteName.E or NoteName.B) => Respell(Next(Name)),
+        (_, Alteration.Flat) when Name is not (NoteName.F or NoteName.C) => Respell(Previous(Name)),
+        (NoteName.E or NoteName.B, Alteration.Natural) => Respell(Next(Name)),
+        (NoteName.F or NoteName.C, Alteration.Natural) => Respell(Previous(Name)),
+        (_, Alteration.Sharp or Alteration.DoubleSharp) => Respell(Next(Name)),
+        _ => Respell(Previous(Name)),
+    };
+
+    /// <summary>Every other spelling of this pitch with at most two accidentals: C4 gives B#3 and Dbb4.</summary>
+    public IEnumerable<Note> GetAllEnharmonicEquivalents() =>
+        Enum.GetValues<NoteName>().Where(l => l != Name).Select(Respell).OfType<Note>().ToList();
 
     /// <summary>
-    /// Gets all possible enharmonic equivalents of this note.
+    /// The plainest spelling: double accidentals and E#, Fb, B#, Cb become their natural or single-accidental
+    /// equivalent; every other note is returned as is.
     /// </summary>
-    /// <returns>A collection of all enharmonically equivalent notes.</returns>
-    public IEnumerable<Note> GetAllEnharmonicEquivalents()
-    {
-        var equivalents = new List<Note>();
-        var targetSemitones = GetSemitonesFromC() % MusicTheoryConstants.SemitonesPerOctave;
-        
-        // Check all possible note name and alteration combinations
-        foreach (NoteName noteName in Enum.GetValues<NoteName>())
-        {
-            foreach (Alteration alteration in Enum.GetValues<Alteration>())
-            {
-                // Skip the current note itself
-                if (noteName == Name && alteration == Alteration)
-                    continue;
-                
-                var candidate = new Note(noteName, alteration, Octave);
-                if (candidate.GetSemitonesFromC() % MusicTheoryConstants.SemitonesPerOctave == targetSemitones)
-                {
-                    equivalents.Add(candidate);
-                }
-            }
-        }
-        
-        return equivalents;
-    }
+    public Note SimplifyEnharmonic() =>
+        Alteration is Alteration.DoubleSharp or Alteration.DoubleFlat
+        || (Name, Alteration) is (NoteName.E or NoteName.B, Alteration.Sharp) or (NoteName.F or NoteName.C, Alteration.Flat)
+            ? GetEnharmonicEquivalent() ?? this
+            : this;
 
     /// <summary>
-    /// Returns a simplified version of this note, preferring natural notes and single alterations.
+    /// Parses a note in English notation: a letter in any case, up to two accidentals in ASCII (<c>#</c>,
+    /// <c>b</c>) or Unicode (♯ ♭ 𝄪 𝄫), and an optional octave (default 4), e.g. <c>C#4</c>, <c>Bb3</c>, <c>F##</c>, <c>B♭</c>.
     /// </summary>
-    /// <returns>A simplified enharmonic equivalent.</returns>
-    public Note SimplifyEnharmonic()
-    {
-        // Only simplify specific cases where there's a simpler equivalent
-        // E#/Fb and B#/Cb should be simplified to their natural equivalents
-        // Double alterations should also be simplified
-        
-        var equivalent = GetEnharmonicEquivalent();
-        
-        // Check if the equivalent is simpler (natural or single alteration vs double)
-        if (equivalent != null)
-        {
-            // Always simplify double alterations
-            if (Alteration == Alteration.DoubleSharp || Alteration == Alteration.DoubleFlat)
-                return equivalent;
-            
-            // Simplify E#/Fb and B#/Cb to their natural equivalents
-            if ((Name == NoteName.E && Alteration == Alteration.Sharp) ||
-                (Name == NoteName.F && Alteration == Alteration.Flat) ||
-                (Name == NoteName.B && Alteration == Alteration.Sharp) ||
-                (Name == NoteName.C && Alteration == Alteration.Flat))
-            {
-                return equivalent;
-            }
-        }
-        
-        // Otherwise, keep the note as-is (including C#, Db, etc.)
-        return this;
-    }
+    /// <exception cref="FormatException">The text is not a note.</exception>
+    public static Note Parse(string noteString) => Parse(noteString, NoteNotation.English);
 
-    /// <summary>
-    /// Parses a string representation of a note.
-    /// </summary>
-    /// <param name="noteString">The string to parse (e.g., "C#4", "Bb3", "F##5", "B♭", "bb"). The letter may be
-    /// lower-case, accidentals may be ASCII (<c>#</c>, <c>b</c>, <c>##</c>, <c>bb</c>) or Unicode (♯ ♭ 𝄪 𝄫),
-    /// and the octave is optional (default 4).</param>
-    /// <returns>A new Note instance.</returns>
-    /// <exception cref="ArgumentException">Thrown when the string cannot be parsed.</exception>
-    public static Note Parse(string noteString)
-    {
-        if (string.IsNullOrWhiteSpace(noteString))
-            throw new ArgumentException("Note string cannot be empty.", nameof(noteString));
+    /// <summary>Parses a note in the given notation; see <see cref="NoteNotation"/>.</summary>
+    /// <exception cref="FormatException">The text is not a note in that notation.</exception>
+    public static Note Parse(string noteString, NoteNotation notation) =>
+        TryParse(noteString, notation, out var note)
+            ? note
+            : throw new FormatException($"Not a note in {notation} notation: '{noteString}'.");
 
-        if (!TryParsePitchClass(noteString, out var pitch, out var consumed))
-            throw new ArgumentException($"Invalid note name: {noteString[0]}", nameof(noteString));
+    /// <summary>Tries to parse a note in English notation; see <see cref="Parse(string)"/>.</summary>
+    public static bool TryParse(string? text, [NotNullWhen(true)] out Note? note) => TryParse(text, NoteNotation.English, out note);
 
-        if (consumed == noteString.Length)
-            return pitch;
-
-        var rest = noteString[consumed..];
-        if (!int.TryParse(rest, out var octave))
-            throw new ArgumentException($"Invalid octave: {rest}", nameof(noteString));
-
-        return new Note(pitch.Name, pitch.Alteration, octave);
-    }
-
-    /// <summary>
-    /// Tries to parse a note; see <see cref="Parse"/> for the accepted syntax.
-    /// </summary>
-    /// <param name="text">The string to parse.</param>
-    /// <param name="note">The parsed note, or null.</param>
-    /// <returns>True when <paramref name="text"/> is a valid note.</returns>
-    public static bool TryParse(string? text, [NotNullWhen(true)] out Note? note)
+    /// <summary>Tries to parse a note in the given notation; never throws.</summary>
+    public static bool TryParse(string? text, NoteNotation notation, [NotNullWhen(true)] out Note? note)
     {
         note = null;
-        if (string.IsNullOrWhiteSpace(text) || !TryParsePitchClass(text, out var pitch, out var consumed))
+        var s = text.AsSpan().Trim();
+        bool read = notation == NoteNotation.German
+            ? TryParseGermanPitchClass(s, out var pitch, out var consumed)
+            : TryParsePitchClass(s, out pitch, out consumed);
+        if (!read)
             return false;
-        if (consumed == text.Length)
+        if (consumed == s.Length)
         {
             note = pitch;
             return true;
         }
-        if (!int.TryParse(text.AsSpan(consumed), out var octave))
+        if (!int.TryParse(s[consumed..], System.Globalization.NumberStyles.AllowLeadingSign,
+                System.Globalization.CultureInfo.InvariantCulture, out var octave) || octave is < MinOctave or > MaxOctave)
             return false;
         note = new Note(pitch.Name, pitch.Alteration, octave);
         return true;
     }
 
     /// <summary>
-    /// Reads a note letter (any case) and up to two accidentals at the start of <paramref name="s"/>.
+    /// Reads an English note letter (any case) and up to two accidentals at the start of <paramref name="s"/>.
     /// </summary>
     /// <param name="s">The text to read from; anything after the note is ignored.</param>
     /// <param name="note">The note read, in octave 4.</param>
     /// <param name="consumed">How many characters the note used.</param>
     /// <returns>True when <paramref name="s"/> starts with a note letter.</returns>
-    public static bool TryParsePitchClass(ReadOnlySpan<char> s, out Note note, out int consumed)
+    public static bool TryParsePitchClass(ReadOnlySpan<char> s, [NotNullWhen(true)] out Note? note, out int consumed)
     {
-        note = null!;
+        note = null;
         consumed = 0;
         if (s.IsEmpty)
             return false;
@@ -580,8 +324,8 @@ public class Note
         if (letter < 0)
             return false;
 
-        int i = 1, alteration = 0, count = 0;
-        while (i < s.Length && count < 2)
+        int i = 1, alteration = 0;
+        while (i < s.Length)
         {
             int step, width = 1;
             if (s[i] is '#' or '♯') step = 1;
@@ -590,15 +334,75 @@ public class Note
             else if (s[i..].StartsWith("𝄫")) { step = -2; width = 2; }
             else break;
 
-            if (alteration != 0 && Math.Sign(step) != Math.Sign(alteration) || Math.Abs(alteration + step) > 2)
+            if ((alteration != 0 && Math.Sign(step) != Math.Sign(alteration)) || Math.Abs(alteration + step) > 2)
                 break;
             alteration += step;
             i += width;
-            count++;
         }
 
         note = new Note((NoteName)letter, (Alteration)alteration);
         consumed = i;
         return true;
     }
+
+    // German names, longest first so "eses" wins over "es" and "heses" over "h".
+    private static readonly (string Name, NoteName Letter, Alteration Alteration)[] German = BuildGerman();
+
+    private static (string, NoteName, Alteration)[] BuildGerman()
+    {
+        var names = new List<(string, NoteName, Alteration)>
+        {
+            ("heses", NoteName.B, Alteration.DoubleFlat), ("hes", NoteName.B, Alteration.Flat),
+            ("asas", NoteName.A, Alteration.DoubleFlat), ("eses", NoteName.E, Alteration.DoubleFlat),
+            ("as", NoteName.A, Alteration.Flat), ("es", NoteName.E, Alteration.Flat),
+            ("h", NoteName.B, Alteration.Natural), ("b", NoteName.B, Alteration.Flat),
+        };
+        foreach (var (letter, name) in new[] { ('c', NoteName.C), ('d', NoteName.D), ('e', NoteName.E), ('f', NoteName.F), ('g', NoteName.G), ('a', NoteName.A), ('h', NoteName.B) })
+        {
+            names.Add(($"{letter}isis", name, Alteration.DoubleSharp));
+            names.Add(($"{letter}is", name, Alteration.Sharp));
+            if (letter is not ('e' or 'a' or 'h'))
+            {
+                names.Add(($"{letter}eses", name, Alteration.DoubleFlat));
+                names.Add(($"{letter}es", name, Alteration.Flat));
+            }
+            if (letter != 'h')
+                names.Add(($"{letter}", name, Alteration.Natural));
+        }
+        return names.OrderByDescending(n => n.Item1.Length).ToArray();
+    }
+
+    private static bool TryParseGermanPitchClass(ReadOnlySpan<char> s, [NotNullWhen(true)] out Note? note, out int consumed)
+    {
+        foreach (var (name, letter, alteration) in German)
+        {
+            if (s.StartsWith(name, StringComparison.OrdinalIgnoreCase))
+            {
+                note = new Note(letter, alteration);
+                consumed = name.Length;
+                return true;
+            }
+        }
+        note = null;
+        consumed = 0;
+        return false;
+    }
+
+    /// <summary>
+    /// The note on diatonic <paramref name="step"/> (see <see cref="Step"/>) sounding <paramref name="semitones"/>
+    /// above C0, or an exception naming <paramref name="what"/> when that needs more than two accidentals.
+    /// </summary>
+    internal static Note FromStep(int step, int semitones, Func<string> what)
+    {
+        int letter = MusicTheoryUtilities.Mod7(step);
+        int octave = MusicTheoryUtilities.FloorDiv(step, 7);
+        int alteration = semitones - (octave * 12 + MusicTheoryConstants.SemitonesFromC[letter]);
+        if (Math.Abs(alteration) > 2)
+            throw new InvalidOperationException($"{what()} needs {Math.Abs(alteration)} {(alteration > 0 ? "sharps" : "flats")} on {(NoteName)letter}; at most two are supported.");
+        return new Note((NoteName)letter, (Alteration)alteration, octave);
+    }
+
+    private static NoteName Next(NoteName n) => (NoteName)(((int)n + 1) % 7);
+
+    private static NoteName Previous(NoteName n) => (NoteName)(((int)n + 6) % 7);
 }

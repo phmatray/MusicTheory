@@ -1,0 +1,71 @@
+tonic,mode,sharps,altered
+Cbb,major,-14,Ab Abb Bb Bbb Cb Cbb Db Dbb Eb Ebb Fb Fbb Gb Gbb
+Cbb,minor,-17,!
+Cb,major,-7,Ab Bb Cb Db Eb Fb Gb
+Cb,minor,-10,Ab Abb Bb Bbb Cb Db Eb Ebb Fb Gb
+C,major,0,
+C,minor,-3,Ab Bb Eb
+C#,major,7,A# B# C# D# E# F# G#
+C#,minor,4,C# D# F# G#
+C##,major,14,A# A## B# B## C# C## D# D## E# E## F# F## G# G##
+C##,minor,11,A# B# C# C## D# D## E# F# F## G# G##
+Dbb,major,-12,Ab Abb Bb Bbb Cb Db Dbb Eb Ebb Fb Gb Gbb
+Dbb,minor,-15,!
+Db,major,-5,Ab Bb Db Eb Gb
+Db,minor,-8,Ab Bb Bbb Cb Db Eb Fb Gb
+D,major,2,C# F#
+D,minor,-1,Bb
+D#,major,9,A# B# C# C## D# E# F# F## G#
+D#,minor,6,A# C# D# E# F# G#
+D##,major,16,!
+D##,minor,13,A# A## B# C# C## D# D## E# E## F# F## G# G##
+Ebb,major,-10,Ab Abb Bb Bbb Cb Db Eb Ebb Fb Gb
+Ebb,minor,-13,Ab Abb Bb Bbb Cb Cbb Db Dbb Eb Ebb Fb Gb Gbb
+Eb,major,-3,Ab Bb Eb
+Eb,minor,-6,Ab Bb Cb Db Eb Gb
+E,major,4,C# D# F# G#
+E,minor,1,F#
+E#,major,11,A# B# C# C## D# D## E# F# F## G# G##
+E#,minor,8,A# B# C# D# E# F# F## G#
+E##,major,18,!
+E##,minor,15,!
+Fbb,major,-15,!
+Fbb,minor,-18,!
+Fb,major,-8,Ab Bb Bbb Cb Db Eb Fb Gb
+Fb,minor,-11,Ab Abb Bb Bbb Cb Db Dbb Eb Ebb Fb Gb
+F,major,-1,Bb
+F,minor,-4,Ab Bb Db Eb
+F#,major,6,A# C# D# E# F# G#
+F#,minor,3,C# F# G#
+F##,major,13,A# A## B# C# C## D# D## E# E## F# F## G# G##
+F##,minor,10,A# B# C# C## D# E# F# F## G# G##
+Gbb,major,-13,Ab Abb Bb Bbb Cb Cbb Db Dbb Eb Ebb Fb Gb Gbb
+Gbb,minor,-16,!
+Gb,major,-6,Ab Bb Cb Db Eb Gb
+Gb,minor,-9,Ab Bb Bbb Cb Db Eb Ebb Fb Gb
+G,major,1,F#
+G,minor,-2,Bb Eb
+G#,major,8,A# B# C# D# E# F# F## G#
+G#,minor,5,A# C# D# F# G#
+G##,major,15,!
+G##,minor,12,A# A## B# C# C## D# D## E# F# F## G# G##
+Abb,major,-11,Ab Abb Bb Bbb Cb Db Dbb Eb Ebb Fb Gb
+Abb,minor,-14,Ab Abb Bb Bbb Cb Cbb Db Dbb Eb Ebb Fb Fbb Gb Gbb
+Ab,major,-4,Ab Bb Db Eb
+Ab,minor,-7,Ab Bb Cb Db Eb Fb Gb
+A,major,3,C# F# G#
+A,minor,0,
+A#,major,10,A# B# C# C## D# E# F# F## G# G##
+A#,minor,7,A# B# C# D# E# F# G#
+A##,major,17,!
+A##,minor,14,A# A## B# B## C# C## D# D## E# E## F# F## G# G##
+Bbb,major,-9,Ab Bb Bbb Cb Db Eb Ebb Fb Gb
+Bbb,minor,-12,Ab Abb Bb Bbb Cb Db Dbb Eb Ebb Fb Gb Gbb
+Bb,major,-2,Bb Eb
+Bb,minor,-5,Ab Bb Db Eb Gb
+B,major,5,A# C# D# F# G#
+B,minor,2,C# F#
+B#,major,12,A# A## B# C# C## D# D## E# F# F## G# G##
+B#,minor,9,A# B# C# C## D# E# F# F## G#
+B##,major,19,!
+B##,minor,16,!

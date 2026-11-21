@@ -68,8 +68,8 @@ public sealed record RomanNumeral(
         ChordType.Augmented7 => "+7",
         ChordType.AugmentedMajor7 => "+maj7",
         ChordType.MinorMajor7 => "maj7",
-        _ when Diatonic.TriadOf(Type) == Triad.Minor => ChordSymbol.AsciiSuffix(Type)[1..],
-        _ => ChordSymbol.AsciiSuffix(Type),
+        _ when Diatonic.TriadOf(Type) == Triad.Minor => ChordTypes.Suffix(Type)[1..],
+        _ => ChordTypes.Suffix(Type),
     };
 
     private string SuffixWithInversion()

@@ -60,7 +60,7 @@ public class GuitarVoicingProviderTests
         foreach (var v in list)
         {
             var lowest = v.Sound(Tuning.Standard).First(n => n is not null)!;
-            MusicTheoryUtilities.GetPitchClass(lowest).ShouldBe(6);
+            lowest.PitchClass.ShouldBe(6);
         }
     }
 
@@ -77,7 +77,7 @@ public class GuitarVoicingProviderTests
     {
         var g = Voicings("G", new VoicingOptions(Capo: 2))[0];
         g.ToTab().ShouldBe("320003");
-        g.Sound(Tuning.Standard, capo: 2).OfType<Note>().Select(MusicTheoryUtilities.GetPitchClass).ToHashSet()
+        g.Sound(Tuning.Standard, capo: 2).OfType<Note>().Select(n => n.PitchClass).ToHashSet()
             .ShouldBe(new HashSet<int> { 9, 1, 4 }, ignoreOrder: true); // A C# E
     }
 
@@ -137,13 +137,13 @@ public class GuitarVoicingProviderTests
                     v.Fingers[a]!.Value.ShouldBeLessThan(v.Fingers[b]!.Value, tab);
 
         // Sound: chord tones only, lowest is root (or bass), 3rd / sus tone present.
-        var chordPcs = new Chord(chord.Root, chord.Type).GetNotes().Select(MusicTheoryUtilities.GetPitchClass).ToHashSet();
-        var sound = v.Sound(Tuning.Standard).OfType<Note>().Select(MusicTheoryUtilities.GetPitchClass).ToList();
+        var chordPcs = new Chord(chord.Root, chord.Type).GetNotes().Select(n => n.PitchClass).ToHashSet();
+        var sound = v.Sound(Tuning.Standard).OfType<Note>().Select(n => n.PitchClass).ToList();
         sound.ShouldAllBe(pc => chordPcs.Contains(pc), tab);
-        sound[0].ShouldBe(MusicTheoryUtilities.GetPitchClass(chord.Root), tab);
+        sound[0].ShouldBe(chord.Root.PitchClass, tab);
         var notes = new Chord(chord.Root, chord.Type).GetNotes().ToList();
         if (chord.Type != ChordType.Power5)
-            sound.ShouldContain(MusicTheoryUtilities.GetPitchClass(notes[1]), tab);
+            sound.ShouldContain(notes[1].PitchClass, tab);
     }
 }
 

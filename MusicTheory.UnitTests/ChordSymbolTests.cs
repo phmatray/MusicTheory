@@ -1,7 +1,7 @@
 namespace MusicTheory.UnitTests;
 
 /// <summary>
-/// Tests for <see cref="Chord.GetSymbol()"/>.
+/// Tests for <see cref="Chord.GetSymbol"/>: ASCII by default, Unicode jazz glyphs on request.
 /// Verifies that all chord types produce their standard symbol strings
 /// (e.g. "Cmaj7", "Dm7", "G7", "F#°7", "Bbm(maj7)", etc.).
 /// </summary>
@@ -35,14 +35,14 @@ public class ChordSymbolTests
     public void DiminishedTriad_Symbol_HasDegreeSign()
     {
         var chord = new Chord(new Note(NoteName.B), ChordType.Diminished);
-        chord.GetSymbol().ShouldBe("B°");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("B°");
     }
 
     [Fact]
     public void AugmentedTriad_Symbol_HasPlusSign()
     {
         var chord = new Chord(new Note(NoteName.C), ChordType.Augmented);
-        chord.GetSymbol().ShouldBe("C+");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("C+");
     }
 
     // ── Seventh Chords ───────────────────────────────────────────────────────
@@ -51,49 +51,49 @@ public class ChordSymbolTests
     public void Major7_Symbol_IsMaj7()
     {
         var chord = new Chord(new Note(NoteName.C), ChordType.Major7);
-        chord.GetSymbol().ShouldBe("Cmaj7");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("Cmaj7");
     }
 
     [Fact]
     public void Minor7_Symbol_IsM7()
     {
         var chord = new Chord(new Note(NoteName.D), ChordType.Minor7);
-        chord.GetSymbol().ShouldBe("Dm7");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("Dm7");
     }
 
     [Fact]
     public void Dominant7_Symbol_IsJust7()
     {
         var chord = new Chord(new Note(NoteName.G), ChordType.Dominant7);
-        chord.GetSymbol().ShouldBe("G7");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("G7");
     }
 
     [Fact]
     public void MinorMajor7_Symbol_IsMMaj7()
     {
         var chord = new Chord(new Note(NoteName.A), ChordType.MinorMajor7);
-        chord.GetSymbol().ShouldBe("Am(maj7)");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("AmMaj7");
     }
 
     [Fact]
     public void HalfDiminished7_Symbol_IsPhiSymbol()
     {
         var chord = new Chord(new Note(NoteName.B), ChordType.HalfDiminished7);
-        chord.GetSymbol().ShouldBe("Bø7");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("Bø7");
     }
 
     [Fact]
     public void Diminished7_Symbol_IsDegreeSymbol7()
     {
         var chord = new Chord(new Note(NoteName.B), ChordType.Diminished7);
-        chord.GetSymbol().ShouldBe("B°7");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("B°7");
     }
 
     [Fact]
     public void AugmentedMajor7_Symbol_IsPlusMaj7()
     {
         var chord = new Chord(new Note(NoteName.C), ChordType.AugmentedMajor7);
-        chord.GetSymbol().ShouldBe("C+maj7");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("C+maj7");
     }
 
     // ── Suspended Chords ─────────────────────────────────────────────────────
@@ -102,21 +102,21 @@ public class ChordSymbolTests
     public void Sus2_Symbol_IsSus2()
     {
         var chord = new Chord(new Note(NoteName.C), ChordType.Sus2);
-        chord.GetSymbol().ShouldBe("Csus2");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("Csus2");
     }
 
     [Fact]
     public void Sus4_Symbol_IsSus4()
     {
         var chord = new Chord(new Note(NoteName.C), ChordType.Sus4);
-        chord.GetSymbol().ShouldBe("Csus4");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("Csus4");
     }
 
     [Fact]
     public void Dominant7Sus4_Symbol_Is7Sus4()
     {
         var chord = new Chord(new Note(NoteName.G), ChordType.Dominant7Sus4);
-        chord.GetSymbol().ShouldBe("G7sus4");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("G7sus4");
     }
 
     // ── Sixth Chords ─────────────────────────────────────────────────────────
@@ -125,21 +125,21 @@ public class ChordSymbolTests
     public void Major6_Symbol_Is6()
     {
         var chord = new Chord(new Note(NoteName.C), ChordType.Major6);
-        chord.GetSymbol().ShouldBe("C6");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("C6");
     }
 
     [Fact]
     public void Minor6_Symbol_IsM6()
     {
         var chord = new Chord(new Note(NoteName.C), ChordType.Minor6);
-        chord.GetSymbol().ShouldBe("Cm6");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("Cm6");
     }
 
     [Fact]
     public void Major6Add9_Symbol_Is69()
     {
         var chord = new Chord(new Note(NoteName.C), ChordType.Major6Add9);
-        chord.GetSymbol().ShouldBe("C6/9");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("C6/9");
     }
 
     // ── Extended Chords ───────────────────────────────────────────────────────
@@ -157,7 +157,7 @@ public class ChordSymbolTests
     public void ExtendedChord_Symbol_IsCorrect(ChordType type, string expected)
     {
         var chord = new Chord(new Note(NoteName.C), type);
-        chord.GetSymbol().ShouldBe(expected);
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe(expected);
     }
 
     // ── Add Chords ────────────────────────────────────────────────────────────
@@ -166,14 +166,14 @@ public class ChordSymbolTests
     public void MajorAdd9_Symbol_IsAdd9()
     {
         var chord = new Chord(new Note(NoteName.C), ChordType.MajorAdd9);
-        chord.GetSymbol().ShouldBe("Cadd9");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("Cadd9");
     }
 
     [Fact]
     public void MinorAdd9_Symbol_IsMAdd9()
     {
         var chord = new Chord(new Note(NoteName.C), ChordType.MinorAdd9);
-        chord.GetSymbol().ShouldBe("Cm(add9)");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("Cmadd9");
     }
 
     // ── Altered Chords ────────────────────────────────────────────────────────
@@ -187,7 +187,7 @@ public class ChordSymbolTests
     public void AlteredChord_Symbol_IsCorrect(ChordType type, string expected)
     {
         var chord = new Chord(new Note(NoteName.G), type);
-        chord.GetSymbol().ShouldBe(expected);
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe(expected);
     }
 
     // ── Power Chords ──────────────────────────────────────────────────────────
@@ -196,7 +196,7 @@ public class ChordSymbolTests
     public void Power5_Symbol_Is5()
     {
         var chord = new Chord(new Note(NoteName.E), ChordType.Power5);
-        chord.GetSymbol().ShouldBe("E5");
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe("E5");
     }
 
     // ── Alteration Formatting ─────────────────────────────────────────────────

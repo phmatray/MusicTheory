@@ -83,31 +83,6 @@ public class GuitarTuning
         if (stringIndex < 0 || stringIndex >= 6)
             throw new ArgumentOutOfRangeException(nameof(stringIndex), "String index must be between 0 and 5.");
             
-        var openStringNote = StandardTuning[stringIndex];
-        // Calculate the new note by adding semitones
-        var totalSemitones = MusicTheoryUtilities.GetTotalSemitones(openStringNote.Name, openStringNote.Alteration, openStringNote.Octave) + fret;
-        var newOctave = totalSemitones / 12;
-        var semitoneInOctave = totalSemitones % 12;
-        
-        // Find the note name for this semitone position
-        // This is a simplified version - in reality, we'd need to handle enharmonic equivalents properly
-        var noteMapping = new Dictionary<int, (NoteName, Alteration)>
-        {
-            { 0, (NoteName.C, Alteration.Natural) },
-            { 1, (NoteName.C, Alteration.Sharp) },
-            { 2, (NoteName.D, Alteration.Natural) },
-            { 3, (NoteName.D, Alteration.Sharp) },
-            { 4, (NoteName.E, Alteration.Natural) },
-            { 5, (NoteName.F, Alteration.Natural) },
-            { 6, (NoteName.F, Alteration.Sharp) },
-            { 7, (NoteName.G, Alteration.Natural) },
-            { 8, (NoteName.G, Alteration.Sharp) },
-            { 9, (NoteName.A, Alteration.Natural) },
-            { 10, (NoteName.A, Alteration.Sharp) },
-            { 11, (NoteName.B, Alteration.Natural) }
-        };
-        
-        var (noteName, alteration) = noteMapping[semitoneInOctave];
-        return new Note(noteName, alteration, newOctave);
+        return StandardTuning[stringIndex].TransposeBySemitones(fret);
     }
 }

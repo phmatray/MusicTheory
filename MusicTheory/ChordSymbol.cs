@@ -28,32 +28,42 @@ public sealed record ChordSymbolStyle(AccidentalStyle Accidentals, bool UseJazzG
 }
 
 /// <summary>
-/// A lead-sheet chord symbol such as <c>Am7</c>, <c>D/F#</c> or <c>B♭Δ7</c>: a root, a chord type and an
-/// optional bass that need not be a chord tone (<c>C/Bb</c>).
+/// A lead-sheet chord symbol such as <c>Am7</c>, <c>D/F#</c>, <c>B♭Δ7</c> or <c>C7b9#11</c>: a root, a chord
+/// type, optional tensions and an optional bass that need not be a chord tone (<c>C/Bb</c>).
 /// </summary>
 /// <param name="Root">The chord root (octave is not significant).</param>
 /// <param name="Type">The chord type.</param>
 /// <param name="Bass">The slash bass, or null when the root is in the bass.</param>
-public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null)
+/// <param name="Tensions">Tensions on top of the type, in order: altered (<c>b9</c>, <c>#11</c>, <c>b13</c>,
+/// <c>b5</c>, <c>#5</c>) replace the natural degree, natural ones (<c>add9</c>, <c>13</c>) are added.</param>
+public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null, IReadOnlyList<Interval>? Tensions = null)
 {
-    // Canonical ASCII suffix per type. Parsing also accepts every alias normalised by Normalize.
-    private static readonly Dictionary<ChordType, string> Suffixes = new()
+    /// <summary>The root.</summary>
+    public Note Root { get; init => field = value ?? throw new ArgumentNullException(nameof(Root)); } = Root;
+
+    /// <summary>The chord type.</summary>
+    public ChordType Type { get; init => field = ChordTypes.Checked(value, nameof(Type)); } = Type;
+
+    /// <summary>The tensions, never null (empty when there are none).</summary>
+    public IReadOnlyList<Interval> Tensions { get; init => field = CheckTensions(value); } = Tensions ?? [];
+
+    // Tension text (ASCII, lower case) → interval. Altered tensions are written inline, natural ones with "add".
+    private static readonly Dictionary<string, Interval> TensionNames = new()
     {
-        [ChordType.Major] = "", [ChordType.Minor] = "m", [ChordType.Diminished] = "dim", [ChordType.Augmented] = "aug",
-        [ChordType.Major7] = "maj7", [ChordType.Minor7] = "m7", [ChordType.Dominant7] = "7",
-        [ChordType.MinorMajor7] = "mMaj7", [ChordType.HalfDiminished7] = "m7b5", [ChordType.Diminished7] = "dim7",
-        [ChordType.Augmented7] = "aug7", [ChordType.AugmentedMajor7] = "maj7#5",
-        [ChordType.Sus2] = "sus2", [ChordType.Sus4] = "sus4", [ChordType.Sus2Sus4] = "sus2sus4", [ChordType.Dominant7Sus4] = "7sus4",
-        [ChordType.Major6] = "6", [ChordType.Minor6] = "m6", [ChordType.Major6Add9] = "6/9",
-        [ChordType.Major9] = "maj9", [ChordType.Minor9] = "m9", [ChordType.Dominant9] = "9",
-        [ChordType.Major11] = "maj11", [ChordType.Minor11] = "m11", [ChordType.Dominant11] = "11",
-        [ChordType.Major13] = "maj13", [ChordType.Minor13] = "m13", [ChordType.Dominant13] = "13",
-        [ChordType.MajorAdd9] = "add9", [ChordType.MinorAdd9] = "madd9", [ChordType.MajorAdd11] = "add11", [ChordType.MinorAdd11] = "madd11",
-        [ChordType.Dominant7Flat5] = "7b5", [ChordType.Dominant7Sharp5] = "7#5", [ChordType.Dominant7Flat9] = "7b9",
-        [ChordType.Dominant7Sharp9] = "7#9", [ChordType.Dominant7Flat5Flat9] = "7b5b9", [ChordType.Dominant7Flat5Sharp9] = "7b5#9",
-        [ChordType.Dominant7Sharp5Flat9] = "7#5b9", [ChordType.Dominant7Sharp5Sharp9] = "7#5#9", [ChordType.Dominant7Alt] = "7alt",
-        [ChordType.Power5] = "5",
+        ["b5"] = Interval.Parse("d5"), ["#5"] = Interval.Parse("A5"),
+        ["b9"] = Interval.Parse("m9"), ["9"] = Interval.Parse("M9"), ["#9"] = Interval.Parse("A9"),
+        ["11"] = Interval.Parse("P11"), ["#11"] = Interval.Parse("A11"),
+        ["b13"] = Interval.Parse("m13"), ["13"] = Interval.Parse("M13"),
     };
+
+    private static IReadOnlyList<Interval> CheckTensions(IReadOnlyList<Interval>? tensions)
+    {
+        var list = (tensions ?? []).ToArray();
+        foreach (var t in list)
+            if (t is null || !TensionNames.ContainsValue(t))
+                throw new ArgumentException($"Not a chord tension: {t?.ToString() ?? "null"}. Use b5, #5, b9, 9, #9, 11, #11, b13 or 13.", nameof(Tensions));
+        return list;
+    }
 
     private static readonly Dictionary<ChordType, string> JazzGlyphs = new()
     {
@@ -66,7 +76,7 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null)
 
     private static Dictionary<string, ChordType> BuildLookup()
     {
-        var lookup = Suffixes.ToDictionary(kv => kv.Value.ToLowerInvariant(), kv => kv.Key);
+        var lookup = ChordTypes.All.ToDictionary(t => ChordTypes.Suffix(t).ToLowerInvariant());
         lookup["maj"] = ChordType.Major;
         lookup["augmaj7"] = ChordType.AugmentedMajor7;
         lookup["sus"] = ChordType.Sus4;
@@ -111,16 +121,43 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null)
             }
         }
 
-        if (!Lookup.TryGetValue(Normalize(suffix.ToString()), out var type))
-            return false;
+        var normalized = Normalize(suffix.ToString());
+        // The longest known suffix that leaves only tensions behind: "7b9#11" is 7b9 plus #11.
+        for (int length = normalized.Length; length >= 0; length--)
+        {
+            if (Lookup.TryGetValue(normalized[..length], out var type) && TryParseTensions(normalized[length..], out var tensions))
+            {
+                symbol = new ChordSymbol(root, type, bass, tensions);
+                return true;
+            }
+        }
+        return false;
+    }
 
-        symbol = new ChordSymbol(root, type, bass);
+    private static bool TryParseTensions(string text, out List<Interval> tensions)
+    {
+        tensions = [];
+        int i = 0;
+        while (i < text.Length)
+        {
+            bool add = text.AsSpan(i).StartsWith("add");
+            if (add)
+                i += 3;
+            var match = TensionNames.Keys
+                .Where(k => (!add || char.IsAsciiDigit(k[0])) && text.AsSpan(i).StartsWith(k))
+                .MaxBy(k => k.Length);
+            // A bare 5 is not a tension, and "add" only takes a natural degree.
+            if (match is null)
+                return false;
+            tensions.Add(TensionNames[match]);
+            i += match.Length;
+        }
         return true;
     }
 
     private static string Normalize(string suffix)
     {
-        var s = suffix.Replace("(", "").Replace(")", "").Replace(" ", "").Replace('♭', 'b').Replace('♯', '#');
+        var s = suffix.Replace("(", "").Replace(")", "").Replace(" ", "").Replace(",", "").Replace('♭', 'b').Replace('♯', '#');
         if (s.StartsWith('-')) s = "m" + s[1..];
         s = s.Replace("min", "m")
              .Replace("Δ7", "maj7").Replace("Δ", "maj7")
@@ -141,7 +178,7 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null)
     /// </summary>
     public Chord ToChord()
     {
-        var chord = new Chord(Root, Type);
+        var chord = Tensions.Aggregate(new Chord(Root, Type), (c, t) => c.AddExtension(t.Number, t.Quality));
         if (Bass is null)
             return chord;
         var index = chord.GetNotes().ToList().FindIndex(n => n.Name == Bass.Name && n.Alteration == Bass.Alteration);
@@ -155,8 +192,8 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null)
     }
 
     /// <summary>Transposes root and bass by an interval, keeping interval spelling (D/F# up a m2 is Eb/G).</summary>
-    public ChordSymbol Transpose(Interval interval, Direction direction = Direction.Up) =>
-        this with { Root = Root.Transpose(interval, direction), Bass = Bass?.Transpose(interval, direction) };
+    public ChordSymbol Transpose(Interval interval) =>
+        this with { Root = Root.Transpose(interval), Bass = Bass?.Transpose(interval) };
 
     /// <summary>Transposes root and bass by semitones and spells them in <paramref name="targetKey"/>.</summary>
     public ChordSymbol Transpose(int semitones, KeySignature targetKey) =>
@@ -164,7 +201,7 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null)
 
     /// <summary>Moves the chord from one key to another (by tonic distance), spelled in <paramref name="to"/>.</summary>
     public ChordSymbol Transpose(KeySignature from, KeySignature to) =>
-        Transpose(MusicTheoryUtilities.GetPitchClass(to.Tonic) - MusicTheoryUtilities.GetPitchClass(from.Tonic), to);
+        Transpose(to.Tonic.PitchClass - from.Tonic.PitchClass, to);
 
     /// <summary>
     /// Piano voicing: the chord in root position from <paramref name="octave"/> (interval spelling, so the #9 of
@@ -172,7 +209,7 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null)
     /// </summary>
     public IReadOnlyList<Note> Voice(int octave = 4)
     {
-        var notes = new Chord(new Note(Root.Name, Root.Alteration, octave), Type).GetNotes()
+        var notes = (this with { Root = new Note(Root.Name, Root.Alteration, octave), Bass = null }).ToChord().GetNotes()
             .OrderBy(MusicTheoryUtilities.GetTotalSemitones).ToList();
         if (Bass is null)
             return notes;
@@ -186,7 +223,9 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null)
     /// <summary>Renders the symbol in the given style, e.g. <c>Bbmaj7</c>, <c>D/F#</c>, <c>Bø7</c>.</summary>
     public string ToString(ChordSymbolStyle style)
     {
-        var suffix = style.UseJazzGlyphs && JazzGlyphs.TryGetValue(Type, out var glyph) ? glyph : Suffixes[Type];
+        ArgumentNullException.ThrowIfNull(style);
+        var suffix = (style.UseJazzGlyphs && JazzGlyphs.TryGetValue(Type, out var glyph) ? glyph : ChordTypes.Suffix(Type))
+            + string.Concat(Tensions.Select(t => TensionText(t)));
         if (style.Accidentals == AccidentalStyle.Unicode)
             suffix = suffix.Replace('b', '♭').Replace('#', '♯');
         var text = Spell(Root, style.Accidentals) + suffix;
@@ -199,16 +238,20 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null)
     /// <summary>Equal when root and bass have the same spelling (octave ignored) and the type matches.</summary>
     public bool Equals(ChordSymbol? other) =>
         other is not null && Type == other.Type && SameSpelling(Root, other.Root) &&
-        (Bass is null ? other.Bass is null : other.Bass is not null && SameSpelling(Bass, other.Bass));
+        (Bass is null ? other.Bass is null : other.Bass is not null && SameSpelling(Bass, other.Bass)) &&
+        Tensions.SequenceEqual(other.Tensions);
 
     /// <inheritdoc />
     public override int GetHashCode() =>
-        HashCode.Combine(Type, Root.Name, Root.Alteration, Bass?.Name, Bass?.Alteration);
+        HashCode.Combine(Type, Root.Name, Root.Alteration, Bass?.Name, Bass?.Alteration, Tensions.Count);
+
+    private static string TensionText(Interval tension)
+    {
+        var name = TensionNames.First(kv => kv.Value == tension).Key;
+        return char.IsAsciiDigit(name[0]) ? "add" + name : name;
+    }
 
     private static bool SameSpelling(Note a, Note b) => a.Name == b.Name && a.Alteration == b.Alteration;
-
-    /// <summary>Canonical ASCII suffix of a chord type, e.g. <c>m7b5</c>.</summary>
-    internal static string AsciiSuffix(ChordType type) => Suffixes[type];
 
     /// <summary>Note name without octave, e.g. <c>Bb</c> or <c>B♭</c>.</summary>
     internal static string Spell(Note note, AccidentalStyle style) => note.Name + (style, note.Alteration) switch

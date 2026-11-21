@@ -74,7 +74,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
 
             foreach (var (name, rootString, offsets) in Movable)
             {
-                int first = Mod12(MusicTheoryUtilities.GetPitchClass(chord.Root) - tuning.Strings[rootString].MidiNumber);
+                int first = Mod12(chord.Root.PitchClass - tuning.Strings[rootString].MidiNumber);
                 for (int fret = first; fret <= spec.MaxFret; fret += 12)
                     Offer(offsets.Select(o => o + fret).ToArray(), VoicingSource.MovableShape, name);
             }
@@ -117,12 +117,12 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
             _stretch = options.MaxStretch;
             MaxFret = options.MaxFret - options.Capo;
 
-            int root = MusicTheoryUtilities.GetPitchClass(chord.Root);
-            var intervals = new Chord(chord.Root, chord.Type).GetNotes()
-                .Select(n => Mod12(MusicTheoryUtilities.GetPitchClass(n) - root)).Distinct().ToList();
+            int root = chord.Root.PitchClass;
+            var intervals = (chord with { Bass = null }).ToChord().GetNotes()
+                .Select(n => Mod12(n.PitchClass - root)).Distinct().ToList();
             _allowed = intervals.Select(i => (i + root) % 12).ToHashSet();
             _required = intervals.Where(i => !Optional(chord.Type, i)).Select(i => (i + root) % 12).ToHashSet();
-            _bass = chord.Bass is null ? root : MusicTheoryUtilities.GetPitchClass(chord.Bass);
+            _bass = chord.Bass is null ? root : chord.Bass.PitchClass;
             _allowed.Add(_bass);
         }
 

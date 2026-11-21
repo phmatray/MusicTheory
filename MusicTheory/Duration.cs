@@ -53,6 +53,8 @@ public class Duration : IEquatable<Duration>
     /// <param name="dots">The number of dots (0-3).</param>
     public Duration(DurationType type, int dots = 0)
     {
+        if (!Enum.IsDefined(type))
+            throw new ArgumentOutOfRangeException(nameof(type), type, "Undefined duration type.");
         if (dots < 0 || dots > 3)
             throw new ArgumentException("Dots must be between 0 and 3.", nameof(dots));
 
@@ -80,8 +82,13 @@ public class Duration : IEquatable<Duration>
     /// <param name="tupletCount">Number of notes in the tuplet.</param>
     /// <param name="normalCount">Number of normal notes it replaces.</param>
     /// <returns>A new tuplet duration.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">An undefined type, or a count below 1.</exception>
     public static Duration CreateTuplet(DurationType baseType, int tupletCount, int normalCount)
     {
+        if (!Enum.IsDefined(baseType))
+            throw new ArgumentOutOfRangeException(nameof(baseType), baseType, "Undefined duration type.");
+        ArgumentOutOfRangeException.ThrowIfLessThan(tupletCount, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(normalCount, 1);
         return new Duration(baseType, tupletCount, normalCount);
     }
 
@@ -129,8 +136,10 @@ public class Duration : IEquatable<Duration>
     /// </summary>
     /// <param name="bpm">The tempo in beats per minute (quarter note = 1 beat).</param>
     /// <returns>The duration in seconds.</returns>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="bpm"/> is not positive.</exception>
     public double GetTimeInSeconds(int bpm)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(bpm, 1);
         // Calculate seconds per quarter note
         double secondsPerQuarter = 60.0 / bpm;
         
@@ -169,6 +178,7 @@ public class Duration : IEquatable<Duration>
     /// <returns>The number of measures this duration spans.</returns>
     public double GetValueInMeasures(TimeSignature timeSignature)
     {
+        ArgumentNullException.ThrowIfNull(timeSignature);
         double measureDuration = timeSignature.GetMeasureDuration();
         return GetValueInWholeNotes() / measureDuration;
     }
@@ -180,6 +190,7 @@ public class Duration : IEquatable<Duration>
     /// <returns>The number of times the other duration fits into this one.</returns>
     public int Divide(Duration other)
     {
+        ArgumentNullException.ThrowIfNull(other);
         double thisValue = GetValueInWholeNotes();
         double otherValue = other.GetValueInWholeNotes();
         return (int)Math.Round(thisValue / otherValue);
@@ -192,6 +203,7 @@ public class Duration : IEquatable<Duration>
     /// <returns>A new duration representing the sum.</returns>
     public Duration Add(Duration other)
     {
+        ArgumentNullException.ThrowIfNull(other);
         double totalValue = GetValueInWholeNotes() + other.GetValueInWholeNotes();
         
         // This is a simplified implementation that returns a duration
@@ -248,10 +260,13 @@ public class Duration : IEquatable<Duration>
         if (other is null)
             return false;
 
-        return Type == other.Type && 
-               Dots == other.Dots && 
+        // A sum (from Add) is equal only to another sum of the same length.
+        return GetType() == other.GetType() &&
+               Type == other.Type &&
+               Dots == other.Dots &&
                IsTuplet == other.IsTuplet &&
-               TupletRatio == other.TupletRatio;
+               TupletRatio == other.TupletRatio &&
+               GetValueInWholeNotes() == other.GetValueInWholeNotes();
     }
 
     /// <summary>
@@ -270,7 +285,7 @@ public class Duration : IEquatable<Duration>
     /// <returns>The hash code.</returns>
     public override int GetHashCode()
     {
-        return HashCode.Combine(Type, Dots, IsTuplet, TupletRatio);
+        return HashCode.Combine(Type, Dots, IsTuplet, TupletRatio, GetValueInWholeNotes());
     }
 
     /// <summary>
@@ -286,5 +301,7 @@ public class Duration : IEquatable<Duration>
         }
 
         public override double GetValueInWholeNotes() => _valueInWholeNotes;
+
+        public override string ToString() => $"{_valueInWholeNotes} whole notes";
     }
 }

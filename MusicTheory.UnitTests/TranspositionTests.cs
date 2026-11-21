@@ -26,7 +26,7 @@ public class TranspositionTests
         var majorThird = new Interval(IntervalQuality.Major, 3);
         
         // Act
-        var result = e4.Transpose(majorThird, Direction.Down);
+        var result = e4.Transpose(majorThird.Reverse());
         
         // Assert
         result.Name.ShouldBe(NoteName.C);

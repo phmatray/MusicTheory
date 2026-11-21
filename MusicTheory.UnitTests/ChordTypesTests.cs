@@ -609,7 +609,7 @@ public class ChordTypesTests
     [InlineData(ChordType.Major7, "Cmaj7")]
     [InlineData(ChordType.Minor7, "Cm7")]
     [InlineData(ChordType.Dominant7, "C7")]
-    [InlineData(ChordType.MinorMajor7, "Cm(maj7)")]
+    [InlineData(ChordType.MinorMajor7, "CmMaj7")]
     [InlineData(ChordType.HalfDiminished7, "Cø7")]
     [InlineData(ChordType.Diminished7, "C°7")]
     [InlineData(ChordType.Sus2, "Csus2")]
@@ -620,7 +620,7 @@ public class ChordTypesTests
     [InlineData(ChordType.Minor9, "Cm9")]
     [InlineData(ChordType.Dominant9, "C9")]
     [InlineData(ChordType.MajorAdd9, "Cadd9")]
-    [InlineData(ChordType.MinorAdd9, "Cm(add9)")]
+    [InlineData(ChordType.MinorAdd9, "Cmadd9")]
     [InlineData(ChordType.Dominant7Flat5, "C7♭5")]
     [InlineData(ChordType.Dominant7Sharp5, "C7♯5")]
     [InlineData(ChordType.Dominant7Flat9, "C7♭9")]
@@ -629,7 +629,7 @@ public class ChordTypesTests
     public void GetSymbol_ShouldReturnCorrectSymbol(ChordType chordType, string expectedSymbol)
     {
         var chord = new Chord(new Note(NoteName.C, Alteration.Natural, 4), chordType);
-        chord.GetSymbol().ShouldBe(expectedSymbol);
+        chord.GetSymbol(ChordSymbolStyle.Unicode).ShouldBe(expectedSymbol);
     }
     
     #endregion

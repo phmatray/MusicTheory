@@ -1,406 +1,140 @@
 namespace MusicTheory;
 
 /// <summary>
-/// Represents different types of musical scales.
+/// Scale types, each defined by its intervals above the tonic.
 /// </summary>
 public enum ScaleType
 {
-    /// <summary>Major scale (W-W-H-W-W-W-H)</summary>
+    /// <summary>Major (P1 M2 M3 P4 P5 M6 M7)</summary>
     Major,
-    /// <summary>Natural minor scale (W-H-W-W-H-W-W)</summary>
+    /// <summary>Natural minor (P1 M2 m3 P4 P5 m6 m7)</summary>
     NaturalMinor,
-    /// <summary>Harmonic minor scale (W-H-W-W-H-WH-H)</summary>
+    /// <summary>Harmonic minor (P1 M2 m3 P4 P5 m6 M7)</summary>
     HarmonicMinor,
-    /// <summary>Melodic minor scale (W-H-W-W-W-W-H ascending)</summary>
+    /// <summary>Melodic minor, ascending form (P1 M2 m3 P4 P5 M6 M7)</summary>
     MelodicMinor,
-    
-    // Modal scales
-    /// <summary>Ionian mode (W-W-H-W-W-W-H) - same as Major</summary>
+    /// <summary>Ionian mode, the major scale</summary>
     Ionian,
-    /// <summary>Dorian mode (W-H-W-W-W-H-W)</summary>
+    /// <summary>Dorian mode (P1 M2 m3 P4 P5 M6 m7)</summary>
     Dorian,
-    /// <summary>Phrygian mode (H-W-W-W-H-W-W)</summary>
+    /// <summary>Phrygian mode (P1 m2 m3 P4 P5 m6 m7)</summary>
     Phrygian,
-    /// <summary>Lydian mode (W-W-W-H-W-W-H)</summary>
+    /// <summary>Lydian mode (P1 M2 M3 A4 P5 M6 M7)</summary>
     Lydian,
-    /// <summary>Mixolydian mode (W-W-H-W-W-H-W)</summary>
+    /// <summary>Mixolydian mode (P1 M2 M3 P4 P5 M6 m7)</summary>
     Mixolydian,
-    /// <summary>Aeolian mode (W-H-W-W-H-W-W) - same as Natural Minor</summary>
+    /// <summary>Aeolian mode, the natural minor scale</summary>
     Aeolian,
-    /// <summary>Locrian mode (H-W-W-H-W-W-W)</summary>
+    /// <summary>Locrian mode (P1 m2 m3 P4 d5 m6 m7)</summary>
     Locrian,
-    
-    // Other scales
-    /// <summary>Chromatic scale (all semitones)</summary>
+    /// <summary>Chromatic scale, ascending with sharps (P1 A1 M2 A2 M3 P4 A4 P5 A5 M6 A6 M7)</summary>
     Chromatic,
-    /// <summary>Whole tone scale (all whole tones)</summary>
+    /// <summary>Whole-tone scale (P1 M2 M3 A4 A5 A6)</summary>
     WholeTone,
-    /// <summary>Blues scale (1-b3-4-#4-5-b7)</summary>
+    /// <summary>Blues scale (P1 m3 P4 A4 P5 m7)</summary>
     Blues,
-    /// <summary>Major pentatonic scale (1-2-3-5-6)</summary>
+    /// <summary>Major pentatonic (P1 M2 M3 P5 M6)</summary>
     PentatonicMajor,
-    /// <summary>Minor pentatonic scale (1-b3-4-5-b7)</summary>
+    /// <summary>Minor pentatonic (P1 m3 P4 P5 m7)</summary>
     PentatonicMinor
 }
 
 /// <summary>
-/// Represents a musical scale.
+/// A scale on a tonic. Notes are spelled from the tonic by interval, so F# major has E# and Gb major has Cb.
 /// </summary>
-public class Scale
+/// <remarks>Every scale's notes run from the tonic to the tonic an octave above, both included.</remarks>
+public sealed record Scale
 {
-    /// <summary>
-    /// Gets the root note of the scale.
-    /// </summary>
+    private static readonly Dictionary<ScaleType, Interval[]> Formulas = new()
+    {
+        [ScaleType.Major] = Of("M2 M3 P4 P5 M6 M7"),
+        [ScaleType.Ionian] = Of("M2 M3 P4 P5 M6 M7"),
+        [ScaleType.NaturalMinor] = Of("M2 m3 P4 P5 m6 m7"),
+        [ScaleType.Aeolian] = Of("M2 m3 P4 P5 m6 m7"),
+        [ScaleType.HarmonicMinor] = Of("M2 m3 P4 P5 m6 M7"),
+        [ScaleType.MelodicMinor] = Of("M2 m3 P4 P5 M6 M7"),
+        [ScaleType.Dorian] = Of("M2 m3 P4 P5 M6 m7"),
+        [ScaleType.Phrygian] = Of("m2 m3 P4 P5 m6 m7"),
+        [ScaleType.Lydian] = Of("M2 M3 A4 P5 M6 M7"),
+        [ScaleType.Mixolydian] = Of("M2 M3 P4 P5 M6 m7"),
+        [ScaleType.Locrian] = Of("m2 m3 P4 d5 m6 m7"),
+        [ScaleType.Chromatic] = Of("A1 M2 A2 M3 P4 A4 P5 A5 M6 A6 M7"),
+        [ScaleType.WholeTone] = Of("M2 M3 A4 A5 A6"),
+        [ScaleType.Blues] = Of("m3 P4 A4 P5 m7"),
+        [ScaleType.PentatonicMajor] = Of("M2 M3 P5 M6"),
+        [ScaleType.PentatonicMinor] = Of("m3 P4 P5 m7"),
+    };
+
+    private static Interval[] Of(string names) =>
+        $"P1 {names} P8".Split(' ').Select(Interval.Parse).ToArray();
+
+    /// <summary>The tonic.</summary>
     public Note Root { get; }
 
-    /// <summary>
-    /// Gets the type of the scale.
-    /// </summary>
+    /// <summary>The scale type.</summary>
     public ScaleType Type { get; }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Scale"/> class.
-    /// </summary>
-    /// <param name="root">The root note of the scale.</param>
-    /// <param name="type">The type of scale.</param>
+    /// <summary>Creates a scale.</summary>
+    /// <exception cref="ArgumentNullException"><paramref name="root"/> is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="type"/> is undefined.</exception>
     public Scale(Note root, ScaleType type)
     {
+        ArgumentNullException.ThrowIfNull(root);
+        if (!Enum.IsDefined(type))
+            throw new ArgumentOutOfRangeException(nameof(type), type, "Undefined scale type.");
         Root = root;
         Type = type;
     }
 
-    /// <summary>
-    /// Gets the notes in the scale.
-    /// </summary>
-    /// <returns>An enumerable of notes in the scale, including the octave.</returns>
+    /// <summary>The intervals above the tonic, from P1 to P8.</summary>
+    public IReadOnlyList<Interval> Intervals => Formulas[Type];
+
+    /// <summary>The notes from the tonic to its octave, both included: C major is C4 D4 E4 F4 G4 A4 B4 C5.</summary>
+    /// <exception cref="InvalidOperationException">A degree needs more than two accidentals (B## major).</exception>
     public IEnumerable<Note> GetNotes()
     {
-        // Handle special scales differently
-        switch (Type)
-        {
-            case ScaleType.Chromatic:
-                return GetChromaticNotes();
-            case ScaleType.WholeTone:
-                return GetWholeToneNotes();
-            case ScaleType.Blues:
-                return GetBluesNotes();
-            case ScaleType.PentatonicMajor:
-                return GetPentatonicMajorNotes();
-            case ScaleType.PentatonicMinor:
-                return GetPentatonicMinorNotes();
-            default:
-                return GetDiatonicNotes();
-        }
+        var root = Root;
+        return Formulas[Type].Select(root.Transpose).ToList();
     }
 
-    private IEnumerable<Note> GetDiatonicNotes()
-    {
-        yield return Root;
-
-        // Get the interval pattern for the scale type
-        var intervals = GetIntervalPattern();
-        var currentNote = Root;
-
-        foreach (var interval in intervals.Take(7)) // Take 7 to get to the octave
-        {
-            currentNote = GetNextNoteInScale(currentNote, interval);
-            yield return currentNote;
-        }
-    }
-
-    private IEnumerable<Note> GetChromaticNotes()
-    {
-        var currentNote = Root;
-        yield return currentNote;
-
-        for (int i = 1; i < MusicTheoryConstants.SemitonesPerOctave; i++)
-        {
-            currentNote = currentNote.TransposeBySemitones(1);
-            yield return currentNote;
-        }
-    }
-
-    private IEnumerable<Note> GetWholeToneNotes()
-    {
-        var currentNote = Root;
-        yield return currentNote;
-
-        for (int i = 1; i < 6; i++)
-        {
-            currentNote = currentNote.TransposeBySemitones(2);
-            yield return currentNote;
-        }
-    }
-
-    private IEnumerable<Note> GetBluesNotes()
-    {
-        yield return Root; // 1
-        
-        // b3 - minor third
-        var minorThird = Root.Transpose(new Interval(IntervalQuality.Minor, 3));
-        yield return minorThird;
-        
-        // 4 - perfect fourth
-        var fourth = Root.Transpose(new Interval(IntervalQuality.Perfect, 4));
-        yield return fourth;
-        
-        // #4/b5 - augmented fourth/diminished fifth
-        var augmentedFourth = Root.Transpose(new Interval(IntervalQuality.Augmented, 4));
-        yield return augmentedFourth;
-        
-        // 5 - perfect fifth
-        var fifth = Root.Transpose(new Interval(IntervalQuality.Perfect, 5));
-        yield return fifth;
-        
-        // b7 - minor seventh
-        var minorSeventh = Root.Transpose(new Interval(IntervalQuality.Minor, 7));
-        yield return minorSeventh;
-    }
-
-    private IEnumerable<Note> GetPentatonicMajorNotes()
-    {
-        yield return Root; // 1
-        yield return Root.TransposeBySemitones(2); // 2
-        yield return Root.TransposeBySemitones(4); // 3
-        yield return Root.TransposeBySemitones(7); // 5
-        yield return Root.TransposeBySemitones(9); // 6
-    }
-
-    private IEnumerable<Note> GetPentatonicMinorNotes()
-    {
-        yield return Root; // 1
-        
-        // b3 - minor third
-        var minorThird = Root.Transpose(new Interval(IntervalQuality.Minor, 3));
-        yield return minorThird;
-        
-        // 4 - perfect fourth
-        var fourth = Root.Transpose(new Interval(IntervalQuality.Perfect, 4));
-        yield return fourth;
-        
-        // 5 - perfect fifth
-        var fifth = Root.Transpose(new Interval(IntervalQuality.Perfect, 5));
-        yield return fifth;
-        
-        // b7 - minor seventh
-        var minorSeventh = Root.Transpose(new Interval(IntervalQuality.Minor, 7));
-        yield return minorSeventh;
-    }
+    /// <summary>The same scale on a tonic transposed by <paramref name="interval"/>.</summary>
+    public Scale Transpose(Interval interval) => new(Root.Transpose(interval), Type);
 
     /// <summary>
-    /// Gets the interval pattern for the scale type.
+    /// The scale note after <paramref name="note"/>, in the right octave: in C major, B4 is followed by C5.
+    /// The octave of <paramref name="note"/> is free; only its spelling must belong to the scale.
     /// </summary>
-    private IntervalStep[] GetIntervalPattern()
-    {
-        return Type switch
-        {
-            ScaleType.Major or ScaleType.Ionian =>
-            [
-                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half, 
-                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half
-            ],
-            ScaleType.NaturalMinor or ScaleType.Aeolian =>
-            [
-                IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole, 
-                IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole
-            ],
-            ScaleType.HarmonicMinor =>
-            [
-                IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole, 
-                IntervalStep.Whole, IntervalStep.Half, IntervalStep.WholeAndHalf, IntervalStep.Half
-            ],
-            ScaleType.MelodicMinor =>
-            [
-                IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole, 
-                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half
-            ],
-            ScaleType.Dorian =>
-            [
-                IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole,
-                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole
-            ],
-            ScaleType.Phrygian =>
-            [
-                IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole,
-                IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole
-            ],
-            ScaleType.Lydian =>
-            [
-                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole,
-                IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half
-            ],
-            ScaleType.Mixolydian =>
-            [
-                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half,
-                IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Half, IntervalStep.Whole
-            ],
-            ScaleType.Locrian =>
-            [
-                IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole,
-                IntervalStep.Half, IntervalStep.Whole, IntervalStep.Whole, IntervalStep.Whole
-            ],
-            _ => throw new ArgumentOutOfRangeException()
-        };
-    }
-
-    /// <summary>
-    /// Gets the next note in the scale based on the interval step.
-    /// </summary>
-    private Note GetNextNoteInScale(Note currentNote, IntervalStep step)
-    {
-        // Calculate the next note name
-        var nextNoteName = (NoteName)(((int)currentNote.Name + 1) % 7);
-        
-        // Calculate semitones to add
-        int semitones = step switch
-        {
-            IntervalStep.Half => 1,
-            IntervalStep.Whole => 2,
-            IntervalStep.WholeAndHalf => 3,
-            _ => throw new ArgumentOutOfRangeException()
-        };
-
-        // Get current note semitones from C0
-        int currentSemitones = MusicTheoryUtilities.GetTotalSemitones(currentNote);
-        int targetSemitones = currentSemitones + semitones;
-        
-        // Calculate octave and alteration
-        int targetOctave = targetSemitones / MusicTheoryConstants.SemitonesPerOctave;
-        int semitonesInOctave = targetSemitones % MusicTheoryConstants.SemitonesPerOctave;
-        
-        // Get expected semitones for the next note name
-        int expectedSemitones = MusicTheoryConstants.SemitonesFromC[(int)nextNoteName];
-        
-        // Calculate alteration needed
-        int alterationValue = semitonesInOctave - expectedSemitones;
-        
-        // Handle octave wrapping
-        if (alterationValue < -2)
-        {
-            alterationValue += MusicTheoryConstants.SemitonesPerOctave;
-            targetOctave--;
-        }
-        else if (alterationValue > 2)
-        {
-            alterationValue -= MusicTheoryConstants.SemitonesPerOctave;
-            targetOctave++;
-        }
-
-        // Ensure we use the correct octave when moving from B to C
-        if (currentNote.Name == NoteName.B && nextNoteName == NoteName.C)
-        {
-            targetOctave = currentNote.Octave + 1;
-        }
-        else if (nextNoteName < currentNote.Name)
-        {
-            targetOctave = currentNote.Octave + 1;
-        }
-        else
-        {
-            targetOctave = currentNote.Octave;
-        }
-
-        // Recalculate alteration with correct octave
-        targetSemitones = currentSemitones + semitones;
-        int actualSemitonesFromC0 = targetOctave * MusicTheoryConstants.SemitonesPerOctave + expectedSemitones;
-        alterationValue = targetSemitones - actualSemitonesFromC0;
-
-        var alteration = (Alteration)alterationValue;
-        
-        return new Note(nextNoteName, alteration, targetOctave);
-    }
-
-
-    /// <summary>
-    /// Represents the interval steps in a scale.
-    /// </summary>
-    private enum IntervalStep
-    {
-        Half,
-        Whole,
-        WholeAndHalf
-    }
-
-    /// <summary>
-    /// Transposes the scale by the specified interval.
-    /// </summary>
-    /// <param name="interval">The interval to transpose by.</param>
-    /// <param name="direction">The direction to transpose (default is Up).</param>
-    /// <returns>A new scale transposed by the interval.</returns>
-    public Scale Transpose(Interval interval, Direction direction = Direction.Up)
-    {
-        var newRoot = Root.Transpose(interval, direction);
-        return new Scale(newRoot, Type);
-    }
-
-    /// <summary>
-    /// Gets the next note in the scale after the given note.
-    /// </summary>
-    /// <param name="note">The current note.</param>
-    /// <returns>The next note in the scale.</returns>
-    /// <exception cref="ArgumentException">Thrown when the note is not in the scale.</exception>
+    /// <exception cref="ArgumentException">The note is not in the scale.</exception>
     public Note GetNextNoteInScale(Note note)
     {
-        var scaleNotes = GetNotes().ToList();
-        
-        // Find the note in the scale (ignoring octave)
-        var index = -1;
-        for (int i = 0; i < scaleNotes.Count; i++)
-        {
-            if (scaleNotes[i].Name == note.Name && scaleNotes[i].Alteration == note.Alteration)
-            {
-                index = i;
-                break;
-            }
-        }
-        
-        if (index == -1)
-        {
-            throw new ArgumentException($"Note {note} is not in the {Root.Name} {Type} scale");
-        }
-        
-        // Get next note, wrapping around to root if at end
-        var nextIndex = (index + 1) % scaleNotes.Count;
-        var nextNote = scaleNotes[nextIndex];
-        
-        // Check if we need to increment octave
-        // If the next note is C and current is B, or if we wrapped to index 0
-        if (nextIndex == 0 || (note.Name == NoteName.B && nextNote.Name == NoteName.C))
-        {
-            return new Note(nextNote.Name, nextNote.Alteration, note.Octave + 1);
-        }
-        
-        // Otherwise, maintain the same octave
-        return new Note(nextNote.Name, nextNote.Alteration, note.Octave);
+        ArgumentNullException.ThrowIfNull(note);
+        var notes = GetNotes().ToList();
+        int index = IndexOf(notes, note)
+            ?? throw new ArgumentException($"{note.GetName()} is not in {Root.GetName()} {Type}.", nameof(note));
+        return note.Transpose(Interval.Between(notes[index], notes[index + 1]));
     }
 
-    /// <summary>
-    /// Determines if the scale contains the specified note.
-    /// </summary>
-    /// <param name="note">The note to check.</param>
-    /// <returns>True if the note is in the scale; otherwise, false.</returns>
+    /// <summary>True when the scale contains a note with this spelling (any octave).</summary>
     public bool Contains(Note note)
     {
-        return GetNotes().Any(n => n.Name == note.Name && n.Alteration == note.Alteration);
+        ArgumentNullException.ThrowIfNull(note);
+        return IndexOf(GetNotes().ToList(), note) is not null;
     }
 
-    /// <summary>
-    /// Gets the scale degree of the given note.
-    /// </summary>
-    /// <param name="note">The note to find the degree for.</param>
-    /// <returns>The scale degree (1-based), or null if the note is not in the scale.</returns>
+    /// <summary>The 1-based degree of a note with this spelling (any octave), or null when absent.</summary>
     public int? GetDegree(Note note)
     {
-        var scaleNotes = GetNotes().ToList();
-        
-        for (int i = 0; i < scaleNotes.Count; i++)
-        {
-            if (scaleNotes[i].Name == note.Name && scaleNotes[i].Alteration == note.Alteration)
-            {
-                return i + 1; // 1-based degree
-            }
-        }
-        
-        return null;
+        ArgumentNullException.ThrowIfNull(note);
+        return IndexOf(GetNotes().ToList(), note) + 1;
     }
+
+    // Index among the distinct degrees (the closing octave excluded).
+    private static int? IndexOf(List<Note> notes, Note note)
+    {
+        int index = notes.FindIndex(0, notes.Count - 1, n => n.Name == note.Name && n.Alteration == note.Alteration);
+        return index < 0 ? null : index;
+    }
+
+    /// <summary>The scale as <c>C4 Major</c>.</summary>
+    public override string ToString() => $"{Root} {Type}";
 }

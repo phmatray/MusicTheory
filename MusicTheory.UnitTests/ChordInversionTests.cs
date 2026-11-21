@@ -147,18 +147,12 @@ public class ChordInversionTests
     }
 
     [Fact]
-    public void Chord_GetNotesInInversion_ThirdInversion_ShouldRequireSeventh()
+    public void Chord_WithInversion_ThirdInversionOfTriad_ShouldThrow()
     {
-        // Arrange
-        var cMajor = new Chord(new Note(NoteName.C, Alteration.Natural, 4), ChordQuality.Major)
-            .WithInversion(ChordInversion.Third);
-        
-        // Act
-        Action act = () => cMajor.GetNotesInInversion().ToList();
-        
-        // Assert
-        act.ShouldThrow<InvalidOperationException>()
-            .Message.ShouldBe("Third inversion requires a seventh chord");
+        var cMajor = new Chord(new Note(NoteName.C, Alteration.Natural, 4), ChordQuality.Major);
+
+        Should.Throw<ArgumentOutOfRangeException>(() => cMajor.WithInversion(ChordInversion.Third))
+            .Message.ShouldStartWith("C has 3 notes, too few for a third inversion.");
     }
 
     [Fact]
@@ -185,18 +179,12 @@ public class ChordInversionTests
     }
 
     [Fact]
-    public void Chord_GetBassNote_ThirdInversion_WithoutSeventh_ShouldThrow()
+    public void Chord_WithInversion_SecondInversionOfPowerChord_ShouldThrow()
     {
-        // Arrange
-        var chord = new Chord(new Note(NoteName.C), ChordQuality.Major)
-            .WithInversion(ChordInversion.Third);
-        
-        // Act
-        Action act = () => chord.GetBassNote();
-        
-        // Assert
-        act.ShouldThrow<InvalidOperationException>()
-            .Message.ShouldBe("Third inversion requires a seventh chord");
+        var power = new Chord(new Note(NoteName.E, Alteration.Natural, 2), ChordType.Power5);
+
+        power.WithInversion(ChordInversion.First).GetBassNote().ShouldBe(new Note(NoteName.B, Alteration.Natural, 2));
+        Should.Throw<ArgumentOutOfRangeException>(() => power.WithInversion(ChordInversion.Second));
     }
 
     [Fact]

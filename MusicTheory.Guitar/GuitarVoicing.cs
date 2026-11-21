@@ -67,11 +67,9 @@ public sealed record GuitarVoicing(
             if (f is not int fret)
                 return null;
             int midi = tuning.Strings[s].MidiNumber + capo + fret;
-            var tone = chordTones.FirstOrDefault(t => MusicTheoryUtilities.GetPitchClass(t) == midi % 12);
-            if (tone is null)
-                return Note.FromMidiNumber(midi, flats);
-            int octave = (midi - MusicTheoryConstants.SemitonesFromC[(int)tone.Name] - (int)tone.Alteration) / 12 - 1;
-            return new Note(tone.Name, tone.Alteration, octave);
+            var played = Note.FromMidiNumber(midi, flats);
+            var tone = chordTones.FirstOrDefault(t => t.PitchClass == played.PitchClass);
+            return tone is null ? played : played.Respell(tone.Name)!;
         }).ToList();
     }
 }

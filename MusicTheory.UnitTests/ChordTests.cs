@@ -82,48 +82,27 @@ public class ChordTests
     }
 
     [Fact]
-    public void Chord_GetNotesInInversion_WithInvalidInversion_ShouldThrow()
+    public void Chord_WithInversion_Undefined_ShouldThrow()
     {
-        // Arrange
-        var chord = new Chord(new Note(NoteName.C), ChordQuality.Major)
-            .WithInversion((ChordInversion)99);
-        
-        // Act
-        Action act = () => chord.GetNotesInInversion().ToList();
-        
-        // Assert
-        act.ShouldThrow<ArgumentOutOfRangeException>();
+        var chord = new Chord(new Note(NoteName.C), ChordQuality.Major);
+        Should.Throw<ArgumentOutOfRangeException>(() => chord.WithInversion((ChordInversion)99)).ParamName.ShouldBe("inversion");
     }
 
     [Fact]
-    public void Chord_GetBassNote_WithInvalidInversion_ShouldThrow()
+    public void Chord_WithUndefinedQualityOrType_ShouldThrow()
     {
-        // Arrange
-        var chord = new Chord(new Note(NoteName.C), ChordQuality.Major)
-            .WithInversion((ChordInversion)99);
-        
-        // Act
-        Action act = () => chord.GetBassNote();
-        
-        // Assert
-        act.ShouldThrow<ArgumentOutOfRangeException>();
+        Should.Throw<ArgumentOutOfRangeException>(() => new Chord(new Note(NoteName.C), (ChordQuality)99)).ParamName.ShouldBe("quality");
+        Should.Throw<ArgumentOutOfRangeException>(() => new Chord(new Note(NoteName.C), (ChordType)99)).ParamName.ShouldBe("type");
+        Should.Throw<ArgumentNullException>(() => new Chord(null!, ChordType.Major));
     }
 
     [Fact]
-    public void Chord_GetNoteAtInterval_WithWrappingAlteration_ShouldAdjustOctave()
+    public void Chord_GetNotes_ThatNeedTripleAccidentals_ShouldThrow()
     {
-        // This tests the alteration wrapping logic in GetNoteAtInterval
-        // We need a chord that produces alterations < -2 or > 2
+        // B# augmented is B#, D##, F###: version 1 returned an "F" with an alteration of -9; 2.0 refuses.
         var chord = new Chord(new Note(NoteName.B, Alteration.Sharp, 4), ChordQuality.Augmented);
-        
-        // Act
-        var notes = chord.GetNotes().ToList();
-        
-        // Assert
-        // B# augmented: B#, D##, F### 
-        // The implementation produces extreme alterations that exceed the enum range
-        notes[2].Name.ShouldBe(NoteName.F);
-        notes[2].Alteration.ShouldBe((Alteration)(-9)); // Extreme negative alteration from wrapping
-        notes[2].Octave.ShouldBe(6); // Octave adjusted up due to extreme alteration wrapping
+
+        Should.Throw<InvalidOperationException>(() => chord.GetNotes().ToList())
+            .Message.ShouldBe("B#4 transposed by A5 needs 3 sharps on F; at most two are supported.");
     }
 }

@@ -151,6 +151,6 @@ public class MidiConversionTests
         // Act & Assert
         Action act = () => { var _ = note.MidiNumber; };
         act.ShouldThrow<InvalidOperationException>()
-            .Message.ShouldContain("outside the valid MIDI range");
+            .Message.ShouldContain("is outside the MIDI range 0..127.");
     }
 }
