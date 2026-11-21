@@ -1,3 +1,4 @@
+using System.Globalization;
 using MusicTheory.Guitar.Blazor;
 using Microsoft.JSInterop;
 
@@ -85,9 +86,46 @@ public class GuitarValueTests
     public void VoicingDescriber_ChordName(string symbol, string spoken) =>
         VoicingDescriber.ChordName(ChordSymbol.Parse(symbol)).ShouldBe(spoken);
 
+    [Theory]
+    [InlineData("Am", "la mineur")]
+    [InlineData("Bbmaj7", "si bémol sept majeur")]
+    [InlineData("D/F#", "ré majeur sur fa dièse")]
+    [InlineData("Ebbdim7", "mi double bémol diminué sept")]
+    [InlineData("C5", "do cinq")]
+    public void VoicingDescriber_ChordName_French(string symbol, string spoken)
+    {
+        VoicingDescriber.ChordName(ChordSymbol.Parse(symbol), new CultureInfo("fr")).ShouldBe(spoken);
+        VoicingDescriber.ChordName(ChordSymbol.Parse(symbol), new CultureInfo("fr-BE")).ShouldBe(spoken);
+    }
+
+    [Fact]
+    public void VoicingDescriber_OtherCulturesSpeakEnglish()
+    {
+        var am = ChordSymbol.Parse("Am");
+        VoicingDescriber.ChordName(am, new CultureInfo("de-DE")).ShouldBe("A minor");
+        VoicingDescriber.ChordName(am, CultureInfo.InvariantCulture).ShouldBe("A minor");
+    }
+
+    [Fact]
+    public void VoicingDescriber_NamesEveryChordTypeInFrench()
+    {
+        var fr = new CultureInfo("fr");
+        foreach (var type in Enum.GetValues<ChordType>())
+        {
+            var name = VoicingDescriber.ChordName(new ChordSymbol(new Note(NoteName.C), type), fr);
+            name.ShouldStartWith("do ");
+            name.Length.ShouldBeGreaterThan(3);
+            name.ShouldNotContain(type.ToString());
+        }
+        foreach (var alteration in Enum.GetValues<Alteration>())
+            VoicingDescriber.ChordName(new ChordSymbol(new Note(NoteName.E, alteration), ChordType.Major), fr).ShouldStartWith("mi");
+    }
+
     [Fact]
     public void VoicingDescriber_Validates()
     {
+        Should.Throw<ArgumentNullException>(() => VoicingDescriber.ChordName(null!, new CultureInfo("fr")));
+        Should.Throw<ArgumentNullException>(() => VoicingDescriber.AccessibleLabel(null!, new CultureInfo("fr")));
         Should.Throw<ArgumentNullException>(() => VoicingDescriber.ChordName(null!));
         Should.Throw<ArgumentNullException>(() => VoicingDescriber.AccessibleLabel(null!));
         VoicingDescriber.AccessibleLabel(Provider.GetVoicings(ChordSymbol.Parse("Am"))[0]).ShouldBe("A minor, x-0-2-2-1-0");
