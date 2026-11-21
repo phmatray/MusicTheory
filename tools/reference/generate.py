@@ -16,7 +16,7 @@ import pathlib
 import music21
 from fractions import Fraction
 
-from music21 import chord, duration, interval, key, note, scale
+from music21 import chord, duration, interval, key, meter, note, scale, stream
 
 OUT = pathlib.Path(__file__).resolve().parents[2] / "MusicTheory.UnitTests" / "Reference"
 LETTERS = "CDEFGAB"
@@ -171,6 +171,47 @@ def pcsets():
     write("pcsets.csv", ["pcs", "normal", "prime", "icv"], rows)
 
 
+# (meter, whole-note values; an "r" prefix is a rest)
+BARRING = [
+    ("4/4", "3/4 1/2"), ("4/4", "1/4 1/4 1/4 1/4"), ("4/4", "1/2 1/2 1/2"), ("4/4", "1/1 1/1"),
+    ("4/4", "1/4 1/2 1/2"), ("4/4", "3/8 3/4 1/8"), ("4/4", "1/2 3/4 3/4"), ("4/4", "3/4 3/4 3/4"),
+    ("2/4", "1/1"), ("2/4", "3/4 1/4"), ("2/4", "1/4 1/2 1/4"), ("2/4", "r1/1"), ("2/4", "1/4 r1/2 1/4"),
+    ("3/4", "1/2 1/2 1/2"), ("3/4", "1/1"), ("3/4", "3/4 3/4"), ("3/4", "1/4 3/4 1/2"), ("3/4", "r1/2 r1/2 1/4"),
+    ("6/8", "1/4 1/4 1/4"), ("6/8", "3/4 3/8"), ("6/8", "1/2 1/2"), ("6/8", "1/8 3/4 1/8"),
+    ("5/4", "1/1 1/2"), ("5/4", "1/2 1/2 1/2 1/2"), ("5/4", "3/4 3/4 3/4"),
+]
+
+
+def measures():
+    def fmt(n):
+        return str(Fraction(n) / 4)
+
+    rows = []
+    for i, (m, spec) in enumerate(BARRING, 1):
+        s = stream.Stream()
+        s.insert(0, meter.TimeSignature(m))
+        for tok in spec.split():
+            rest = tok.startswith("r")
+            ql = Fraction(tok.lstrip("r")) * 4
+            n = note.Rest() if rest else note.Note("C4")
+            n.quarterLength = ql
+            s.append(n)
+        bars = s.makeMeasures()
+        bars.makeTies(inPlace=True)
+        out = []
+        for bar in bars.getElementsByClass(stream.Measure):
+            toks = []
+            for n in bar.notesAndRests:
+                tied = not n.isRest and n.tie is not None and n.tie.type in ("start", "continue")
+                # music21 keeps a complex duration (5/8) as one note; split it the way Duration.Decompose does.
+                parts = n.duration.components
+                for j, c in enumerate(parts):
+                    toks.append(fmt(c.quarterLength) + ("~" if not n.isRest and (j < len(parts) - 1 or tied) else ""))
+            out.append(" ".join(toks))
+        rows.append([f"case{i}", m, spec, "|".join(out)])
+    write("measures.csv", ["case", "meter", "input", "expected"], rows)
+
+
 def tempo():
     from fractions import Fraction
     from music21 import stream, tempo as m21tempo
@@ -211,4 +252,5 @@ if __name__ == "__main__":
     neoriemannian()
     durations()
     pcsets()
+    measures()
     tempo()
