@@ -6,9 +6,16 @@
 @code {
     /// <summary>Spacing of the two notes of a melodic interval, in ms (ChordAudio's strum is the gap).</summary>
     private const int MelodicGapMs = 700;
+    private const int ChordStepMs = 1100;
 
     [Parameter, EditorRequired] public IReadOnlyList<IReadOnlyList<Note>> Sounds { get; set; } = default!;
     [Parameter, EditorRequired] public Lang Lang { get; set; }
+
+    /// <summary>Spacing of the notes of a melodic question, in ms (a scale plays faster than an interval).</summary>
+    [Parameter] public int GapMs { get; set; } = MelodicGapMs;
+
+    /// <summary>True when each step is a chord of its own (a progression), not a note of a melody.</summary>
+    [Parameter] public bool ChordSteps { get; set; }
 
     private bool _played;
 
@@ -17,9 +24,17 @@
     {
         var steps = DrillAudio.ToSchedule(Sounds);
         _played = true;
-        if (steps.Count == 1)
+        if (ChordSteps)
+        {
+            foreach (var step in steps)
+            {
+                await Audio.PlayAsync(step);
+                await Task.Delay(ChordStepMs);
+            }
+        }
+        else if (steps.Count == 1)
             await Audio.PlayAsync(steps[0], strumMs: 0);
         else
-            await Audio.PlayAsync(steps.SelectMany(s => s).ToArray(), strumMs: MelodicGapMs);
+            await Audio.PlayAsync(steps.SelectMany(s => s).ToArray(), strumMs: GapMs);
     }
 }

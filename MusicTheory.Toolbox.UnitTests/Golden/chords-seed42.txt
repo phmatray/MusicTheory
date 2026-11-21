@@ -1,0 +1,3 @@
+beginner: Major Minor Major Major Minor Major Minor Minor Minor Minor
+intermediate: Minor Dominant7 Minor Diminished Augmented Diminished Dominant7 Augmented Augmented Augmented
+advanced: Diminished Minor Minor Major7 Major Major7 Minor7 HalfDiminished7 Major7 Minor7

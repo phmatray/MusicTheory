@@ -1,0 +1,138 @@
+@using System.Globalization
+@using MusicTheory.Toolbox.Drills
+@using MusicTheory.Training
+@inject NavigationManager Nav
+@{
+    var lang = State.Lang;
+    var l = Link;
+}
+<PageTitle>@Strings.T(lang, "progressions.title") - @Strings.T(lang, "shell.title")</PageTitle>
+
+<h1>@Strings.T(lang, "progressions.title")</h1>
+<p>@Strings.T(lang, "progressions.blurb")</p>
+
+<div class="tb-controls">
+    <label>
+        @Strings.T(lang, "progressions.difficulty")
+        <select class="tb-difficulty" value="@l.Difficulty.ToString().ToLowerInvariant()" @onchange="OnDifficulty">
+            @foreach (var d in new[] { "beginner", "intermediate", "advanced" })
+            {
+                <option value="@d">@Strings.T(lang, "progressions.d." + d)</option>
+            }
+        </select>
+    </label>
+    <label>
+        @Strings.T(lang, "progressions.count")
+        <input class="tb-count" type="number" min="1" max="@DrillLink.MaxCount" value="@l.Count" @onchange="OnCount" />
+    </label>
+    <button type="button" class="tb-btn tb-generate" @onclick="Generate">@Strings.T(lang, l.Seed is null ? "progressions.generate" : "progressions.new")</button>
+</div>
+
+@if (_session is null)
+{
+    <p class="tb-notice" role="status">@Strings.T(lang, "progressions.new.blurb")</p>
+}
+else
+{
+    @if (_shown is { } q)
+    {
+        var minor = q.Key?.Mode == KeyMode.Minor;
+        <h2 class="tb-progress">@Strings.T(lang, "progressions.question", _session.Index + (_last is null ? 1 : 0), _session.Questions.Count)</h2>
+        <p class="tb-key-name">@Strings.T(lang, "progressions.key", TypeNames.Key(q.Key!, lang))</p>
+        <DrillPlayer Sounds="q.Sounds" Lang="lang" ChordSteps="true" @key="q" />
+        <DegreeSequence Model="_sequence" Degrees="_degrees" Minor="minor" Lang="lang" Disabled="@(_last is not null)" OnSubmit="Submit" />
+        @if (_last is { } r)
+        {
+            <p class="tb-result @(r.IsCorrect ? "tb-right" : "tb-wrong")" role="status">
+                @if (r.IsCorrect)
+                {
+                    @Strings.T(lang, "progressions.right", Numerals(r.Expected, minor, lang))
+                }
+                else
+                {
+                    @Strings.T(lang, "progressions.partial", (int)Math.Round(r.Score * r.Expected.Count), r.Expected.Count, Numerals(r.Expected, minor, lang))
+                }
+            </p>
+            <button type="button" class="tb-btn tb-next" @onclick="Next">
+                @Strings.T(lang, _session.IsFinished ? "progressions.finish" : "progressions.next")
+            </button>
+        }
+    }
+    else
+    {
+        <p class="tb-score" role="status">@Strings.T(lang, "progressions.score", _session.Score.ToString("0.##", Culture(lang)), _session.Summary.Total)</p>
+        <button type="button" class="tb-btn tb-restart" @onclick="Restart">@Strings.T(lang, "progressions.restart")</button>
+    }
+
+    <ShareButton Url="@ShareUrl" Lang="lang" />
+
+    @if (l.TeacherKey)
+    {
+        <h2>@Strings.T(lang, "progressions.teacher")</h2>
+        <ol class="tb-key-list">
+            @foreach (var keyed in _session.Questions)
+            {
+                <li>@TypeNames.Key(keyed.Key!, lang): @Numerals(keyed.Answer, keyed.Key!.Mode == KeyMode.Minor, lang)</li>
+            }
+        </ol>
+    }
+}
+
+<Understand Lang="lang" TextKey="progressions.understand" />
+
+@code {
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+
+    private DrillLink Link => DrillLink.FromState(State);
+    private DrillSessionModel<IReadOnlyList<int>>? _session;
+    private AnswerResult<IReadOnlyList<int>>? _last;
+    private Question<IReadOnlyList<int>>? _shown;
+    private DegreeSequenceModel _sequence = new(0);
+    private IReadOnlyList<int> _degrees = [];
+    private DrillLink? _built;
+
+    private string ShareUrl => Nav.Uri.Split('?')[0] + ToolboxUrl.Build((Link with { TeacherKey = false }).ToState(State.Lang));
+
+    private static CultureInfo Culture(Lang lang) => CultureInfo.GetCultureInfo(lang == Lang.Fr ? "fr-FR" : "en-US");
+
+    private static string Numerals(IReadOnlyList<int> degrees, bool minor, Lang lang) =>
+        string.Join(" - ", degrees.Select(d => TypeNames.Degree(d, minor, lang)));
+
+    protected override void OnParametersSet()
+    {
+        var l = Link with { TeacherKey = false };
+        if (_built == l) return;
+        _built = l;
+        Restart();
+    }
+
+    private void Restart()
+    {
+        _last = null;
+        var l = Link;
+        if (l.Seed is not { } seed) { _session = null; _shown = null; return; }
+        _session = DrillSessions.Progressions(l, seed);
+        _degrees = ProgressionDrillOptions.For(l.Difficulty).Degrees;
+        NewSequence();
+    }
+
+    private void NewSequence()
+    {
+        _shown = _session!.Current;
+        _sequence = new DegreeSequenceModel(_shown?.Answer.Count ?? 0);
+    }
+
+    private void Submit(IReadOnlyList<int> given) => _last = _session!.Answer(given.ToArray());
+
+    private void Next() { _last = null; NewSequence(); }
+
+    private void Go(DrillLink l) => Nav.NavigateTo(ToolboxUrl.Build(l.ToState(State.Lang)));
+
+    private void Generate() => Go(Link with { Seed = (ulong)Random.Shared.Next(1, 1_000_000_000) });
+
+    private void OnDifficulty(ChangeEventArgs e) =>
+        Go(DrillLink.FromState(State with { Params = new Dictionary<string, string>(State.Params) { ["d"] = e.Value?.ToString() ?? "" } }));
+
+    private void OnCount(ChangeEventArgs e) =>
+        Go(DrillLink.FromState(State with { Params = new Dictionary<string, string>(State.Params) { ["n"] = e.Value?.ToString() ?? "" } }));
+}

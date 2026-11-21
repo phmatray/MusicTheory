@@ -1,0 +1,6 @@
+@using MusicTheory.Toolbox.Drills
+<ChoiceDrill T="ScaleType" Prefix="scales" State="State" Build="DrillSessions.Scales" Label="TypeNames.Label" GapMs="350" />
+
+@code {
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+}
