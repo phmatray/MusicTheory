@@ -68,6 +68,8 @@ new Scale(Note.Parse("F#4"), ScaleType.Major).GetNotes();         // F#4 G#4 A#4
 ChordSymbol.Parse("C7b9#11").ToChord().GetNotes();                // C4 E4 G4 Bb4 Db5 F#5
 KeySignature.Parse("Eb").AccidentalCount;                         // -3
 Note.Parse("A4").GetFrequency(442);                               // 442
+Note.FromFrequency(446.0);                                        // A4 +23.4¢
+TunedPitch.CentsBetween(440, 880);                                // 1200
 
 HarmonicAnalyzer.Analyze(
     new[] { "Dm7", "G7", "Cmaj7" }.Select(ChordSymbol.Parse),
@@ -76,6 +78,14 @@ HarmonicAnalyzer.Analyze(
 CadenceDetector.Detect(
     new[] { "C", "F", "G", "Am" }.Select(ChordSymbol.Parse).ToList(),
     KeySignature.Parse("C"));                                     // Cadence(Deceptive, 3)
+
+// Voice leading: each voicing moves the least from the previous one.
+foreach (var v in VoiceLeader.Lead(
+             new[] { "Dm7", "G7", "Cmaj7" }.Select(ChordSymbol.Parse), PianoVoicingStyle.RootlessA))
+    Console.WriteLine(string.Join(" ", v));
+// F4 A4 C5 E5
+// F4 A4 B4 D5
+// E4 G4 B4 D5
 ```
 
 ## 🎯 How it is checked
