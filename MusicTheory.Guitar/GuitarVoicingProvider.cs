@@ -168,7 +168,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
                 }
                 var options = new List<int?> { null };
                 // ponytail: open strings only next to low positions; a smarter reach model if mixed voicings matter.
-                // Stryker disable once Conditional: only prunes the search; TryBuild rejects a wrong bass either way.
+                // Stryker disable once Conditional: only prunes the search; TryBuild rejects a wrong bass either way (re-entrant tunings start with bassPlaced true and require no bass).
                 if (window <= 3 && (!bassPlaced ? Pc(s, 0) == _bass : _allowed.Contains(Pc(s, 0))))
                     options.Add(0);
                 for (int f = window; f < window + _stretch && f <= MaxFret; f++)
