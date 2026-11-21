@@ -2,9 +2,9 @@
 x32010             Curated      open    base  1  difficulty   1.5  fingers -32-1-  sounds x C3 E3 G3 C4 E4  midi 48,52,55,60,64
 x320xx             Generated    -       base  1  difficulty   6.3  fingers -21---  sounds x C3 E3 G3 x x  midi 48,52,55
 x35553             MovableShape A-form  base  3  difficulty   6.6  fingers -12341 barre 3:1-5  sounds x C3 G3 C4 E4 G4  midi 48,55,60,64,67
-xxx550             Generated    -       base  5  difficulty   6.7  fingers ---12-  sounds x x x C4 E4 E4  midi 60,64,64
 x3201x             Generated    -       base  1  difficulty     7  fingers -32-1-  sounds x C3 E3 G3 C4 x  midi 48,52,55,60
 x35050             Generated    -       base  3  difficulty   7.1  fingers -12-3-  sounds x C3 G3 G3 E4 E4  midi 48,55,55,64,64
+x320x0             Generated    -       base  1  difficulty   7.3  fingers -21---  sounds x C3 E3 G3 x E4  midi 48,52,55,64
 8 10 10 9 8 8      MovableShape E-form  base  8  difficulty   7.6  fingers 134211 barre 8:0-5  sounds C3 G3 C4 E4 G4 C5  midi 48,55,60,64,67,72
 x x 10 12 13 12    MovableShape D-form  base 10  difficulty   8.2  fingers --1243  sounds x x C4 G4 C5 E5  midi 60,67,72,76
 ## Am (default)
@@ -19,30 +19,30 @@ x 12 14 14 13 12   MovableShape A-form  base 12  difficulty   9.3  fingers -1342
 ## F (default)
 133211             Curated      open    base  1  difficulty   3.5  fingers 134211 barre 1:0-5  sounds F2 C3 F3 A3 C4 F4  midi 41,48,53,57,60,65
 xx3565             MovableShape D-form  base  3  difficulty   6.1  fingers --1243  sounds x x F3 C4 F4 A4  midi 53,60,65,69
-103xxx             Generated    -       base  1  difficulty   6.5  fingers 1-2---  sounds F2 A2 F3 x x x  midi 41,45,53
-1032xx             Generated    -       base  1  difficulty     7  fingers 1-32--  sounds F2 A2 F3 A3 x x  midi 41,45,53,57
 10321x             Generated    -       base  1  difficulty   7.5  fingers 1-432-  sounds F2 A2 F3 A3 C4 x  midi 41,45,53,57,60
-10x2xx             Generated    -       base  1  difficulty   7.5  fingers 1--2--  sounds F2 A2 x A3 x x  midi 41,45,57
+xx321x             Generated    -       base  1  difficulty   7.5  fingers --321-  sounds x x F3 A3 C4 x  midi 53,57,60
+10x21x             Generated    -       base  1  difficulty     8  fingers 1--32-  sounds F2 A2 x A3 C4 x  midi 41,45,57,60
+1332xx             Generated    -       base  1  difficulty     8  fingers 1342--  sounds F2 C3 F3 A3 x x  midi 41,48,53,57
 x 8 10 10 10 8     MovableShape A-form  base  8  difficulty   8.1  fingers -12341 barre 8:1-5  sounds x F3 C4 F4 A4 C5  midi 53,60,65,69,72
 13 15 15 14 13 13  MovableShape E-form  base 13  difficulty   9.1  fingers 134211 barre 13:0-5  sounds F3 C4 F4 A4 C5 F5  midi 53,60,65,69,72,77
 ## G7 (default)
 320001             Curated      open    base  1  difficulty     1  fingers 32---1  sounds G2 B2 D3 G3 B3 F4  midi 43,47,50,55,59,65
-xxx001             Generated    -       base  1  difficulty   4.5  fingers -----1  sounds x x x G3 B3 F4  midi 55,59,65
 353433             MovableShape E-form  base  3  difficulty   5.1  fingers 131211 barre 3:0-5  sounds G2 D3 F3 B3 D4 G4  midi 43,50,53,59,62,67
 xx5767             MovableShape D-form  base  5  difficulty   6.2  fingers --1324  sounds x x G3 D4 F4 B4  midi 55,62,65,71
-32300x             Generated    -       base  1  difficulty   6.3  fingers 213---  sounds G2 B2 F3 G3 B3 x  midi 43,47,53,55,59
-323003             Generated    -       base  1  difficulty   6.8  fingers 213--4  sounds G2 B2 F3 G3 B3 G4  midi 43,47,53,55,59,67
-3230xx             Generated    -       base  1  difficulty   6.8  fingers 213---  sounds G2 B2 F3 G3 x x  midi 43,47,53,55
+xxx001             Generated    -       base  1  difficulty   6.5  fingers -----1  sounds x x x G3 B3 F4  midi 55,59,65
+320031             Generated    -       base  1  difficulty     7  fingers 32--41  sounds G2 B2 D3 G3 D4 F4  midi 43,47,50,55,62,65
+3x0001             Generated    -       base  1  difficulty     7  fingers 2----1  sounds G2 x D3 G3 B3 F4  midi 43,50,55,59,65
+35300x             Generated    -       base  3  difficulty   7.1  fingers 132---  sounds G2 D3 F3 G3 B3 x  midi 43,50,53,55,59
 x 10 12 10 12 10   MovableShape A-form  base 10  difficulty   7.7  fingers -12131 barre 10:1-5  sounds x G3 D4 F4 B4 D5  midi 55,62,65,71,74
 ## Bb7 (default)
 x13131             MovableShape A-form  base  1  difficulty     5  fingers -12131 barre 1:1-5  sounds x Bb2 F3 Ab3 D4 F4  midi 46,53,56,62,65
-x101xx             Generated    -       base  1  difficulty   5.5  fingers -1-2--  sounds x Bb2 D3 Ab3 x x  midi 46,50,56
 686766             MovableShape E-form  base  6  difficulty     6  fingers 131211 barre 6:0-5  sounds Bb2 F3 Ab3 D4 F4 Bb4  midi 46,53,56,62,65,70
-x1013x             Generated    -       base  1  difficulty     7  fingers -1-23-  sounds x Bb2 D3 Ab3 D4 x  midi 46,50,56,62
 x x 8 10 9 10      MovableShape D-form  base  8  difficulty   7.1  fingers --1324  sounds x x Bb3 F4 Ab4 D5  midi 58,65,68,74
 x10131             Generated    -       base  1  difficulty   7.5  fingers -1-243  sounds x Bb2 D3 Ab3 D4 F4  midi 46,50,56,62,65
 x101x1             Generated    -       base  1  difficulty   7.5  fingers -1-2-3  sounds x Bb2 D3 Ab3 x F4  midi 46,50,56,65
-xxx334             Generated    -       base  1  difficulty   7.6  fingers ---123  sounds x x x Bb3 D4 Ab4  midi 58,62,68
+x101xx             Generated    -       base  1  difficulty   7.5  fingers -1-2--  sounds x Bb2 D3 Ab3 x x  midi 46,50,56
+x1313x             Generated    -       base  1  difficulty     8  fingers -1324-  sounds x Bb2 F3 Ab3 D4 x  midi 46,53,56,62
+x 13 15 13 15 13   MovableShape A-form  base 13  difficulty   8.6  fingers -12131 barre 13:1-5  sounds x Bb3 F4 Ab4 D5 F5  midi 58,65,68,74,77
 ## E7#9 (default)
 020004             Generated    -       base  1  difficulty   5.3  fingers -1---2  sounds E2 B2 D3 F##3 B3 G#4  midi 40,47,50,55,59,68
 050004             Generated    -       base  4  difficulty   5.4  fingers -2---1  sounds E2 D3 D3 F##3 B3 G#4  midi 40,50,50,55,59,68
@@ -51,7 +51,7 @@ xxx334             Generated    -       base  1  difficulty   7.6  fingers ---12
 020103             Generated    -       base  1  difficulty     6  fingers -2-1-3  sounds E2 B2 D3 G#3 B3 F##4  midi 40,47,50,56,59,67
 05600x             Generated    -       base  5  difficulty   6.2  fingers -12---  sounds E2 D3 G#3 F##3 B3 x  midi 40,50,56,55,59
 020034             Generated    -       base  1  difficulty   6.3  fingers -1--23  sounds E2 B2 D3 F##3 D4 G#4  midi 40,47,50,55,62,68
-x7678x             MovableShape A-form  base  6  difficulty   6.5  fingers -2134-  sounds x E3 G#3 D4 F##4 x  midi 52,56,62,67
+x7678x             MovableShape A-form  base  6  difficulty   8.5  fingers -2134-  sounds x E3 G#3 D4 F##4 x  midi 52,56,62,67
 ## C/G (default)
 xxx010             Generated    -       base  1  difficulty   4.5  fingers ----1-  sounds x x x G3 C4 E4  midi 55,60,64
 3320xx             Generated    -       base  1  difficulty   6.8  fingers 231---  sounds G2 C3 E3 G3 x x  midi 43,48,52,55
@@ -62,14 +62,14 @@ xx5550             Generated    -       base  5  difficulty   7.2  fingers --123
 335050             Generated    -       base  3  difficulty   7.6  fingers 123-4-  sounds G2 C3 G3 G3 E4 E4  midi 43,48,55,55,64,64
 xx555x             Generated    -       base  5  difficulty   7.7  fingers --123-  sounds x x G3 C4 E4 x  midi 55,60,64
 ## Cmaj13 (default)
-x30200             Generated    -       base  1  difficulty   5.3  fingers -2-1--  sounds x C3 D3 A3 B3 E4  midi 48,50,57,59,64
-x32200             Generated    -       base  1  difficulty   6.3  fingers -312--  sounds x C3 E3 A3 B3 E4  midi 48,52,57,59,64
-x33200             Generated    -       base  1  difficulty   6.3  fingers -231--  sounds x C3 F3 A3 B3 E4  midi 48,53,57,59,64
-x3220x             Generated    -       base  1  difficulty   6.8  fingers -312--  sounds x C3 E3 A3 B3 x  midi 48,52,57,59
-x32203             Generated    -       base  1  difficulty   7.3  fingers -312-4  sounds x C3 E3 A3 B3 G4  midi 48,52,57,59,67
-x3x200             Generated    -       base  1  difficulty   7.3  fingers -2-1--  sounds x C3 x A3 B3 E4  midi 48,57,59,64
-x32005             Generated    -       base  2  difficulty   7.3  fingers -21--3  sounds x C3 E3 G3 B3 A4  midi 48,52,55,59,69
-x35200             Generated    -       base  2  difficulty   7.3  fingers -231--  sounds x C3 G3 A3 B3 E4  midi 48,55,57,59,64
+x30200             Generated    -       base  1  difficulty   9.3  fingers -2-1--  sounds x C3 D3 A3 B3 E4  midi 48,50,57,59,64
+x33200             Generated    -       base  1  difficulty  10.3  fingers -231--  sounds x C3 F3 A3 B3 E4  midi 48,53,57,59,64
+877787             Generated    -       base  7  difficulty  10.8  fingers 211131 barre 7:1-5  sounds C3 E3 A3 D4 G4 B4  midi 48,52,57,62,67,71
+x32203             Generated    -       base  1  difficulty  11.3  fingers -312-4  sounds x C3 E3 A3 B3 G4  midi 48,52,57,59,67
+x32005             Generated    -       base  2  difficulty  11.3  fingers -21--3  sounds x C3 E3 G3 B3 A4  midi 48,52,55,59,69
+x35200             Generated    -       base  2  difficulty  11.3  fingers -231--  sounds x C3 G3 A3 B3 E4  midi 48,55,57,59,64
+x32201             Generated    -       base  1  difficulty  11.5  fingers -423-1  sounds x C3 E3 A3 B3 F4  midi 48,52,57,59,65
+x30455             Generated    -       base  3  difficulty  12.1  fingers -1-234  sounds x C3 D3 B3 E4 A4  midi 48,50,59,64,69
 ## C5 (default)
 x350xx             Generated    -       base  3  difficulty   7.1  fingers -12---  sounds x C3 G3 G3 x x  midi 48,55,55
 x3x01x             Generated    -       base  1  difficulty     8  fingers -2--1-  sounds x C3 x G3 C4 x  midi 48,55,60
@@ -80,11 +80,11 @@ xxx588             Generated    -       base  5  difficulty   9.2  fingers ---12
 8 10 10 x x x      Generated    -       base  8  difficulty   9.6  fingers 123---  sounds C3 G3 C4 x x x  midi 48,55,60
 x355x3             Generated    -       base  3  difficulty  10.1  fingers -134-2  sounds x C3 G3 C4 x G4  midi 48,55,60,67
 ## C7alt (default)
-x32324             Generated    -       base  1  difficulty   9.3  fingers -21314 barre 2:2-4  sounds x C3 E3 Bb3 Db4 G#4  midi 48,52,58,61,68
 876676             Generated    -       base  6  difficulty    10  fingers 421131 barre 6:2-5  sounds C3 E3 G#3 Db4 Gb4 Bb4  midi 48,52,56,61,66,70
-876696             Generated    -       base  6  difficulty  10.5  fingers 321141 barre 6:2-5  sounds C3 E3 G#3 Db4 G#4 Bb4  midi 48,52,56,61,68,70
-87x696             Generated    -       base  6  difficulty  12.5  fingers 32-141 barre 6:3-5  sounds C3 E3 x Db4 G#4 Bb4  midi 48,52,61,68,70
-8 11 8 9 x 9       Generated    -       base  8  difficulty  13.1  fingers 1412-3 barre 8:0-2  sounds C3 G#3 Bb3 E4 x Db5  midi 48,56,58,64,73
+x32324             Generated    -       base  1  difficulty  11.3  fingers -21314 barre 2:2-4  sounds x C3 E3 Bb3 Db4 G#4  midi 48,52,58,61,68
+876696             Generated    -       base  6  difficulty  12.5  fingers 321141 barre 6:2-5  sounds C3 E3 G#3 Db4 G#4 Bb4  midi 48,52,56,61,68,70
+87x696             Generated    -       base  6  difficulty  14.5  fingers 32-141 barre 6:3-5  sounds C3 E3 x Db4 G#4 Bb4  midi 48,52,61,68,70
+8 11 8 9 x 9       Generated    -       base  8  difficulty  15.1  fingers 1412-3 barre 8:0-2  sounds C3 G#3 Bb3 E4 x Db5  midi 48,56,58,64,73
 ## Dm7b5 (default)
 x5656x             MovableShape A-form  base  5  difficulty   5.7  fingers -1324-  sounds x D3 Ab3 C4 F4 x  midi 50,56,60,65
 xx0111             Generated    -       base  1  difficulty     6  fingers ---123  sounds x x D3 Ab3 C4 F4  midi 50,56,60,65
@@ -95,22 +95,22 @@ x53534             Generated    -       base  3  difficulty   9.6  fingers -3141
 x535x4             Generated    -       base  3  difficulty  10.1  fingers -314-2  sounds x D3 F3 C4 x Ab4  midi 50,53,60,68
 10 11 10 10 x x    Generated    -       base 10  difficulty  10.2  fingers 1423--  sounds D3 Ab3 C4 F4 x x  midi 50,56,60,65
 ## Eb6/9 (default)
-xx1011             Generated    -       base  1  difficulty     6  fingers --1-23  sounds x x Eb3 G3 C4 F4  midi 51,55,60,65
-x6556x             Generated    -       base  5  difficulty   8.7  fingers -3124-  sounds x Eb3 G3 C4 F4 x  midi 51,55,60,65
+xx1011             Generated    -       base  1  difficulty     8  fingers --1-23  sounds x x Eb3 G3 C4 F4  midi 51,55,60,65
 11 8 8 8 8 8       Generated    -       base  8  difficulty   9.1  fingers 211111 barre 8:1-5  sounds Eb3 F3 Bb3 Eb4 G4 C5  midi 51,53,58,63,67,72
 x65566             Generated    -       base  5  difficulty   9.7  fingers -21134 barre 5:2-3  sounds x Eb3 G3 C4 F4 Bb4  midi 51,55,60,65,70
-x63543             Generated    -       base  3  difficulty  10.1  fingers -41321 barre 3:2-5  sounds x Eb3 F3 C4 Eb4 G4  midi 51,53,60,63,67
-x63563             Generated    -       base  3  difficulty  10.1  fingers -31241 barre 3:2-5  sounds x Eb3 F3 C4 F4 G4  midi 51,53,60,65,67
-11 8 10 8 8 8      Generated    -       base  8  difficulty  10.1  fingers 312111 barre 8:1-5  sounds Eb3 F3 C4 Eb4 G4 C5  midi 51,53,60,63,67,72
 11 8 8 10 8 8      Generated    -       base  8  difficulty  10.1  fingers 311211 barre 8:1-5  sounds Eb3 F3 Bb3 F4 G4 C5  midi 51,53,58,65,67,72
+11 10 10 10 11 x   Generated    -       base 10  difficulty  10.2  fingers 21113- barre 10:1-3  sounds Eb3 G3 C4 F4 Bb4 x  midi 51,55,60,65,70
+x6556x             Generated    -       base  5  difficulty  10.7  fingers -3124-  sounds x Eb3 G3 C4 F4 x  midi 51,55,60,65
+11 10 10 10 11 11  Generated    -       base 10  difficulty  10.7  fingers 211134 barre 10:1-3  sounds Eb3 G3 C4 F4 Bb4 Eb5  midi 51,55,60,65,70,75
+11 10 8 10 8 8     Generated    -       base  8  difficulty  11.1  fingers 421311 barre 8:2-5  sounds Eb3 G3 Bb3 F4 G4 C5  midi 51,55,58,65,67,72
 ## F#m (default)
 244222             MovableShape E-form  base  1  difficulty   4.8  fingers 123111 barre 2:0-5  sounds F#2 C#3 F#3 A3 C#4 F#4  midi 42,49,54,57,61,66
 xx4675             MovableShape D-form  base  4  difficulty   6.4  fingers --1342  sounds x x F#3 C#4 F#4 A4  midi 54,61,66,69
-204xxx             Generated    -       base  1  difficulty   6.8  fingers 1-2---  sounds F#2 A2 F#3 x x x  midi 42,45,54
-2042xx             Generated    -       base  1  difficulty   7.3  fingers 1-32--  sounds F#2 A2 F#3 A3 x x  midi 42,45,54,57
-20x2xx             Generated    -       base  1  difficulty   7.3  fingers 1--2--  sounds F#2 A2 x A3 x x  midi 42,45,57
 20422x             Generated    -       base  1  difficulty   7.8  fingers 1-423-  sounds F#2 A2 F#3 A3 C#4 x  midi 42,45,54,57,61
 20x22x             Generated    -       base  1  difficulty   7.8  fingers 1--23-  sounds F#2 A2 x A3 C#4 x  midi 42,45,57,61
+xx422x             Generated    -       base  1  difficulty   7.8  fingers --312-  sounds x x F#3 A3 C#4 x  midi 54,57,61
+20x222             Generated    -       base  1  difficulty   8.3  fingers 1--234  sounds F#2 A2 x A3 C#4 F#4  midi 42,45,57,61,66
+24422x             Generated    -       base  1  difficulty   8.3  fingers 12311- barre 2:0-4  sounds F#2 C#3 F#3 A3 C#4 x  midi 42,49,54,57,61
 x 9 11 11 10 9     MovableShape A-form  base  9  difficulty   8.4  fingers -13421 barre 9:1-5  sounds x F#3 C#4 F#4 A4 C#5  midi 54,61,66,69,73
 ## Gsus4 (default)
 3300xx             Generated    -       base  1  difficulty   5.6  fingers 12----  sounds G2 C3 D3 G3 x x  midi 43,48,50,55
@@ -118,53 +118,53 @@ x 9 11 11 10 9     MovableShape A-form  base  9  difficulty   8.4  fingers -1342
 330xxx             Generated    -       base  1  difficulty   6.1  fingers 12----  sounds G2 C3 D3 x x x  midi 43,48,50
 355533             MovableShape E-form  base  3  difficulty   6.1  fingers 123411 barre 3:0-5  sounds G2 D3 G3 C4 D4 G4  midi 43,50,55,60,62,67
 33001x             Generated    -       base  1  difficulty   6.5  fingers 23--1-  sounds G2 C3 D3 G3 C4 x  midi 43,48,50,55,60
-xxx013             Generated    -       base  1  difficulty   6.5  fingers ----12  sounds x x x G3 C4 G4  midi 55,60,67
+330033             Generated    -       base  1  difficulty   6.6  fingers 12--34  sounds G2 C3 D3 G3 D4 G4  midi 43,48,50,55,62,67
 xx5788             MovableShape D-form  base  5  difficulty   6.7  fingers --1234  sounds x x G3 D4 G4 C5  midi 55,62,67,72
 x 10 12 12 13 10   MovableShape A-form  base 10  difficulty   9.2  fingers -12341 barre 10:1-5  sounds x G3 D4 G4 C5 D5  midi 55,62,67,72,74
 ## Ab (default)
 466544             MovableShape E-form  base  4  difficulty   6.4  fingers 134211 barre 4:0-5  sounds Ab2 Eb3 Ab3 C4 Eb4 Ab4  midi 44,51,56,60,63,68
 xx6898             MovableShape D-form  base  6  difficulty     7  fingers --1243  sounds x x Ab3 Eb4 Ab4 C5  midi 56,63,68,72
 431xxx             Generated    -       base  1  difficulty     8  fingers 321---  sounds Ab2 C3 Eb3 x x x  midi 44,48,51
-xxx114             Generated    -       base  1  difficulty     8  fingers ---123  sounds x x x Ab3 C4 Ab4  midi 56,60,68
 xx654x             Generated    -       base  4  difficulty   8.4  fingers --321-  sounds x x Ab3 C4 Eb4 x  midi 56,60,63
 43111x             Generated    -       base  1  difficulty   8.5  fingers 32111- barre 1:2-4  sounds Ab2 C3 Eb3 Ab3 C4 x  midi 44,48,51,56,60
 4311xx             Generated    -       base  1  difficulty   8.5  fingers 4312--  sounds Ab2 C3 Eb3 Ab3 x x  midi 44,48,51,56
+4665xx             Generated    -       base  4  difficulty   8.9  fingers 1342--  sounds Ab2 Eb3 Ab3 C4 x x  midi 44,51,56,60
 x 11 13 13 13 11   MovableShape A-form  base 11  difficulty     9  fingers -12341 barre 11:1-5  sounds x Ab3 Eb4 Ab4 C5 Eb5  midi 56,63,68,72,75
 ## Cm11 (default)
-888888             Generated    -       base  8  difficulty   6.6  fingers 111111 barre 8:0-5  sounds C3 F3 Bb3 Eb4 G4 C5  midi 48,53,58,63,67,72
-x33343             Generated    -       base  1  difficulty   7.1  fingers -11121 barre 3:1-5  sounds x C3 F3 Bb3 Eb4 G4  midi 48,53,58,63,67
-88888x             Generated    -       base  8  difficulty   7.1  fingers 11111- barre 8:0-4  sounds C3 F3 Bb3 Eb4 G4 x  midi 48,53,58,63,67
-x30341             Generated    -       base  1  difficulty     8  fingers -2-341  sounds x C3 D3 Bb3 Eb4 F4  midi 48,50,58,63,65
-x31311             Generated    -       base  1  difficulty     8  fingers -21311 barre 1:2-5  sounds x C3 Eb3 Bb3 C4 F4  midi 48,51,58,60,65
-x3334x             Generated    -       base  1  difficulty   8.1  fingers -1234-  sounds x C3 F3 Bb3 Eb4 x  midi 48,53,58,63
-x33046             Generated    -       base  3  difficulty   8.6  fingers -12-34  sounds x C3 F3 G3 Eb4 Bb4  midi 48,53,55,63,70
 8 8 8 8 8 10       Generated    -       base  8  difficulty   8.6  fingers 111112 barre 8:0-4  sounds C3 F3 Bb3 Eb4 G4 D5  midi 48,53,58,63,67,74
+888888             Generated    -       base  8  difficulty   8.6  fingers 111111 barre 8:0-5  sounds C3 F3 Bb3 Eb4 G4 C5  midi 48,53,58,63,67,72
+x33343             Generated    -       base  1  difficulty   9.1  fingers -11121 barre 3:1-5  sounds x C3 F3 Bb3 Eb4 G4  midi 48,53,58,63,67
+88888x             Generated    -       base  8  difficulty   9.1  fingers 11111- barre 8:0-4  sounds C3 F3 Bb3 Eb4 G4 x  midi 48,53,58,63,67
+x30341             Generated    -       base  1  difficulty    10  fingers -2-341  sounds x C3 D3 Bb3 Eb4 F4  midi 48,50,58,63,65
+x33046             Generated    -       base  3  difficulty  10.6  fingers -12-34  sounds x C3 F3 G3 Eb4 Bb4  midi 48,53,55,63,70
+x31331             Generated    -       base  1  difficulty    11  fingers -21341 barre 1:2-5  sounds x C3 Eb3 Bb3 D4 F4  midi 48,51,58,62,65
+8 8 8 8 8 11       Generated    -       base  8  difficulty  11.1  fingers 111112 barre 8:0-4  sounds C3 F3 Bb3 Eb4 G4 Eb5  midi 48,53,58,63,67,75
 ## C (capo 3)
 x32010             Curated      open    base  1  difficulty   1.5  fingers -32-1-  sounds x Eb3 G3 Bb3 Eb4 G4  midi 51,55,58,63,67
 x320xx             Generated    -       base  1  difficulty   6.3  fingers -21---  sounds x Eb3 G3 Bb3 x x  midi 51,55,58
 x35553             MovableShape A-form  base  3  difficulty   6.6  fingers -12341 barre 3:1-5  sounds x Eb3 Bb3 Eb4 G4 Bb4  midi 51,58,63,67,70
-xxx550             Generated    -       base  5  difficulty   6.7  fingers ---12-  sounds x x x Eb4 G4 G4  midi 63,67,67
 x3201x             Generated    -       base  1  difficulty     7  fingers -32-1-  sounds x Eb3 G3 Bb3 Eb4 x  midi 51,55,58,63
 x35050             Generated    -       base  3  difficulty   7.1  fingers -12-3-  sounds x Eb3 Bb3 Bb3 G4 G4  midi 51,58,58,67,67
 x320x0             Generated    -       base  1  difficulty   7.3  fingers -21---  sounds x Eb3 G3 Bb3 x G4  midi 51,55,58,67
+x32050             Generated    -       base  2  difficulty   7.3  fingers -21-3-  sounds x Eb3 G3 Bb3 G4 G4  midi 51,55,58,67,67
 8 10 10 9 8 8      MovableShape E-form  base  8  difficulty   7.6  fingers 134211 barre 8:0-5  sounds Eb3 Bb3 Eb4 G4 Bb4 Eb5  midi 51,58,63,67,70,75
 ## C (max fret 7)
 x32010             Curated      open    base  1  difficulty   1.5  fingers -32-1-  sounds x C3 E3 G3 C4 E4  midi 48,52,55,60,64
 x320xx             Generated    -       base  1  difficulty   6.3  fingers -21---  sounds x C3 E3 G3 x x  midi 48,52,55
 x35553             MovableShape A-form  base  3  difficulty   6.6  fingers -12341 barre 3:1-5  sounds x C3 G3 C4 E4 G4  midi 48,55,60,64,67
-xxx550             Generated    -       base  5  difficulty   6.7  fingers ---12-  sounds x x x C4 E4 E4  midi 60,64,64
 x3201x             Generated    -       base  1  difficulty     7  fingers -32-1-  sounds x C3 E3 G3 C4 x  midi 48,52,55,60
 x35050             Generated    -       base  3  difficulty   7.1  fingers -12-3-  sounds x C3 G3 G3 E4 E4  midi 48,55,55,64,64
 x320x0             Generated    -       base  1  difficulty   7.3  fingers -21---  sounds x C3 E3 G3 x E4  midi 48,52,55,64
 x32050             Generated    -       base  2  difficulty   7.3  fingers -21-3-  sounds x C3 E3 G3 E4 E4  midi 48,52,55,64,64
+x32013             Generated    -       base  1  difficulty   7.5  fingers -32-14  sounds x C3 E3 G3 C4 G4  midi 48,52,55,60,67
 ## C (stretch 3)
 x32010             Curated      open    base  1  difficulty   1.5  fingers -32-1-  sounds x C3 E3 G3 C4 E4  midi 48,52,55,60,64
 x320xx             Generated    -       base  1  difficulty   6.3  fingers -21---  sounds x C3 E3 G3 x x  midi 48,52,55
 x35553             MovableShape A-form  base  3  difficulty   6.6  fingers -12341 barre 3:1-5  sounds x C3 G3 C4 E4 G4  midi 48,55,60,64,67
-xxx550             Generated    -       base  5  difficulty   6.7  fingers ---12-  sounds x x x C4 E4 E4  midi 60,64,64
 x3201x             Generated    -       base  1  difficulty     7  fingers -32-1-  sounds x C3 E3 G3 C4 x  midi 48,52,55,60
 x35050             Generated    -       base  3  difficulty   7.1  fingers -12-3-  sounds x C3 G3 G3 E4 E4  midi 48,55,55,64,64
 x320x0             Generated    -       base  1  difficulty   7.3  fingers -21---  sounds x C3 E3 G3 x E4  midi 48,52,55,64
+x32013             Generated    -       base  1  difficulty   7.5  fingers -32-14  sounds x C3 E3 G3 C4 G4  midi 48,52,55,60,67
 8 10 10 9 8 8      MovableShape E-form  base  8  difficulty   7.6  fingers 134211 barre 8:0-5  sounds C3 G3 C4 E4 G4 C5  midi 48,55,60,64,67,72
 ## C (max 3)
 x32010             Curated      open    base  1  difficulty   1.5  fingers -32-1-  sounds x C3 E3 G3 C4 E4  midi 48,52,55,60,64
@@ -174,9 +174,9 @@ x35553             MovableShape A-form  base  3  difficulty   6.6  fingers -1234
 x32010             Curated      open    base  1  difficulty   1.5  fingers -32-1-  sounds x C3 E3 G3 C4 E4  midi 48,52,55,60,64
 x320xx             Generated    -       base  1  difficulty   6.3  fingers -21---  sounds x C3 E3 G3 x x  midi 48,52,55
 x35553             MovableShape A-form  base  3  difficulty   6.6  fingers -12341 barre 3:1-5  sounds x C3 G3 C4 E4 G4  midi 48,55,60,64,67
-xxx550             Generated    -       base  5  difficulty   6.7  fingers ---12-  sounds x x x C4 E4 E4  midi 60,64,64
 x3201x             Generated    -       base  1  difficulty     7  fingers -32-1-  sounds x C3 E3 G3 C4 x  midi 48,52,55,60
 x35050             Generated    -       base  3  difficulty   7.1  fingers -12-3-  sounds x C3 G3 G3 E4 E4  midi 48,55,55,64,64
+x320x0             Generated    -       base  1  difficulty   7.3  fingers -21---  sounds x C3 E3 G3 x E4  midi 48,52,55,64
 8 10 10 9 8 8      MovableShape E-form  base  8  difficulty   7.6  fingers 134211 barre 8:0-5  sounds C3 G3 C4 E4 G4 C5  midi 48,55,60,64,67,72
 x x 10 12 13 12    MovableShape D-form  base 10  difficulty   8.2  fingers --1243  sounds x x C4 G4 C5 E5  midi 60,67,72,76
 ## D (drop D)
@@ -187,7 +187,7 @@ x x 10 12 13 12    MovableShape D-form  base 10  difficulty   8.2  fingers --124
 000x32             Generated    -       base  1  difficulty   6.8  fingers ----21  sounds D2 A2 D3 x D4 F#4  midi 38,45,50,62,66
 00423x             Generated    -       base  1  difficulty   6.8  fingers --312-  sounds D2 A2 F#3 A3 D4 x  midi 38,45,54,57,62
 xx0232             Generated    -       base  1  difficulty   6.8  fingers ---132  sounds x x D3 A3 D4 F#4  midi 50,57,62,66
-054xxx             Generated    -       base  4  difficulty   6.9  fingers -21---  sounds D2 D3 F#3 x x x  midi 38,50,54
+004232             Generated    -       base  1  difficulty   7.3  fingers --4132  sounds D2 A2 F#3 A3 D4 F#4  midi 38,45,54,57,62,66
 ## Dsus4 (DADGAD)
 000000             Generated    -       base  1  difficulty     2  fingers ------  sounds D2 A2 D3 G3 A3 D4  midi 38,45,50,55,57,62
 00000x             Generated    -       base  1  difficulty   2.5  fingers ------  sounds D2 A2 D3 G3 A3 x  midi 38,45,50,55,57
@@ -207,83 +207,81 @@ x00x00             Generated    -       base  1  difficulty   4.5  fingers -----
 x0x000             Generated    -       base  1  difficulty   4.5  fingers ------  sounds x G2 x G3 B3 D4  midi 43,55,59,62
 50000x             Generated    -       base  5  difficulty   4.7  fingers 1-----  sounds G2 G2 D3 G3 B3 x  midi 43,43,50,55,59
 ## E (half step down)
-103xxx             Generated    -       base  1  difficulty   6.5  fingers 1-2---  sounds E2 G#2 E3 x x x  midi 40,44,52
-1032xx             Generated    -       base  1  difficulty     7  fingers 1-32--  sounds E2 G#2 E3 G#3 x x  midi 40,44,52,56
 10321x             Generated    -       base  1  difficulty   7.5  fingers 1-432-  sounds E2 G#2 E3 G#3 B3 x  midi 40,44,52,56,59
-10x2xx             Generated    -       base  1  difficulty   7.5  fingers 1--2--  sounds E2 G#2 x G#3 x x  midi 40,44,56
 xx321x             Generated    -       base  1  difficulty   7.5  fingers --321-  sounds x x E3 G#3 B3 x  midi 52,56,59
 10x21x             Generated    -       base  1  difficulty     8  fingers 1--32-  sounds E2 G#2 x G#3 B3 x  midi 40,44,56,59
 1332xx             Generated    -       base  1  difficulty     8  fingers 1342--  sounds E2 B2 E3 G#3 x x  midi 40,47,52,56
 xx3211             Generated    -       base  1  difficulty     8  fingers --4312  sounds x x E3 G#3 B3 E4  midi 52,56,59,64
+103x1x             Generated    -       base  1  difficulty   8.5  fingers 1-3-2-  sounds E2 G#2 E3 x B3 x  midi 40,44,52,59
+103xxx             Generated    -       base  1  difficulty   8.5  fingers 1-2---  sounds E2 G#2 E3 x x x  midi 40,44,52
+10x211             Generated    -       base  1  difficulty   8.5  fingers 1--423  sounds E2 G#2 x G#3 B3 E4  midi 40,44,56,59,64
 ## C (ukulele)
 0003               Generated    -       base  1  difficulty   3.6  fingers ---1  sounds G4 C4 E4 C5  midi 67,60,64,72
 000x               Generated    -       base  1  difficulty     4  fingers ----  sounds G4 C4 E4 x  midi 67,60,64
 0403               Generated    -       base  1  difficulty   5.1  fingers -2-1  sounds G4 E4 E4 C5  midi 67,64,64,72
-x003               Generated    -       base  1  difficulty   5.6  fingers ---1  sounds x C4 E4 C5  midi 60,64,72
-5003               Generated    -       base  3  difficulty   5.6  fingers 2--1  sounds C5 C4 E4 C5  midi 72,60,64,72
 0433               Generated    -       base  1  difficulty   6.1  fingers -312  sounds G4 E4 G4 C5  midi 67,64,67,72
-500x               Generated    -       base  5  difficulty   6.2  fingers 1---  sounds C5 C4 E4 x  midi 72,60,64
-5403               Generated    -       base  3  difficulty   6.6  fingers 32-1  sounds C5 E4 E4 C5  midi 72,64,64,72
+0x03               Generated    -       base  1  difficulty   7.1  fingers ---1  sounds G4 x E4 C5  midi 67,64,72
+x003               Generated    -       base  1  difficulty   7.6  fingers ---1  sounds x C4 E4 C5  midi 60,64,72
+5003               Generated    -       base  3  difficulty   7.6  fingers 2--1  sounds C5 C4 E4 C5  midi 72,60,64,72
+5433               Generated    -       base  3  difficulty   7.6  fingers 4312  sounds C5 E4 G4 C5  midi 72,64,67,72
 ## C/Bb (bass outside the chord)
 x12010             Generated    -       base  1  difficulty     6  fingers -13-2-  sounds x Bb2 E3 G3 C4 E4  midi 46,52,55,60,64
 x1201x             Generated    -       base  1  difficulty   6.5  fingers -13-2-  sounds x Bb2 E3 G3 C4 x  midi 46,52,55,60
 x1x010             Generated    -       base  1  difficulty   6.5  fingers -1--2-  sounds x Bb2 x G3 C4 E4  midi 46,55,60,64
-xxx310             Generated    -       base  1  difficulty   6.5  fingers ---21-  sounds x x x Bb3 C4 E4  midi 58,60,64
 x12013             Generated    -       base  1  difficulty   7.5  fingers -13-24  sounds x Bb2 E3 G3 C4 G4  midi 46,52,55,60,67
-x12310             Generated    -       base  1  difficulty   7.5  fingers -1342-  sounds x Bb2 E3 Bb3 C4 E4  midi 46,52,58,60,64
-x1231x             Generated    -       base  1  difficulty     8  fingers -1342-  sounds x Bb2 E3 Bb3 C4 x  midi 46,52,58,60
-x12x10             Generated    -       base  1  difficulty     8  fingers -13-2-  sounds x Bb2 E3 x C4 E4  midi 46,52,60,64
+635050             Generated    -       base  3  difficulty   8.1  fingers 412-3-  sounds Bb2 C3 G3 G3 E4 E4  midi 46,48,55,55,64,64
+xxx310             Generated    -       base  1  difficulty   8.5  fingers ---21-  sounds x x x Bb3 C4 E4  midi 58,60,64
+63505x             Generated    -       base  3  difficulty   8.6  fingers 412-3-  sounds Bb2 C3 G3 G3 E4 x  midi 46,48,55,55,64
+x12313             Generated    -       base  1  difficulty     9  fingers -12314 barre 1:1-4  sounds x Bb2 E3 Bb3 C4 G4  midi 46,52,58,60,67
 ## D/C (bass outside the chord)
 x30232             Generated    -       base  1  difficulty   7.3  fingers -3-142  sounds x C3 D3 A3 D4 F#4  midi 48,50,57,62,66
 x30212             Generated    -       base  1  difficulty   7.5  fingers -4-213  sounds x C3 D3 A3 C4 F#4  midi 48,50,57,60,66
 x302x2             Generated    -       base  1  difficulty   8.3  fingers -3-1-2  sounds x C3 D3 A3 x F#4  midi 48,50,57,66
-x30x32             Generated    -       base  1  difficulty   8.3  fingers -2--31  sounds x C3 D3 x D4 F#4  midi 48,50,62,66
 x3423x             Generated    -       base  1  difficulty   8.3  fingers -2413-  sounds x C3 F#3 A3 D4 x  midi 48,54,57,62
-x30532             Generated    -       base  2  difficulty   8.3  fingers -2-431  sounds x C3 D3 C4 D4 F#4  midi 48,50,60,62,66
-xxx532             Generated    -       base  2  difficulty   8.3  fingers ---321  sounds x x x C4 D4 F#4  midi 60,62,66
-x30x12             Generated    -       base  1  difficulty   8.5  fingers -3--12  sounds x C3 D3 x C4 F#4  midi 48,50,60,66
+x34232             Generated    -       base  1  difficulty   9.3  fingers -24131 barre 2:3-5  sounds x C3 F#3 A3 D4 F#4  midi 48,54,57,62,66
+x3x232             Generated    -       base  1  difficulty   9.3  fingers -3-142  sounds x C3 x A3 D4 F#4  midi 48,57,62,66
+x34535             Generated    -       base  3  difficulty   9.6  fingers -12314 barre 3:1-4  sounds x C3 F#3 C4 D4 A4  midi 48,54,60,62,69
+89777x             Generated    -       base  7  difficulty   9.8  fingers 23111- barre 7:2-4  sounds C3 F#3 A3 D4 F#4 x  midi 48,54,57,62,66
 ## C7 (max fret 8, all)
-x32310             Curated      open    base  1  difficulty   2.5  fingers -3241-  sounds x C3 E3 Bb3 C4 E4  midi 48,52,58,60,64
+x32310             Curated      open    base  1  difficulty   4.5  fingers -3241-  sounds x C3 E3 Bb3 C4 E4  midi 48,52,58,60,64
 x35353             MovableShape A-form  base  3  difficulty   5.6  fingers -12131 barre 3:1-5  sounds x C3 G3 Bb3 E4 G4  midi 48,55,58,64,67
-x323xx             Generated    -       base  1  difficulty   7.3  fingers -213--  sounds x C3 E3 Bb3 x x  midi 48,52,58
-x3231x             Generated    -       base  1  difficulty     8  fingers -3241-  sounds x C3 E3 Bb3 C4 x  midi 48,52,58,60
 x35350             Generated    -       base  3  difficulty   8.1  fingers -1324-  sounds x C3 G3 Bb3 E4 E4  midi 48,55,58,64,64
-xxx556             Generated    -       base  5  difficulty   8.2  fingers ---123  sounds x x x C4 E4 Bb4  midi 60,64,70
-x323x0             Generated    -       base  1  difficulty   8.3  fingers -213--  sounds x C3 E3 Bb3 x E4  midi 48,52,58,64
-x32350             Generated    -       base  2  difficulty   8.3  fingers -2134-  sounds x C3 E3 Bb3 E4 E4  midi 48,52,58,64,64
-x3x310             Generated    -       base  1  difficulty   8.5  fingers -2-31-  sounds x C3 x Bb3 C4 E4  midi 48,58,60,64
 x35056             Generated    -       base  3  difficulty   8.6  fingers -12-34  sounds x C3 G3 G3 E4 Bb4  midi 48,55,55,64,70
 x3535x             Generated    -       base  3  difficulty   8.6  fingers -1324-  sounds x C3 G3 Bb3 E4 x  midi 48,55,58,64
-x3235x             Generated    -       base  2  difficulty   8.8  fingers -2134-  sounds x C3 E3 Bb3 E4 x  midi 48,52,58,64
-878xxx             Generated    -       base  7  difficulty   8.8  fingers 213---  sounds C3 E3 Bb3 x x x  midi 48,52,58
 x353x0             Generated    -       base  3  difficulty   9.1  fingers -132--  sounds x C3 G3 Bb3 x E4  midi 48,55,58,64
-x3x350             Generated    -       base  3  difficulty   9.1  fingers -1-23-  sounds x C3 x Bb3 E4 E4  midi 48,58,64,64
 x323x3             Generated    -       base  1  difficulty   9.3  fingers -213-4  sounds x C3 E3 Bb3 x G4  midi 48,52,58,67
+x323xx             Generated    -       base  1  difficulty   9.3  fingers -213--  sounds x C3 E3 Bb3 x x  midi 48,52,58
 x3x056             Generated    -       base  3  difficulty   9.6  fingers -1--23  sounds x C3 x G3 E4 Bb4  midi 48,55,64,70
-x3x35x             Generated    -       base  3  difficulty   9.6  fingers -1-23-  sounds x C3 x Bb3 E4 x  midi 48,58,64
-8785xx             Generated    -       base  5  difficulty   9.7  fingers 3241--  sounds C3 E3 Bb3 C4 x x  midi 48,52,58,60
+x3231x             Generated    -       base  1  difficulty    10  fingers -3241-  sounds x C3 E3 Bb3 C4 x  midi 48,52,58,60
 x35356             Generated    -       base  3  difficulty  10.1  fingers -12134 barre 3:1-3  sounds x C3 G3 Bb3 E4 Bb4  midi 48,55,58,64,70
 x3x353             Generated    -       base  3  difficulty  10.1  fingers -1-243  sounds x C3 x Bb3 E4 G4  midi 48,58,64,67
 875556             Generated    -       base  5  difficulty  10.2  fingers 431112 barre 5:2-4  sounds C3 E3 G3 C4 E4 Bb4  midi 48,52,55,60,64,70
+xxx556             Generated    -       base  5  difficulty  10.2  fingers ---123  sounds x x x C4 E4 Bb4  midi 60,64,70
+x323x0             Generated    -       base  1  difficulty  10.3  fingers -213--  sounds x C3 E3 Bb3 x E4  midi 48,52,58,64
+x32350             Generated    -       base  2  difficulty  10.3  fingers -2134-  sounds x C3 E3 Bb3 E4 E4  midi 48,52,58,64,64
+x3x310             Generated    -       base  1  difficulty  10.5  fingers -2-31-  sounds x C3 x Bb3 C4 E4  midi 48,58,60,64
 x35x56             Generated    -       base  3  difficulty  10.6  fingers -12-34  sounds x C3 G3 x E4 Bb4  midi 48,55,64,70
-x3x356             Generated    -       base  3  difficulty  10.6  fingers -1-234  sounds x C3 x Bb3 E4 Bb4  midi 48,58,64,70
-x3x556             Generated    -       base  3  difficulty  10.6  fingers -1-234  sounds x C3 x C4 E4 Bb4  midi 48,60,64,70
-87855x             Generated    -       base  5  difficulty  10.7  fingers 32411- barre 5:3-4  sounds C3 E3 Bb3 C4 E4 x  midi 48,52,58,60,64
+x3235x             Generated    -       base  2  difficulty  10.8  fingers -2134-  sounds x C3 E3 Bb3 E4 x  midi 48,52,58,64
 878x8x             Generated    -       base  7  difficulty  10.8  fingers 213-4-  sounds C3 E3 Bb3 x G4 x  midi 48,52,58,67
-878x5x             Generated    -       base  5  difficulty  11.2  fingers 324-1-  sounds C3 E3 Bb3 x E4 x  midi 48,52,58,64
+878xxx             Generated    -       base  7  difficulty  10.8  fingers 213---  sounds C3 E3 Bb3 x x x  midi 48,52,58
+x3x350             Generated    -       base  3  difficulty  11.1  fingers -1-23-  sounds x C3 x Bb3 E4 E4  midi 48,58,64,64
 8x5556             Generated    -       base  5  difficulty  11.2  fingers 3-1112 barre 5:2-4  sounds C3 x G3 C4 E4 Bb4  midi 48,55,60,64,70
-8x855x             Generated    -       base  5  difficulty  11.2  fingers 3-412-  sounds C3 x Bb3 C4 E4 x  midi 48,58,60,64
+x3x35x             Generated    -       base  3  difficulty  11.6  fingers -1-23-  sounds x C3 x Bb3 E4 x  midi 48,58,64
+8785xx             Generated    -       base  5  difficulty  11.7  fingers 3241--  sounds C3 E3 Bb3 C4 x x  midi 48,52,58,60
 8755x6             Generated    -       base  5  difficulty  12.2  fingers 4311-2 barre 5:2-3  sounds C3 E3 G3 C4 x Bb4  midi 48,52,55,60,70
-87x556             Generated    -       base  5  difficulty  12.2  fingers 43-112 barre 5:3-4  sounds C3 E3 x C4 E4 Bb4  midi 48,52,60,64,70
-8x8556             Generated    -       base  5  difficulty  12.2  fingers 3-4112 barre 5:3-4  sounds C3 x Bb3 C4 E4 Bb4  midi 48,58,60,64,70
-8x8558             Generated    -       base  5  difficulty  12.2  fingers 2-3114 barre 5:3-4  sounds C3 x Bb3 C4 E4 C5  midi 48,58,60,64,72
+x3x356             Generated    -       base  3  difficulty  12.6  fingers -1-234  sounds x C3 x Bb3 E4 Bb4  midi 48,58,64,70
+x3x556             Generated    -       base  3  difficulty  12.6  fingers -1-234  sounds x C3 x C4 E4 Bb4  midi 48,60,64,70
+87855x             Generated    -       base  5  difficulty  12.7  fingers 32411- barre 5:3-4  sounds C3 E3 Bb3 C4 E4 x  midi 48,52,58,60,64
+878x5x             Generated    -       base  5  difficulty  13.2  fingers 324-1-  sounds C3 E3 Bb3 x E4 x  midi 48,52,58,64
+8x855x             Generated    -       base  5  difficulty  13.2  fingers 3-412-  sounds C3 x Bb3 C4 E4 x  midi 48,58,60,64
+87x556             Generated    -       base  5  difficulty  14.2  fingers 43-112 barre 5:3-4  sounds C3 E3 x C4 E4 Bb4  midi 48,52,60,64,70
+8x8556             Generated    -       base  5  difficulty  14.2  fingers 3-4112 barre 5:3-4  sounds C3 x Bb3 C4 E4 Bb4  midi 48,58,60,64,70
+8x8558             Generated    -       base  5  difficulty  14.2  fingers 2-3114 barre 5:3-4  sounds C3 x Bb3 C4 E4 C5  midi 48,58,60,64,72
 ## G (max fret 5, all)
 320003             Curated      open    base  1  difficulty   0.8  fingers 21---3  sounds G2 B2 D3 G3 B3 G4  midi 43,47,50,55,59,67
 3x0003             Curated      open    base  1  difficulty   1.6  fingers 1----2  sounds G2 x D3 G3 B3 G4  midi 43,50,55,59,67
 320033             Curated      open    base  1  difficulty   1.8  fingers 21--34  sounds G2 B2 D3 G3 D4 G4  midi 43,47,50,55,62,67
-xxx003             Generated    -       base  1  difficulty   5.1  fingers -----1  sounds x x x G3 B3 G4  midi 55,59,67
 32000x             Generated    -       base  1  difficulty   5.3  fingers 21----  sounds G2 B2 D3 G3 B3 x  midi 43,47,50,55,59
-xx500x             Generated    -       base  5  difficulty   5.7  fingers --1---  sounds x x G3 G3 B3 x  midi 55,55,59
 3200xx             Generated    -       base  1  difficulty   5.8  fingers 21----  sounds G2 B2 D3 G3 x x  midi 43,47,50,55
 3x000x             Generated    -       base  1  difficulty   6.1  fingers 1-----  sounds G2 x D3 G3 B3 x  midi 43,50,55,59
 35000x             Generated    -       base  3  difficulty   6.1  fingers 12----  sounds G2 D3 D3 G3 B3 x  midi 43,50,50,55,59
@@ -291,43 +289,45 @@ xx500x             Generated    -       base  5  difficulty   5.7  fingers --1--
 32003x             Generated    -       base  1  difficulty   6.3  fingers 21--3-  sounds G2 B2 D3 G3 D4 x  midi 43,47,50,55,62
 320xxx             Generated    -       base  1  difficulty   6.3  fingers 21----  sounds G2 B2 D3 x x x  midi 43,47,50
 350003             Generated    -       base  3  difficulty   6.6  fingers 13---2  sounds G2 D3 D3 G3 B3 G4  midi 43,50,50,55,59,67
-xx5003             Generated    -       base  3  difficulty   6.6  fingers --2--1  sounds x x G3 G3 B3 G4  midi 55,55,59,67
 32040x             Generated    -       base  1  difficulty   6.8  fingers 21-3--  sounds G2 B2 D3 B3 B3 x  midi 43,47,50,59,59
-xx540x             Generated    -       base  4  difficulty   6.9  fingers --21--  sounds x x G3 B3 B3 x  midi 55,59,59
+xxx003             Generated    -       base  1  difficulty   7.1  fingers -----1  sounds x x x G3 B3 G4  midi 55,59,67
 35040x             Generated    -       base  3  difficulty   7.1  fingers 13-2--  sounds G2 D3 D3 B3 B3 x  midi 43,50,50,59,59
 35500x             Generated    -       base  3  difficulty   7.1  fingers 123---  sounds G2 D3 G3 G3 B3 x  midi 43,50,55,55,59
 320403             Generated    -       base  1  difficulty   7.3  fingers 21-4-3  sounds G2 B2 D3 B3 B3 G4  midi 43,47,50,59,59,67
 3204xx             Generated    -       base  1  difficulty   7.3  fingers 21-3--  sounds G2 B2 D3 B3 x x  midi 43,47,50,59
 320x0x             Generated    -       base  1  difficulty   7.3  fingers 21----  sounds G2 B2 D3 x B3 x  midi 43,47,50,59
-32x00x             Generated    -       base  1  difficulty   7.3  fingers 21----  sounds G2 B2 x G3 B3 x  midi 43,47,55,59
-32500x             Generated    -       base  2  difficulty   7.3  fingers 213---  sounds G2 B2 G3 G3 B3 x  midi 43,47,55,55,59
 3x040x             Generated    -       base  1  difficulty   7.6  fingers 1--2--  sounds G2 x D3 B3 B3 x  midi 43,50,59,59
 350403             Generated    -       base  3  difficulty   7.6  fingers 14-3-2  sounds G2 D3 D3 B3 B3 G4  midi 43,50,50,59,59,67
 3504xx             Generated    -       base  3  difficulty   7.6  fingers 13-2--  sounds G2 D3 D3 B3 x x  midi 43,50,50,59
 355003             Generated    -       base  3  difficulty   7.6  fingers 134--2  sounds G2 D3 G3 G3 B3 G4  midi 43,50,55,55,59,67
-xx5403             Generated    -       base  3  difficulty   7.6  fingers --32-1  sounds x x G3 B3 B3 G4  midi 55,59,59,67
+xx500x             Generated    -       base  5  difficulty   7.7  fingers --1---  sounds x x G3 G3 B3 x  midi 55,55,59
 3200x3             Generated    -       base  1  difficulty   7.8  fingers 21---3  sounds G2 B2 D3 G3 x G4  midi 43,47,50,55,67
 32043x             Generated    -       base  1  difficulty   7.8  fingers 21-43-  sounds G2 B2 D3 B3 D4 x  midi 43,47,50,59,62
 320x03             Generated    -       base  1  difficulty   7.8  fingers 21---3  sounds G2 B2 D3 x B3 G4  midi 43,47,50,59,67
-32x003             Generated    -       base  1  difficulty   7.8  fingers 21---3  sounds G2 B2 x G3 B3 G4  midi 43,47,55,59,67
-32x0xx             Generated    -       base  1  difficulty   7.8  fingers 21----  sounds G2 B2 x G3 x x  midi 43,47,55
-325003             Generated    -       base  2  difficulty   7.8  fingers 214--3  sounds G2 B2 G3 G3 B3 G4  midi 43,47,55,55,59,67
-3250xx             Generated    -       base  2  difficulty   7.8  fingers 213---  sounds G2 B2 G3 G3 x x  midi 43,47,55,55
 3x0403             Generated    -       base  1  difficulty   8.1  fingers 1--3-2  sounds G2 x D3 B3 B3 G4  midi 43,50,59,59,67
 3x04xx             Generated    -       base  1  difficulty   8.1  fingers 1--2--  sounds G2 x D3 B3 x x  midi 43,50,59
 35043x             Generated    -       base  3  difficulty   8.1  fingers 14-32-  sounds G2 D3 D3 B3 D4 x  midi 43,50,50,59,62
 350x0x             Generated    -       base  3  difficulty   8.1  fingers 12----  sounds G2 D3 D3 x B3 x  midi 43,50,50,59
 35540x             Generated    -       base  3  difficulty   8.1  fingers 1342--  sounds G2 D3 G3 B3 B3 x  midi 43,50,55,59,59
 35x00x             Generated    -       base  3  difficulty   8.1  fingers 12----  sounds G2 D3 x G3 B3 x  midi 43,50,55,59
-3x500x             Generated    -       base  3  difficulty   8.1  fingers 1-2---  sounds G2 x G3 G3 B3 x  midi 43,55,55,59
 xx543x             Generated    -       base  3  difficulty   8.1  fingers --321-  sounds x x G3 B3 D4 x  midi 55,59,62
 320x3x             Generated    -       base  1  difficulty   8.3  fingers 21--3-  sounds G2 B2 D3 x D4 x  midi 43,47,50,62
 32x03x             Generated    -       base  1  difficulty   8.3  fingers 21--3-  sounds G2 B2 x G3 D4 x  midi 43,47,55,62
 32503x             Generated    -       base  2  difficulty   8.3  fingers 214-3-  sounds G2 B2 G3 G3 D4 x  midi 43,47,55,55,62
-32540x             Generated    -       base  2  difficulty   8.3  fingers 2143--  sounds G2 B2 G3 B3 B3 x  midi 43,47,55,59,59
-325xxx             Generated    -       base  2  difficulty   8.3  fingers 213---  sounds G2 B2 G3 x x x  midi 43,47,55
 3x043x             Generated    -       base  1  difficulty   8.6  fingers 1--32-  sounds G2 x D3 B3 D4 x  midi 43,50,59,62
 350x03             Generated    -       base  3  difficulty   8.6  fingers 13---2  sounds G2 D3 D3 x B3 G4  midi 43,50,50,59,67
+3554xx             Generated    -       base  3  difficulty   8.6  fingers 1342--  sounds G2 D3 G3 B3 x x  midi 43,50,55,59
+35x003             Generated    -       base  3  difficulty   8.6  fingers 13---2  sounds G2 D3 x G3 B3 G4  midi 43,50,55,59,67
+xx5003             Generated    -       base  3  difficulty   8.6  fingers --2--1  sounds x x G3 G3 B3 G4  midi 55,55,59,67
+xx5433             Generated    -       base  3  difficulty   8.6  fingers --4312  sounds x x G3 B3 D4 G4  midi 55,59,62,67
+320x33             Generated    -       base  1  difficulty   8.8  fingers 21--34  sounds G2 B2 D3 x D4 G4  midi 43,47,50,62,67
+32x033             Generated    -       base  1  difficulty   8.8  fingers 21--34  sounds G2 B2 x G3 D4 G4  midi 43,47,55,62,67
+xx540x             Generated    -       base  4  difficulty   8.9  fingers --21--  sounds x x G3 B3 B3 x  midi 55,59,59
+3x0433             Generated    -       base  1  difficulty   9.1  fingers 1--423  sounds G2 x D3 B3 D4 G4  midi 43,50,59,62,67
+355x0x             Generated    -       base  3  difficulty   9.1  fingers 123---  sounds G2 D3 G3 x B3 x  midi 43,50,55,59
+35x40x             Generated    -       base  3  difficulty   9.1  fingers 13-2--  sounds G2 D3 x B3 B3 x  midi 43,50,59,59
+3204x3             Generated    -       base  1  difficulty   9.3  fingers 21-4-3  sounds G2 B2 D3 B3 x G4  midi 43,47,50,59,67
+32x00x             Generated    -       base  1  difficulty   9.3  fingers 21----  sounds G2 B2 x G3 B3 x  midi 43,47,55,59
 ## E (stretch 2, all)
 022100             Curated      open    base  1  difficulty   0.5  fingers -231--  sounds E2 B2 E3 G#3 B3 E4  midi 40,47,52,56,59,64
 xx2100             Generated    -       base  1  difficulty   5.5  fingers --21--  sounds x x E3 G#3 B3 E4  midi 52,56,59,64
@@ -340,49 +340,49 @@ xx210x             Generated    -       base  1  difficulty     6  fingers --21-
 0x210x             Generated    -       base  1  difficulty     7  fingers --21--  sounds E2 x E3 G#3 B3 x  midi 40,52,56,59
 0221x0             Generated    -       base  1  difficulty   7.5  fingers -231--  sounds E2 B2 E3 G#3 x E4  midi 40,47,52,56,64
 02x1xx             Generated    -       base  1  difficulty   7.5  fingers -2-1--  sounds E2 B2 x G#3 x x  midi 40,47,56
-0x21xx             Generated    -       base  1  difficulty   7.5  fingers --21--  sounds E2 x E3 G#3 x x  midi 40,52,56
-xx21x0             Generated    -       base  1  difficulty   7.5  fingers --21--  sounds x x E3 G#3 x E4  midi 52,56,64
+0x21xx             Generated    -       base  1  difficulty   9.5  fingers --21--  sounds E2 x E3 G#3 x x  midi 40,52,56
+xx21x0             Generated    -       base  1  difficulty   9.5  fingers --21--  sounds x x E3 G#3 x E4  midi 52,56,64
 ## Bb (max fret 6, all)
 x13331             MovableShape A-form  base  1  difficulty     6  fingers -12341 barre 1:1-5  sounds x Bb2 F3 Bb3 D4 F4  midi 46,53,58,62,65
-x103xx             Generated    -       base  1  difficulty   6.5  fingers -1-2--  sounds x Bb2 D3 Bb3 x x  midi 46,50,58
-x1033x             Generated    -       base  1  difficulty     7  fingers -1-23-  sounds x Bb2 D3 Bb3 D4 x  midi 46,50,58,62
-650xxx             Generated    -       base  5  difficulty   7.2  fingers 21----  sounds Bb2 D3 D3 x x x  midi 46,50,50
 x10331             Generated    -       base  1  difficulty   7.5  fingers -1-342  sounds x Bb2 D3 Bb3 D4 F4  midi 46,50,58,62,65
 xxx331             Generated    -       base  1  difficulty   7.5  fingers ---231  sounds x x x Bb3 D4 F4  midi 58,62,65
-x10x3x             Generated    -       base  1  difficulty     8  fingers -1--2-  sounds x Bb2 D3 x D4 x  midi 46,50,62
 x1333x             Generated    -       base  1  difficulty     8  fingers -1234-  sounds x Bb2 F3 Bb3 D4 x  midi 46,53,58,62
-6503xx             Generated    -       base  3  difficulty   8.1  fingers 32-1--  sounds Bb2 D3 D3 Bb3 x x  midi 46,50,50,58
 x103x1             Generated    -       base  1  difficulty   8.5  fingers -1-3-2  sounds x Bb2 D3 Bb3 x F4  midi 46,50,58,65
+x103xx             Generated    -       base  1  difficulty   8.5  fingers -1-2--  sounds x Bb2 D3 Bb3 x x  midi 46,50,58
 x10x31             Generated    -       base  1  difficulty   8.5  fingers -1--32  sounds x Bb2 D3 x D4 F4  midi 46,50,62,65
-65033x             Generated    -       base  3  difficulty   8.6  fingers 43-12-  sounds Bb2 D3 D3 Bb3 D4 x  midi 46,50,50,58,62
 65036x             Generated    -       base  3  difficulty   8.6  fingers 32-14-  sounds Bb2 D3 D3 Bb3 F4 x  midi 46,50,50,58,65
 653xxx             Generated    -       base  3  difficulty   8.6  fingers 321---  sounds Bb2 D3 F3 x x x  midi 46,50,53
-xxx336             Generated    -       base  3  difficulty   8.6  fingers ---123  sounds x x x Bb3 D4 Bb4  midi 58,62,70
+x1033x             Generated    -       base  1  difficulty     9  fingers -1-23-  sounds x Bb2 D3 Bb3 D4 x  midi 46,50,58,62
 x13x3x             Generated    -       base  1  difficulty     9  fingers -12-3-  sounds x Bb2 F3 x D4 x  midi 46,53,62
-x1x33x             Generated    -       base  1  difficulty     9  fingers -1-23-  sounds x Bb2 x Bb3 D4 x  midi 46,58,62
 65333x             Generated    -       base  3  difficulty   9.1  fingers 32111- barre 3:2-4  sounds Bb2 D3 F3 Bb3 D4 x  midi 46,50,53,58,62
 6533xx             Generated    -       base  3  difficulty   9.1  fingers 4312--  sounds Bb2 D3 F3 Bb3 x x  midi 46,50,53,58
-6x03xx             Generated    -       base  3  difficulty   9.1  fingers 2--1--  sounds Bb2 x D3 Bb3 x x  midi 46,50,58
 650x6x             Generated    -       base  5  difficulty   9.2  fingers 21--3-  sounds Bb2 D3 D3 x F4 x  midi 46,50,50,65
+650xxx             Generated    -       base  5  difficulty   9.2  fingers 21----  sounds Bb2 D3 D3 x x x  midi 46,50,50
 x13x31             Generated    -       base  1  difficulty   9.5  fingers -13-42  sounds x Bb2 F3 x D4 F4  midi 46,53,62,65
 x1x331             Generated    -       base  1  difficulty   9.5  fingers -1-342  sounds x Bb2 x Bb3 D4 F4  midi 46,58,62,65
-650336             Generated    -       base  3  difficulty   9.6  fingers 32-114 barre 3:3-4  sounds Bb2 D3 D3 Bb3 D4 Bb4  midi 46,50,50,58,62,70
-650x3x             Generated    -       base  3  difficulty   9.6  fingers 32--1-  sounds Bb2 D3 D3 x D4 x  midi 46,50,50,62
 653336             Generated    -       base  3  difficulty   9.6  fingers 321114 barre 3:2-4  sounds Bb2 D3 F3 Bb3 D4 Bb4  midi 46,50,53,58,62,70
-6x033x             Generated    -       base  3  difficulty   9.6  fingers 3--12-  sounds Bb2 x D3 Bb3 D4 x  midi 46,50,58,62
 6x036x             Generated    -       base  3  difficulty   9.6  fingers 2--13-  sounds Bb2 x D3 Bb3 F4 x  midi 46,50,58,65
 650x66             Generated    -       base  5  difficulty   9.7  fingers 21--34  sounds Bb2 D3 D3 x F4 Bb4  midi 46,50,50,65,70
-6503x6             Generated    -       base  3  difficulty  10.1  fingers 32-1-4  sounds Bb2 D3 D3 Bb3 x Bb4  midi 46,50,50,58,70
-650x36             Generated    -       base  3  difficulty  10.1  fingers 32--14  sounds Bb2 D3 D3 x D4 Bb4  midi 46,50,50,62,70
+x10x3x             Generated    -       base  1  difficulty    10  fingers -1--2-  sounds x Bb2 D3 x D4 x  midi 46,50,62
+6503xx             Generated    -       base  3  difficulty  10.1  fingers 32-1--  sounds Bb2 D3 D3 Bb3 x x  midi 46,50,50,58
 65336x             Generated    -       base  3  difficulty  10.1  fingers 32114- barre 3:2-3  sounds Bb2 D3 F3 Bb3 F4 x  midi 46,50,53,58,65
-65x3xx             Generated    -       base  3  difficulty  10.1  fingers 32-1--  sounds Bb2 D3 x Bb3 x x  midi 46,50,58
-6x0336             Generated    -       base  3  difficulty  10.1  fingers 3--124  sounds Bb2 x D3 Bb3 D4 Bb4  midi 46,50,58,62,70
 6x0366             Generated    -       base  3  difficulty  10.1  fingers 2--134  sounds Bb2 x D3 Bb3 F4 Bb4  midi 46,50,58,65,70
+65033x             Generated    -       base  3  difficulty  10.6  fingers 43-12-  sounds Bb2 D3 D3 Bb3 D4 x  midi 46,50,50,58,62
 653x3x             Generated    -       base  3  difficulty  10.6  fingers 431-2-  sounds Bb2 D3 F3 x D4 x  midi 46,50,53,62
 653x6x             Generated    -       base  3  difficulty  10.6  fingers 321-4-  sounds Bb2 D3 F3 x F4 x  midi 46,50,53,65
-65x33x             Generated    -       base  3  difficulty  10.6  fingers 43-12-  sounds Bb2 D3 x Bb3 D4 x  midi 46,50,58,62
 65x36x             Generated    -       base  3  difficulty  10.6  fingers 32-14-  sounds Bb2 D3 x Bb3 F4 x  midi 46,50,58,65
 6x3336             Generated    -       base  3  difficulty  10.6  fingers 2-1113 barre 3:2-4  sounds Bb2 x F3 Bb3 D4 Bb4  midi 46,53,58,62,70
 6x333x             Generated    -       base  3  difficulty  10.6  fingers 4-123-  sounds Bb2 x F3 Bb3 D4 x  midi 46,53,58,62
+xxx336             Generated    -       base  3  difficulty  10.6  fingers ---123  sounds x x x Bb3 D4 Bb4  midi 58,62,70
+x1x33x             Generated    -       base  1  difficulty    11  fingers -1-23-  sounds x Bb2 x Bb3 D4 x  midi 46,58,62
+6x03xx             Generated    -       base  3  difficulty  11.1  fingers 2--1--  sounds Bb2 x D3 Bb3 x x  midi 46,50,58
+650336             Generated    -       base  3  difficulty  11.6  fingers 32-114 barre 3:3-4  sounds Bb2 D3 D3 Bb3 D4 Bb4  midi 46,50,50,58,62,70
+650x3x             Generated    -       base  3  difficulty  11.6  fingers 32--1-  sounds Bb2 D3 D3 x D4 x  midi 46,50,50,62
 6533x6             Generated    -       base  3  difficulty  11.6  fingers 3211-4 barre 3:2-3  sounds Bb2 D3 F3 Bb3 x Bb4  midi 46,50,53,58,70
-65x336             Generated    -       base  3  difficulty  11.6  fingers 32-114 barre 3:3-4  sounds Bb2 D3 x Bb3 D4 Bb4  midi 46,50,58,62,70
+6x033x             Generated    -       base  3  difficulty  11.6  fingers 3--12-  sounds Bb2 x D3 Bb3 D4 x  midi 46,50,58,62
+6503x6             Generated    -       base  3  difficulty  12.1  fingers 32-1-4  sounds Bb2 D3 D3 Bb3 x Bb4  midi 46,50,50,58,70
+650x36             Generated    -       base  3  difficulty  12.1  fingers 32--14  sounds Bb2 D3 D3 x D4 Bb4  midi 46,50,50,62,70
+65x3xx             Generated    -       base  3  difficulty  12.1  fingers 32-1--  sounds Bb2 D3 x Bb3 x x  midi 46,50,58
+6x0336             Generated    -       base  3  difficulty  12.1  fingers 3--124  sounds Bb2 x D3 Bb3 D4 Bb4  midi 46,50,58,62,70
+65x33x             Generated    -       base  3  difficulty  12.6  fingers 43-12-  sounds Bb2 D3 x Bb3 D4 x  midi 46,50,58,62
+65x336             Generated    -       base  3  difficulty  13.6  fingers 32-114 barre 3:3-4  sounds Bb2 D3 x Bb3 D4 Bb4  midi 46,50,58,62,70
