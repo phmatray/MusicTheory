@@ -54,6 +54,36 @@ public class PianoFingeringTests
         Should.Throw<ArgumentOutOfRangeException>(() => PianoFingering.ForScale(new Scale(Note.Parse("C"), ScaleType.Major), Hand.Right, 0));
     }
 
+    private static Note[] Notes(string s) => s.Split(' ').Select(Note.Parse).ToArray();
+
+    [Theory]
+    [InlineData("C4 E4 G4", Hand.Right, new[] { 1, 3, 5 })]
+    [InlineData("E4 G4 C5", Hand.Right, new[] { 1, 2, 5 })]
+    [InlineData("G4 C5 E5", Hand.Right, new[] { 1, 3, 5 })]
+    [InlineData("C4 E4 G4", Hand.Left, new[] { 5, 3, 1 })]
+    [InlineData("E4 G4 C5", Hand.Left, new[] { 5, 3, 1 })]
+    [InlineData("G4 C5 E5", Hand.Left, new[] { 5, 2, 1 })]
+    [InlineData("G4 C4 E4", Hand.Right, new[] { 1, 3, 5 })]
+    public void ForTriad_Fingers(string notes, Hand hand, int[] fingers)
+    {
+        PianoFingering.ForTriad(Notes(notes), hand).ShouldBe(fingers);
+    }
+
+    [Theory]
+    [InlineData("C4 E4 G5")]
+    [InlineData("C4 E4")]
+    [InlineData("C4 C4 E4")]
+    public void ForTriad_RejectsBadInput(string notes)
+    {
+        Should.Throw<ArgumentException>(() => PianoFingering.ForTriad(Notes(notes), Hand.Right));
+    }
+
+    [Fact]
+    public void ForTriad_RejectsNull()
+    {
+        Should.Throw<ArgumentNullException>(() => PianoFingering.ForTriad(null!, Hand.Right));
+    }
+
     [Fact]
     public void ForScale_EveryHeptatonicTypeGivesFingers()
     {

@@ -56,4 +56,22 @@ public static class PianoFingering
             fingers.Reverse();
         return fingers;
     }
+
+    /// <summary>Fingers for a close-position triad, aligned with the notes sorted ascending.</summary>
+    /// <exception cref="ArgumentNullException"><paramref name="notes"/> is null.</exception>
+    /// <exception cref="ArgumentException">Not exactly three distinct pitches within an octave.</exception>
+    public static IReadOnlyList<int> ForTriad(IReadOnlyList<Note> notes, Hand hand)
+    {
+        ArgumentNullException.ThrowIfNull(notes);
+        if (notes.Count != 3)
+            throw new ArgumentException("A triad fingering needs exactly three notes.", nameof(notes));
+        var midi = notes.Select(n => n.MidiNumber).Order().ToArray();
+        if (midi.Distinct().Count() != 3 || midi[2] - midi[0] > 12)
+            throw new ArgumentException("A triad fingering needs three distinct pitches spanning at most an octave.", nameof(notes));
+
+        int lower = midi[1] - midi[0], upper = midi[2] - midi[1];
+        return hand == Hand.Right
+            ? [1, upper >= 5 ? 2 : 3, 5]
+            : [5, lower >= 5 ? 2 : 3, 1];
+    }
 }
