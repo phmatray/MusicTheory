@@ -38,7 +38,12 @@ def ours(p, with_octave=True):
 
 
 def write(name, header, rows):
-    with open(OUT / name, "w", newline="") as f:
+    write_to(OUT / name, header, rows)
+
+
+def write_to(path, header, rows):
+    name = path.name
+    with open(path, "w", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
         w.writerow(header)
         w.writerows(rows)
@@ -401,6 +406,92 @@ def midi():
     print(f"midi.csv: {len(rows)} rows")
 
 
+def abc():
+    """Parses the hand-written folk tunes with music21 into abc.csv (file, meter, key_sharps, notes).
+
+    music21 does not carry an accidental to the end of the bar, so the fixtures never rely on it.
+    """
+    abc_dir = pathlib.Path(__file__).resolve().parents[2] / "MusicTheory.Abc.UnitTests" / "Reference"
+    rows = []
+    for path in sorted(abc_dir.glob("*.abc")):
+        s = music21.converter.parse(str(path), format="abc")
+        flat = s.flatten()
+        toks = []
+        for n in flat.notesAndRests:
+            d = Fraction(n.quarterLength).limit_denominator(1000) / 4
+            name = "r" if n.isRest else "+".join(ours(p) for p in n.pitches)
+            tied = not n.isRest and n.tie is not None and n.tie.type in ("start", "continue")
+            toks.append(f"{name}/{d.numerator}/{d.denominator}{'~' if tied else ''}")
+        ks = flat.getElementsByClass(key.KeySignature)[0]
+        rows.append([path.name, flat.getElementsByClass(meter.TimeSignature)[0].ratioString, ks.sharps, " ".join(toks)])
+    write_into(abc_dir, "abc.csv", ["file", "meter", "key_sharps", "notes"], rows)
+
+
+def write_into(directory, name, header, rows):
+    with open(directory / name, "w", newline="") as f:
+        w = csv.writer(f, lineterminator="\n")
+        w.writerow(header)
+        w.writerows(rows)
+    print(f"{name}: {len(rows)} rows")
+
+
+def musicxml():
+    """Single-part MusicXML files written by music21, plus the notes the MusicTheory reader must recover."""
+    out = OUT.parent.parent / "MusicTheory.MusicXml.UnitTests" / "Reference"
+    out.mkdir(parents=True, exist_ok=True)
+
+    def fmt(ql):
+        return str(Fraction(ql) / 4)
+
+    cases = {
+        "accidentals": ("4/4", key.KeySignature(0), [("n", 1, "F##4"), ("n", 1, "B-3"), ("n", 1, "C#5"), ("n", 1, "E-4")]),
+        "triplets": ("4/4", key.KeySignature(1), [("n", Fraction(2, 3), "G4"), ("n", Fraction(2, 3), "A4"), ("n", Fraction(2, 3), "B4"), ("n", 1, "C5"), ("r", 1, None)]),
+        "pickup": ("3/4", key.KeySignature(-2), [("n", 1, "F4"), ("n", 3, "B-4"), ("n", 2, "A4"), ("n", 1, "G4")]),
+        "ties": ("4/4", key.KeySignature(0), [("n", 3, "C4"), ("n", 3, "C4"), ("n", 2, "C4")]),
+        "chords": ("4/4", key.KeySignature(2), [("c", 2, ["D4", "F#4", "A4"]), ("c", 2, ["G3", "B3", "D4"]), ("c", 4, ["D4", "F#4", "A4"])]),
+        "minor": ("6/8", key.Key("a", "minor"), [("n", 1.5, "A4"), ("n", 0.5, "G#4"), ("n", 0.5, "A4"), ("n", 0.5, "B4"), ("r", 3, None)]),
+    }
+    rows = []
+    for name, (m, k, items) in cases.items():
+        s = stream.Part()
+        s.insert(0, k)
+        s.insert(0, meter.TimeSignature(m))
+        built = []
+        for kind, ql, pitch in items:
+            n = note.Rest() if kind == "r" else chord.Chord(pitch) if kind == "c" else note.Note(pitch)
+            n.quarterLength = ql
+            built.append(n)
+            s.append(n)
+        if name == "pickup":
+            # one beat, then two full 3/4 bars: the first bar is the pickup (number 0)
+            bars = [stream.Measure(number=i) for i in range(3)]
+            bars[0].insert(0, k)
+            bars[0].insert(0, meter.TimeSignature(m))
+            for bar, chunk in zip(bars, (built[:1], built[1:2], built[2:])):
+                for n in chunk:
+                    bar.append(n)
+            s = stream.Part(bars)
+        else:
+            s = s.makeMeasures()
+        s.makeTies(inPlace=True)
+        fp = out / f"{name}.musicxml"
+        s.write("musicxml", fp=str(fp))
+        if name == "pickup":
+            # the exporter never writes implicit="yes"; add it the way MuseScore marks a pickup
+            fp.write_text(fp.read_text().replace('<measure implicit="no" number="0">', '<measure implicit="yes" number="0">', 1))
+        toks = []
+        for n in s.recurse().notesAndRests:
+            if n.isRest:
+                toks.append(f"r:{fmt(n.quarterLength)}")
+                continue
+            names = "+".join(ours(p) for p in (n.pitches if n.isChord else [n.pitch]))
+            tied = n.tie is not None and n.tie.type in ("start", "continue")
+            toks.append(f"{names}:{fmt(n.quarterLength)}" + ("~" if tied else ""))
+        mode = getattr(k, "mode", None) or "major"
+        rows.append([f"{name}.musicxml", m, k.sharps, mode, " ".join(toks)])
+    write_to(out / "musicxml.csv", ["file", "meter", "fifths", "mode", "notes"], rows)
+
+
 if __name__ == "__main__":
     print("music21", music21.__version__)
     OUT.mkdir(parents=True, exist_ok=True)
@@ -418,3 +509,5 @@ if __name__ == "__main__":
     tempo()
     beams()
     midi()
+    abc()
+    musicxml()
