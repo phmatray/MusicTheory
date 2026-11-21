@@ -28,6 +28,11 @@ public class AnalysisModelTests
     }
 
     [Fact]
+    public void Commas_separate_chords_like_spaces() =>
+        AnalysisModel.Run("Dm7, G7,Cmaj7", "C", Lang.En).Rows.Select(x => x.Numeral)
+            .ShouldBe(AnalysisModel.Run("Dm7 G7 Cmaj7", "C", Lang.En).Rows.Select(x => x.Numeral));
+
+    [Fact]
     public void Without_a_key_it_is_detected_and_ranked()
     {
         var r = AnalysisModel.Run("C Am F G7 C", null, Lang.Fr);

@@ -8,7 +8,7 @@ public sealed class AnalysisStrings : IStringTable
     {
         ["analysis.title"] = "Progression analysis",
         ["analysis.blurb"] = "Type a chord progression to get its Roman numerals, cadences and key changes.",
-        ["analysis.chords"] = "Chords (separated by spaces or |)",
+        ["analysis.chords"] = "Chords (separated by spaces, commas or |)",
         ["analysis.key"] = "Key (empty to detect it)",
         ["analysis.apply"] = "Analyse",
         ["analysis.usedkey"] = "Key used",
@@ -48,7 +48,7 @@ public sealed class AnalysisStrings : IStringTable
     {
         ["analysis.title"] = "Analyse de progression",
         ["analysis.blurb"] = "Saisissez une grille d'accords pour obtenir ses chiffrages romains, ses cadences et ses changements de tonalité.",
-        ["analysis.chords"] = "Accords (séparés par des espaces ou |)",
+        ["analysis.chords"] = "Accords (séparés par des espaces, des virgules ou |)",
         ["analysis.key"] = "Tonalité (vide pour la détecter)",
         ["analysis.apply"] = "Analyser",
         ["analysis.usedkey"] = "Tonalité retenue",

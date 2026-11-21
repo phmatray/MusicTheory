@@ -9,15 +9,15 @@
 <h1>@Strings.T(lang, "analysis.title")</h1>
 <p>@Strings.T(lang, "analysis.blurb")</p>
 
-<form method="get">
+<form method="get" class="tb-form">
     <input type="hidden" name="t" value="analysis" />
     <input type="hidden" name="lang" value="@(lang == Lang.Fr ? "fr" : "en")" />
     <input type="hidden" name="v" value="1" />
-    <p><label>@Strings.T(lang, "analysis.chords")<br />
-        <input name="chords" value="@chords" size="40" /></label></p>
-    <p><label>@Strings.T(lang, "analysis.key")<br />
-        <input name="key" value="@key" size="8" /></label></p>
-    <p><button type="submit">@Strings.T(lang, "analysis.apply")</button></p>
+    <label class="tb-grow">@Strings.T(lang, "analysis.chords")
+        <input name="chords" value="@chords" placeholder="Dm7 G7 Cmaj7" autocomplete="off" spellcheck="false" /></label>
+    <label>@Strings.T(lang, "analysis.key")
+        <input name="key" value="@key" size="6" autocomplete="off" spellcheck="false" /></label>
+    <button type="submit">@Strings.T(lang, "analysis.apply")</button>
 </form>
 
 @if (result.Error is not null)

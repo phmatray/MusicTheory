@@ -1,13 +1,29 @@
 <PageTitle>@Strings.T(State.Lang, "shell.title")</PageTitle>
 
-<h1>@Strings.T(State.Lang, "shell.title")</h1>
-<p>@Strings.T(State.Lang, "shell.intro")</p>
-<ul class="tb-grid">
-    @foreach (var tool in ToolRegistry.All)
-    {
-        <li><a href="@ToolboxUrl.Build(new ToolState(tool.Id, State.Lang, new Dictionary<string, string>()))">@Strings.T(State.Lang, tool.TitleKey)</a></li>
-    }
-</ul>
+<header class="tb-page-head">
+    <h1>@Strings.T(State.Lang, "shell.title")</h1>
+    <p class="tb-lede">@Strings.T(State.Lang, "shell.intro")</p>
+</header>
+
+@foreach (var group in ToolGroups.All)
+{
+    <section class="tb-index">
+        <h2>@Strings.T(State.Lang, group.TitleKey)</h2>
+        <ul>
+            @foreach (var tool in ToolGroups.Tools(group))
+            {
+                <li>
+                    <a href="@ToolboxUrl.Build(new ToolState(tool.Id, State.Lang, new Dictionary<string, string>()))">@Strings.T(State.Lang, tool.TitleKey)</a>
+                    <p>@Strings.T(State.Lang, tool.Id + ".blurb")</p>
+                </li>
+            }
+        </ul>
+    </section>
+}
+
+<p class="tb-index-foot">
+    <a href="@ToolboxUrl.Build(new ToolState(ToolGroups.HelpId, State.Lang, new Dictionary<string, string>()))">@Strings.T(State.Lang, "help.title")</a>
+</p>
 
 @code {
     [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
