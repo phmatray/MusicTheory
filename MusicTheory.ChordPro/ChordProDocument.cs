@@ -57,21 +57,23 @@ public sealed record ChordProDocument(IReadOnlyList<ChordProLine> Lines)
 
     /// <summary>Transposes every chord and the <c>{key}</c> directive by <paramref name="semitones"/>. Chords are spelled in the new key when <see cref="Key"/> is known.</summary>
     /// <param name="semitones">Semitones up (positive) or down (negative).</param>
-    public ChordProDocument Transpose(int semitones)
+    /// <param name="suffix">With <see cref="SuffixHandling.KeepUnparsed"/>, bracket text that is not a chord but starts with a root moves its root and bass too.</param>
+    public ChordProDocument Transpose(int semitones, SuffixHandling suffix = SuffixHandling.Canonical)
     {
         if (semitones == 0)
             return this;
         var target = Key?.TransposeBySemitones(semitones);
-        return Map(c => ChordTransposer.Transpose(c, semitones, target), target);
+        return Map(c => ChordTransposer.Transpose(c, semitones, target, suffix: suffix), target);
     }
 
     /// <summary>Transposes from <see cref="Key"/> to <paramref name="to"/>, spelling every chord in <paramref name="to"/>.</summary>
     /// <param name="to">The target key.</param>
+    /// <param name="suffix">See <see cref="Transpose(int, SuffixHandling)"/>.</param>
     /// <exception cref="InvalidOperationException">The document has no parseable <c>{key}</c>.</exception>
-    public ChordProDocument Transpose(KeySignature to)
+    public ChordProDocument Transpose(KeySignature to, SuffixHandling suffix = SuffixHandling.Canonical)
     {
         var from = Key ?? throw new InvalidOperationException("Transposing to a key needs a {key:} directive the document can parse.");
-        return Map(c => ChordTransposer.Transpose(c, from, to), to);
+        return Map(c => ChordTransposer.Transpose(c, from, to, suffix: suffix), to);
     }
 
     // Rebuilds only the lines that change; annotations ([*Riff]) are not chords.

@@ -24,6 +24,8 @@ song.Transpose(new KeySignature(Note.Parse("Bb"), KeyMode.Major)); // spelled in
 ```
 
 Every chord goes through `ChordTransposer` and the `{key:}` directive is rewritten; lyrics, annotations
-(`[*Riff]`), unparseable chords (`[N.C.]`) and `{start_of_tab}` blocks are left as written. Only changed lines
+(`[*Riff]`), unparseable chords (`[N.C.]`, `[Gfoo/B]`) and `{start_of_tab}` blocks are left as written by default;
+`Transpose(2, SuffixHandling.KeepUnparsed)` also moves the root and bass of chords the library cannot read
+(`[Gfoo/B]` becomes `[Afoo/C#]`). Only changed lines
 get new text. `Transpose(KeySignature)` needs a parseable `{key:}`, else it throws `InvalidOperationException`.
 Suffixes are rewritten to their canonical form (`CM7` becomes `Dmaj7`), see issue #104.

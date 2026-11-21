@@ -67,6 +67,40 @@ public class ChordTransposerTests
         ChordTransposer.Transpose(text, K("C"), K("D")).ShouldBe(text);
     }
 
+    [Theory]
+    [InlineData("Cfoo/E", "Dfoo/F#")]
+    [InlineData("Cfoo/e", "Dfoo/e")]
+    [InlineData("Cfoo/Xyz", "Dfoo/Xyz")]
+    [InlineData("Cfoo/", "Dfoo/")]
+    [InlineData("Cfoo", "Dfoo")]
+    [InlineData("  Cfoo/E ", "Dfoo/F#")]
+    [InlineData("A♭foo/C", "B♭foo/D")]
+    [InlineData("C13sus4b9", "D13sus4b9")]
+    public void Transpose_KeepUnparsed_MovesRootAndBass(string text, string expected) =>
+        ChordTransposer.Transpose(text, 2, suffix: SuffixHandling.KeepUnparsed).ShouldBe(expected);
+
+    [Fact]
+    public void Transpose_KeepUnparsed_ParseableChordsMatchCanonical()
+    {
+        ChordTransposer.Transpose("CM7/E", 2, suffix: SuffixHandling.KeepUnparsed).ShouldBe(ChordTransposer.Transpose("CM7/E", 2));
+    }
+
+    [Fact]
+    public void Transpose_DefaultLeavesUnparseableTextAlone() =>
+        ChordTransposer.Transpose("Cfoo/E", 2).ShouldBe("Cfoo/E");
+
+    [Fact]
+    public void Transpose_KeepUnparsed_BetweenKeys() =>
+        ChordTransposer.Transpose("Cfoo/E", K("C"), K("D"), suffix: SuffixHandling.KeepUnparsed).ShouldBe("Dfoo/F#");
+
+    [Theory]
+    [InlineData("N.C.")] [InlineData("xyz")] [InlineData("%")] [InlineData("am")] [InlineData("")] [InlineData("  ")] [InlineData("Hello")]
+    public void Transpose_KeepUnparsed_NonChordsUnchanged(string text)
+    {
+        ChordTransposer.Transpose(text, 5, suffix: SuffixHandling.KeepUnparsed).ShouldBe(text);
+        ChordTransposer.Transpose(text, K("C"), K("D"), suffix: SuffixHandling.KeepUnparsed).ShouldBe(text);
+    }
+
     [Fact]
     public void Transpose_KeepsUnicodeInput_Unicode()
     {
