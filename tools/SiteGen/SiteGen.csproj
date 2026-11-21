@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Builds the static site: docs/*.md through site/_docs.html, an API reference from the XML docs of the
+       three packages, and site/index.html with every {{sample:...}} and {{circle:...}} token replaced by what
+       the library actually computes. Run: dotnet run, project tools/SiteGen, with the repo root and an output folder. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Markdig" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../MusicTheory/MusicTheory.csproj" />
+    <ProjectReference Include="../../MusicTheory.Guitar/MusicTheory.Guitar.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -21,14 +21,17 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Shouldly" />
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="../MusicTheory.Guitar.Blazor/wwwroot/chord-audio.js" Link="chord-audio.js" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Golden/*.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../MusicTheory.Guitar/MusicTheory.Guitar.csproj" />
+    <ProjectReference Include="../MusicTheory.Guitar.Blazor/MusicTheory.Guitar.Blazor.csproj" />
   </ItemGroup>
 
 </Project>

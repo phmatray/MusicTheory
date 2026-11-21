@@ -14,178 +14,82 @@ public enum KeyMode
 }
 
 /// <summary>
-/// Represents a key signature in music.
+/// A key: a tonic and a mode, with its signature computed on the line of fifths. Theoretical keys are
+/// supported up to two accidentals per note (G# major has F##); equality ignores the tonic's octave.
 /// </summary>
-public class KeySignature
+public sealed record KeySignature
 {
-    /// <summary>
-    /// Gets the tonic (root) note of the key.
-    /// </summary>
+    // Order in which sharps (and, reversed, flats) enter a signature.
+    private static readonly NoteName[] SharpOrder = [NoteName.F, NoteName.C, NoteName.G, NoteName.D, NoteName.A, NoteName.E, NoteName.B];
+    private static readonly NoteName[] FlatOrder = [NoteName.B, NoteName.E, NoteName.A, NoteName.D, NoteName.G, NoteName.C, NoteName.F];
+
+    /// <summary>The tonic.</summary>
     public Note Tonic { get; }
 
-    /// <summary>
-    /// Gets the mode of the key (major or minor).
-    /// </summary>
+    /// <summary>Major or minor.</summary>
     public KeyMode Mode { get; }
 
     /// <summary>
-    /// Gets the number of accidentals in the key signature.
-    /// Positive values indicate sharps, negative values indicate flats.
+    /// Accidentals in the signature: sharps positive, flats negative. A double sharp counts twice, so G#
+    /// major is 8.
     /// </summary>
     public int AccidentalCount { get; }
 
-    /// <summary>
-    /// Gets the notes that are altered in this key signature.
-    /// </summary>
+    /// <summary>The letters the signature alters, in the order they enter it (F C G… for sharps).</summary>
     public IReadOnlyList<NoteName> AlteredNotes { get; }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="KeySignature"/> class.
-    /// </summary>
-    /// <param name="tonic">The tonic note of the key.</param>
-    /// <param name="mode">The mode of the key.</param>
+    /// <summary>Creates a key.</summary>
+    /// <exception cref="ArgumentNullException"><paramref name="tonic"/> is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The mode is undefined, or the key needs triple
+    /// accidentals (more than 14 sharps or flats, e.g. Cbb minor).</exception>
     public KeySignature(Note tonic, KeyMode mode)
     {
+        ArgumentNullException.ThrowIfNull(tonic);
+        if (!Enum.IsDefined(mode))
+            throw new ArgumentOutOfRangeException(nameof(mode), mode, "Undefined key mode.");
         Tonic = tonic;
         Mode = mode;
-        
-        (AccidentalCount, AlteredNotes) = CalculateKeySignature();
+        AccidentalCount = PositionOf(tonic, mode);
+        if (Math.Abs(AccidentalCount) > 14)
+            // Stryker disable once Equality: the count is beyond ±14 here, never 0, so > and >= agree.
+            throw new ArgumentOutOfRangeException(nameof(tonic), tonic, $"{ToString()} needs {Math.Abs(AccidentalCount)} {(AccidentalCount > 0 ? "sharps" : "flats")}; at most 14 (two per note) are supported.");
+        // Stryker disable once Equality: with no accidentals nothing is taken from either order, so >= and > agree.
+        var order = AccidentalCount >= 0 ? SharpOrder : FlatOrder;
+        AlteredNotes = order.Take(Math.Min(Math.Abs(AccidentalCount), 7)).ToList();
     }
 
-    /// <summary>
-    /// Gets the alteration for a specific note in this key signature.
-    /// </summary>
-    /// <param name="noteName">The note name to check.</param>
-    /// <returns>The alteration for the note in this key.</returns>
+    /// <summary>The accidental the signature puts on <paramref name="noteName"/> (F## in G# major).</summary>
     public Alteration GetAlteration(NoteName noteName)
     {
-        if (!AlteredNotes.Contains(noteName))
-            return Alteration.Natural;
-
-        return AccidentalCount > 0 ? Alteration.Sharp : Alteration.Flat;
+        int count = Math.Abs(AccidentalCount);
+        var order = AccidentalCount >= 0 ? SharpOrder : FlatOrder;
+        int times = (count - Array.IndexOf(order, noteName) + 6) / 7;
+        return (Alteration)(AccidentalCount >= 0 ? times : -times);
     }
 
-    /// <summary>
-    /// Gets the next key in the circle of fifths (clockwise, adding sharps).
-    /// </summary>
-    /// <returns>The next key signature in the circle of fifths.</returns>
-    public KeySignature NextInCircle()
-    {
-        var position = GetCircleOfFifthsPosition();
-        var nextPosition = position + 1;
-        
-        // Handle wrap-around for enharmonic equivalents
-        if (nextPosition > 7)
-            nextPosition = -5; // C# major -> Db major (enharmonic)
-        
-        return GetKeyFromPosition(nextPosition, Mode);
-    }
+    /// <summary>The key a fifth above, same mode (C → G, C# → Ab).</summary>
+    public KeySignature NextInCircle() => GetKeyFromPosition(Wrap(AccidentalCount + 1), Mode);
+
+    /// <summary>The key a fifth below, same mode (C → F, Cb → E).</summary>
+    public KeySignature PreviousInCircle() => GetKeyFromPosition(Wrap(AccidentalCount - 1), Mode);
+
+    /// <summary>The relative key: the major's 6th degree, the minor's 3rd (C ↔ Am, C# ↔ A#m).</summary>
+    public KeySignature GetRelative() => Mode == KeyMode.Major
+        ? new KeySignature(Tonic.Transpose(new Interval(IntervalQuality.Minor, 3, Direction.Down)), KeyMode.Minor)
+        : new KeySignature(Tonic.Transpose(new Interval(IntervalQuality.Minor, 3)), KeyMode.Major);
+
+    /// <summary>The parallel key: same tonic, other mode.</summary>
+    public KeySignature GetParallel() => new(Tonic, Mode == KeyMode.Major ? KeyMode.Minor : KeyMode.Major);
 
     /// <summary>
-    /// Gets the previous key in the circle of fifths (counter-clockwise, adding flats).
+    /// The enharmonic keys with at most seven accidentals: B ↔ Cb, F# ↔ Gb, C# ↔ Db, and in minor
+    /// G#m ↔ Abm, D#m ↔ Ebm, A#m ↔ Bbm.
     /// </summary>
-    /// <returns>The previous key signature in the circle of fifths.</returns>
-    public KeySignature PreviousInCircle()
-    {
-        var position = GetCircleOfFifthsPosition();
-        var prevPosition = position - 1;
-        
-        // Handle wrap-around for enharmonic equivalents
-        if (prevPosition < -7)
-            prevPosition = 5; // Cb major -> B major (enharmonic)
-            
-        return GetKeyFromPosition(prevPosition, Mode);
-    }
-
-    /// <summary>
-    /// Gets the relative major or minor key.
-    /// </summary>
-    /// <returns>The relative key signature.</returns>
-    public KeySignature GetRelative()
-    {
-        if (Mode == KeyMode.Major)
-        {
-            // Major to minor: the sixth degree
-            return new KeySignature(Spell(PitchClass(Tonic) + 9), KeyMode.Minor);
-        }
-        else
-        {
-            // Minor to major: the third degree
-            return new KeySignature(Spell(PitchClass(Tonic) + 3), KeyMode.Major);
-        }
-    }
-
-    /// <summary>
-    /// Gets the parallel major or minor key (same tonic, different mode).
-    /// </summary>
-    /// <returns>The parallel key signature.</returns>
-    public KeySignature GetParallel()
-    {
-        var parallelMode = Mode == KeyMode.Major ? KeyMode.Minor : KeyMode.Major;
-        return new KeySignature(Tonic, parallelMode);
-    }
-
-    /// <summary>
-    /// Gets all enharmonic equivalent keys (e.g., C# major = Db major).
-    /// </summary>
-    /// <returns>A list of enharmonically equivalent key signatures.</returns>
-    public IEnumerable<KeySignature> GetEnharmonicEquivalents()
-    {
-        var equivalents = new List<KeySignature>();
-        
-        // Check for enharmonic equivalents based on position
-        var position = GetCircleOfFifthsPosition();
-        
-        // Sharp keys that have flat equivalents
-        if (position == 6 && Mode == KeyMode.Major && Tonic.Name == NoteName.F && Tonic.Alteration == Alteration.Sharp)
-        {
-            // F# major = Gb major
-            equivalents.Add(new KeySignature(new Note(NoteName.G, Alteration.Flat), KeyMode.Major));
-        }
-        else if (position == 7 && Mode == KeyMode.Major && Tonic.Name == NoteName.C && Tonic.Alteration == Alteration.Sharp)
-        {
-            // C# major = Db major
-            equivalents.Add(new KeySignature(new Note(NoteName.D, Alteration.Flat), KeyMode.Major));
-        }
-        
-        // Flat keys that have sharp equivalents
-        else if (position == -6 && Mode == KeyMode.Major && Tonic.Name == NoteName.G && Tonic.Alteration == Alteration.Flat)
-        {
-            // Gb major = F# major
-            equivalents.Add(new KeySignature(new Note(NoteName.F, Alteration.Sharp), KeyMode.Major));
-        }
-        else if (position == -7 && Mode == KeyMode.Major && Tonic.Name == NoteName.C && Tonic.Alteration == Alteration.Flat)
-        {
-            // Cb major = B major
-            equivalents.Add(new KeySignature(new Note(NoteName.B), KeyMode.Major));
-        }
-        
-        // Similar for minor keys
-        if (position == 5 && Mode == KeyMode.Minor && Tonic.Name == NoteName.G && Tonic.Alteration == Alteration.Sharp)
-        {
-            // G# minor = Ab minor
-            equivalents.Add(new KeySignature(new Note(NoteName.A, Alteration.Flat), KeyMode.Minor));
-        }
-        else if (position == 6 && Mode == KeyMode.Minor && Tonic.Name == NoteName.D && Tonic.Alteration == Alteration.Sharp)
-        {
-            // D# minor = Eb minor
-            equivalents.Add(new KeySignature(new Note(NoteName.E, Alteration.Flat), KeyMode.Minor));
-        }
-        else if (position == 7 && Mode == KeyMode.Minor && Tonic.Name == NoteName.A && Tonic.Alteration == Alteration.Sharp)
-        {
-            // A# minor = Bb minor
-            equivalents.Add(new KeySignature(new Note(NoteName.B, Alteration.Flat), KeyMode.Minor));
-        }
-        
-        // Flat minor keys
-        else if (position == -7 && Mode == KeyMode.Minor && Tonic.Name == NoteName.A && Tonic.Alteration == Alteration.Flat)
-        {
-            // Ab minor = G# minor
-            equivalents.Add(new KeySignature(new Note(NoteName.G, Alteration.Sharp), KeyMode.Minor));
-        }
-        
-        return equivalents;
-    }
+    public IEnumerable<KeySignature> GetEnharmonicEquivalents() =>
+        new[] { AccidentalCount - 12, AccidentalCount + 12 }
+            .Where(p => Math.Abs(p) <= 7)
+            .Select(p => GetKeyFromPosition(p, Mode))
+            .ToList();
 
     /// <summary>
     /// Gets the dominant key (fifth above).
@@ -228,7 +132,7 @@ public class KeySignature
             "m" or "min" or "minor" => KeyMode.Minor,
             _ => null,
         };
-        if (mode is null || Math.Abs(new KeySignature(tonic, mode.Value).AccidentalCount) > 7)
+        if (mode is null || Math.Abs(PositionOf(tonic, mode.Value)) > 7)
             return false;
 
         key = new KeySignature(tonic, mode.Value);
@@ -299,98 +203,33 @@ public class KeySignature
 
     private static int Mod12(int n) => ((n % 12) + 12) % 12;
 
-    private static int PitchClass(Note note) => MusicTheoryUtilities.GetPitchClass(note);
-
     /// <summary>
-    /// Calculates the key signature based on the circle of fifths.
+    /// Position on the line of fifths (sharps positive): F=-1 C=0 G=1 D=2 A=3 E=4 B=5, ±7 per sharp/flat,
+    /// minor keys three fifths below their relative major.
     /// </summary>
-    private (int accidentalCount, IReadOnlyList<NoteName> alteredNotes) CalculateKeySignature()
-    {
-        // Order of sharps: F# C# G# D# A# E# B#
-        var sharpOrder = new[] { NoteName.F, NoteName.C, NoteName.G, NoteName.D, NoteName.A, NoteName.E, NoteName.B };
-        
-        // Order of flats: Bb Eb Ab Db Gb Cb Fb
-        var flatOrder = new[] { NoteName.B, NoteName.E, NoteName.A, NoteName.D, NoteName.G, NoteName.C, NoteName.F };
-
-        // Calculate position in circle of fifths
-        int position = GetCircleOfFifthsPosition();
-        
-        if (position > 0)
-        {
-            // Sharps
-            return (position, sharpOrder.Take(position).ToList());
-        }
-        else if (position < 0)
-        {
-            // Flats
-            return (position, flatOrder.Take(-position).ToList());
-        }
-        else
-        {
-            // No accidentals
-            return (0, new List<NoteName>());
-        }
-    }
-
-    /// <summary>
-    /// Gets the position in the circle of fifths (sharps positive, flats negative), from the tonic's
-    /// place on the line of fifths: F=-1 C=0 G=1 D=2 A=3 E=4 B=5, ±7 per sharp/flat, minor keys three
-    /// fifths below their relative major.
-    /// </summary>
-    private int GetCircleOfFifthsPosition()
+    private static int PositionOf(Note tonic, KeyMode mode)
     {
         int[] lineOfFifths = [0, 2, 4, -1, 1, 3, 5]; // C D E F G A B
-        return lineOfFifths[(int)Tonic.Name] + 7 * (int)Tonic.Alteration - (Mode == KeyMode.Minor ? 3 : 0);
+        return lineOfFifths[(int)tonic.Name] + 7 * (int)tonic.Alteration - (mode == KeyMode.Minor ? 3 : 0);
     }
 
-    /// <summary>
-    /// Creates a KeySignature from a position in the circle of fifths.
-    /// </summary>
+    // Past seven accidentals, the circle continues on the enharmonic side (8 sharps = 4 flats).
+    private static int Wrap(int position) => position > 7 ? position - 12 : position < -7 ? position + 12 : position;
+
+    /// <inheritdoc />
+    public bool Equals(KeySignature? other) =>
+        other is not null && Mode == other.Mode && Tonic.Name == other.Tonic.Name && Tonic.Alteration == other.Tonic.Alteration;
+
+    /// <inheritdoc />
+    public override int GetHashCode() => HashCode.Combine(Mode, Tonic.Name, Tonic.Alteration);
+
+    /// <summary>The key whose signature has <paramref name="position"/> accidentals (sharps positive).</summary>
     private static KeySignature GetKeyFromPosition(int position, KeyMode mode)
     {
-        if (mode == KeyMode.Major)
-        {
-            return position switch
-            {
-                0 => new KeySignature(new Note(NoteName.C), KeyMode.Major),
-                1 => new KeySignature(new Note(NoteName.G), KeyMode.Major),
-                2 => new KeySignature(new Note(NoteName.D), KeyMode.Major),
-                3 => new KeySignature(new Note(NoteName.A), KeyMode.Major),
-                4 => new KeySignature(new Note(NoteName.E), KeyMode.Major),
-                5 => new KeySignature(new Note(NoteName.B), KeyMode.Major),
-                6 => new KeySignature(new Note(NoteName.F, Alteration.Sharp), KeyMode.Major),
-                7 => new KeySignature(new Note(NoteName.C, Alteration.Sharp), KeyMode.Major),
-                -1 => new KeySignature(new Note(NoteName.F), KeyMode.Major),
-                -2 => new KeySignature(new Note(NoteName.B, Alteration.Flat), KeyMode.Major),
-                -3 => new KeySignature(new Note(NoteName.E, Alteration.Flat), KeyMode.Major),
-                -4 => new KeySignature(new Note(NoteName.A, Alteration.Flat), KeyMode.Major),
-                -5 => new KeySignature(new Note(NoteName.D, Alteration.Flat), KeyMode.Major),
-                -6 => new KeySignature(new Note(NoteName.G, Alteration.Flat), KeyMode.Major),
-                -7 => new KeySignature(new Note(NoteName.C, Alteration.Flat), KeyMode.Major),
-                _ => throw new ArgumentOutOfRangeException(nameof(position), "Position must be between -7 and 7")
-            };
-        }
-        else
-        {
-            return position switch
-            {
-                0 => new KeySignature(new Note(NoteName.A), KeyMode.Minor),
-                1 => new KeySignature(new Note(NoteName.E), KeyMode.Minor),
-                2 => new KeySignature(new Note(NoteName.B), KeyMode.Minor),
-                3 => new KeySignature(new Note(NoteName.F, Alteration.Sharp), KeyMode.Minor),
-                4 => new KeySignature(new Note(NoteName.C, Alteration.Sharp), KeyMode.Minor),
-                5 => new KeySignature(new Note(NoteName.G, Alteration.Sharp), KeyMode.Minor),
-                6 => new KeySignature(new Note(NoteName.D, Alteration.Sharp), KeyMode.Minor),
-                7 => new KeySignature(new Note(NoteName.A, Alteration.Sharp), KeyMode.Minor),
-                -1 => new KeySignature(new Note(NoteName.D), KeyMode.Minor),
-                -2 => new KeySignature(new Note(NoteName.G), KeyMode.Minor),
-                -3 => new KeySignature(new Note(NoteName.C), KeyMode.Minor),
-                -4 => new KeySignature(new Note(NoteName.F), KeyMode.Minor),
-                -5 => new KeySignature(new Note(NoteName.B, Alteration.Flat), KeyMode.Minor),
-                -6 => new KeySignature(new Note(NoteName.E, Alteration.Flat), KeyMode.Minor),
-                -7 => new KeySignature(new Note(NoteName.A, Alteration.Flat), KeyMode.Minor),
-                _ => throw new ArgumentOutOfRangeException(nameof(position), "Position must be between -7 and 7")
-            };
-        }
+        // The major key with this signature sits on the line of fifths (F C G D A E B, one more accidental
+        // every seven steps); the minor key with the same signature is its relative, a minor 3rd below.
+        int step = position + 1;
+        var major = new Note(SharpOrder[MusicTheoryUtilities.Mod7(step)], (Alteration)MusicTheoryUtilities.FloorDiv(step, 7));
+        return new KeySignature(mode == KeyMode.Minor ? major.Transpose(new Interval(IntervalQuality.Minor, 3, Direction.Down)) : major, mode);
     }
 }

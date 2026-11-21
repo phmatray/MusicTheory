@@ -45,346 +45,133 @@ public enum VoiceLeadingViolationType
 /// <summary>
 /// Represents a voice leading violation.
 /// </summary>
-public class VoiceLeadingViolation
-{
-    /// <summary>
-    /// Gets the type of violation.
-    /// </summary>
-    public VoiceLeadingViolationType Type { get; }
-
-    /// <summary>
-    /// Gets a description of the violation.
-    /// </summary>
-    public string Description { get; }
-
-    /// <summary>
-    /// Gets the voice indices involved in the violation.
-    /// </summary>
-    public (int Voice1, int Voice2)? VoiceIndices { get; }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="VoiceLeadingViolation"/> class.
-    /// </summary>
-    public VoiceLeadingViolation(VoiceLeadingViolationType type, string description, (int, int)? voiceIndices = null)
-    {
-        Type = type;
-        Description = description;
-        VoiceIndices = voiceIndices;
-    }
-}
+/// <param name="Type">The kind of violation.</param>
+/// <param name="Description">A readable description.</param>
+/// <param name="VoiceIndices">The two voices involved, or null for a single-voice violation.</param>
+public sealed record VoiceLeadingViolation(VoiceLeadingViolationType Type, string Description, (int Voice1, int Voice2)? VoiceIndices = null);
 
 /// <summary>
-/// Provides voice leading rules and validation for part-writing.
+/// Common-practice part-writing checks. Voices are given note by note: the first chord's note, then the
+/// second chord's, for each voice. Every check is spelling-aware (a diminished 5th is not a perfect 5th).
 /// </summary>
 public static class VoiceLeadingRules
 {
-    /// <summary>
-    /// Checks if there are parallel perfect fifths between two voices.
-    /// </summary>
-    public static bool HasParallelFifths(Note voice1Note1, Note voice1Note2, Note voice2Note1, Note voice2Note2)
-    {
-        var interval1 = Interval.Between(voice1Note1, voice2Note1);
-        var interval2 = Interval.Between(voice1Note2, voice2Note2);
+    /// <summary>Parallel perfect fifths (or compound fifths) between two voices.</summary>
+    public static bool HasParallelFifths(Note voice1Note1, Note voice1Note2, Note voice2Note1, Note voice2Note2) =>
+        IsPerfect(voice1Note1, voice2Note1, 5) && IsPerfect(voice1Note2, voice2Note2, 5)
+        && GetMotionType(voice1Note1, voice1Note2, voice2Note1, voice2Note2) == MotionType.Parallel;
 
-        // Check if both intervals are perfect fifths
-        if (interval1.Quality != IntervalQuality.Perfect || interval2.Quality != IntervalQuality.Perfect)
-            return false;
+    /// <summary>Parallel perfect octaves (or compound octaves) between two voices; two unisons are not octaves.</summary>
+    public static bool HasParallelOctaves(Note voice1Note1, Note voice1Note2, Note voice2Note1, Note voice2Note2) =>
+        // Parallel motion keeps the distance, so if the first interval is an octave (not a unison) so is the second.
+        IsPerfect(voice1Note1, voice2Note1, 1) && IsPerfect(voice1Note2, voice2Note2, 1)
+        && Interval.Between(voice1Note1, voice2Note1).Number > 1
+        && GetMotionType(voice1Note1, voice1Note2, voice2Note1, voice2Note2) == MotionType.Parallel;
 
-        var simpleNumber1 = ((interval1.Number - 1) % 7) + 1;
-        var simpleNumber2 = ((interval2.Number - 1) % 7) + 1;
-
-        if (simpleNumber1 != 5 || simpleNumber2 != 5)
-            return false;
-
-        // Check if both voices move in the same direction
-        var motion = GetMotionType(voice1Note1, voice1Note2, voice2Note1, voice2Note2);
-        return motion == MotionType.Parallel;
-    }
+    /// <summary>Parallel perfect unisons between two voices.</summary>
+    public static bool HasParallelUnisons(Note voice1Note1, Note voice1Note2, Note voice2Note1, Note voice2Note2) =>
+        Interval.Between(voice1Note1, voice2Note1) == Unison && Interval.Between(voice1Note2, voice2Note2) == Unison
+        && GetMotionType(voice1Note1, voice1Note2, voice2Note1, voice2Note2) == MotionType.Parallel;
 
     /// <summary>
-    /// Checks if there are parallel perfect octaves between two voices.
+    /// Hidden (direct) fifths in the outer voices: similar or parallel motion into a perfect fifth with a
+    /// leap of more than a whole step in the soprano.
     /// </summary>
-    public static bool HasParallelOctaves(Note voice1Note1, Note voice1Note2, Note voice2Note1, Note voice2Note2)
-    {
-        var interval1 = Interval.Between(voice1Note1, voice2Note1);
-        var interval2 = Interval.Between(voice1Note2, voice2Note2);
+    public static bool HasHiddenFifths(Note bassNote1, Note bassNote2, Note sopranoNote1, Note sopranoNote2) =>
+        IsPerfect(bassNote2, sopranoNote2, 5)
+        && GetMotionType(bassNote1, bassNote2, sopranoNote1, sopranoNote2) is MotionType.Similar or MotionType.Parallel
+        && Math.Abs(Pitch(sopranoNote2, nameof(sopranoNote2)) - Pitch(sopranoNote1, nameof(sopranoNote1))) > 2;
 
-        // Check if both intervals are perfect octaves (or compound octaves)
-        if (interval1.Quality != IntervalQuality.Perfect || interval2.Quality != IntervalQuality.Perfect)
-            return false;
+    /// <summary>The lower voice sounds above the higher one.</summary>
+    public static bool HasVoiceCrossing(Note lowerVoiceNote, Note higherVoiceNote) =>
+        Pitch(lowerVoiceNote, nameof(lowerVoiceNote)) > Pitch(higherVoiceNote, nameof(higherVoiceNote));
 
-        var simpleNumber1 = ((interval1.Number - 1) % 7) + 1;
-        var simpleNumber2 = ((interval2.Number - 1) % 7) + 1;
-
-        if (simpleNumber1 != 1 || simpleNumber2 != 1)
-            return false;
-
-        // Both must be octaves (not unisons in same octave)
-        if (interval1.Number == 1 && interval2.Number == 1)
-            return false;
-
-        // Check if both voices move in the same direction
-        var motion = GetMotionType(voice1Note1, voice1Note2, voice2Note1, voice2Note2);
-        return motion == MotionType.Parallel;
-    }
-
-    /// <summary>
-    /// Checks if there are parallel unisons between two voices.
-    /// </summary>
-    public static bool HasParallelUnisons(Note voice1Note1, Note voice1Note2, Note voice2Note1, Note voice2Note2)
-    {
-        var interval1 = Interval.Between(voice1Note1, voice2Note1);
-        var interval2 = Interval.Between(voice1Note2, voice2Note2);
-
-        // Check if both intervals are perfect unisons
-        if (interval1.Quality != IntervalQuality.Perfect || interval2.Quality != IntervalQuality.Perfect)
-            return false;
-
-        if (interval1.Number != 1 || interval2.Number != 1)
-            return false;
-
-        // Check if both voices move in the same direction
-        var motion = GetMotionType(voice1Note1, voice1Note2, voice2Note1, voice2Note2);
-        return motion == MotionType.Parallel;
-    }
-
-    /// <summary>
-    /// Checks if there are hidden (direct) fifths between outer voices.
-    /// </summary>
-    public static bool HasHiddenFifths(Note bassNote1, Note bassNote2, Note sopranoNote1, Note sopranoNote2)
-    {
-        // Determine the interval at the destination
-        var lowerNote = bassNote2;
-        var higherNote = sopranoNote2;
-
-        // Ensure we're calculating from lower to higher
-        if (MusicTheoryUtilities.GetTotalSemitones(bassNote2) > MusicTheoryUtilities.GetTotalSemitones(sopranoNote2))
-        {
-            lowerNote = sopranoNote2;
-            higherNote = bassNote2;
-        }
-
-        var interval2 = Interval.Between(lowerNote, higherNote);
-
-        // Check if the resulting interval is a perfect fifth (or compound fifth)
-        if (interval2.Quality != IntervalQuality.Perfect)
-            return false;
-
-        var simpleNumber = ((interval2.Number - 1) % 7) + 1;
-        if (simpleNumber != 5)
-            return false;
-
-        // Check if both voices move in similar or parallel motion (same direction)
-        var motion = GetMotionType(bassNote1, bassNote2, sopranoNote1, sopranoNote2);
-        if (motion != MotionType.Similar && motion != MotionType.Parallel)
-            return false;
-
-        // Hidden fifths are particularly problematic when the soprano leaps
-        int sopranoSemitones1 = MusicTheoryUtilities.GetTotalSemitones(sopranoNote1);
-        int sopranoSemitones2 = MusicTheoryUtilities.GetTotalSemitones(sopranoNote2);
-        int sopranoLeap = Math.Abs(sopranoSemitones2 - sopranoSemitones1);
-
-        return sopranoLeap > 2; // More than a whole step
-    }
-
-    /// <summary>
-    /// Checks if there is voice crossing between two voices.
-    /// </summary>
-    public static bool HasVoiceCrossing(Note lowerVoiceNote, Note higherVoiceNote)
-    {
-        var lowerSemitones = MusicTheoryUtilities.GetTotalSemitones(lowerVoiceNote);
-        var higherSemitones = MusicTheoryUtilities.GetTotalSemitones(higherVoiceNote);
-
-        return lowerSemitones > higherSemitones;
-    }
-
-    /// <summary>
-    /// Checks if there is voice overlap between two voices.
-    /// Voice overlap occurs when a voice moves past the previous note of an adjacent voice.
-    /// </summary>
+    /// <summary>A voice moves past the previous note of the other voice (voice 1 is the lower one).</summary>
     public static bool HasVoiceOverlap(Note voice1Note1, Note voice1Note2, Note voice2Note1, Note voice2Note2)
     {
-        var voice1Semitones1 = MusicTheoryUtilities.GetTotalSemitones(voice1Note1);
-        var voice1Semitones2 = MusicTheoryUtilities.GetTotalSemitones(voice1Note2);
-        var voice2Semitones1 = MusicTheoryUtilities.GetTotalSemitones(voice2Note1);
-        var voice2Semitones2 = MusicTheoryUtilities.GetTotalSemitones(voice2Note2);
-
-        // Check if voice1 (lower) moves above where voice2 (higher) was
-        if (voice1Semitones1 < voice2Semitones1 && voice1Semitones2 > voice2Semitones1)
-            return true;
-
-        // Check if voice2 (higher) moves below where voice1 (lower) was
-        if (voice2Semitones1 > voice1Semitones1 && voice2Semitones2 < voice1Semitones1)
-            return true;
-
-        return false;
+        int low1 = Pitch(voice1Note1, nameof(voice1Note1)), low2 = Pitch(voice1Note2, nameof(voice1Note2));
+        int high1 = Pitch(voice2Note1, nameof(voice2Note1)), high2 = Pitch(voice2Note2, nameof(voice2Note2));
+        return low1 < high1 && (low2 > high1 || high2 < low1);
     }
 
-    /// <summary>
-    /// Checks if there is an augmented interval in a melodic line.
-    /// </summary>
-    public static bool HasAugmentedInterval(Note note1, Note note2)
-    {
-        // Ensure we calculate from lower to higher note
-        var lowerNote = note1;
-        var higherNote = note2;
+    /// <summary>An augmented melodic interval, of any degree, in either direction.</summary>
+    public static bool HasAugmentedInterval(Note note1, Note note2) => Interval.Between(note1, note2).IsAugmented;
 
-        if (MusicTheoryUtilities.GetTotalSemitones(note1) > MusicTheoryUtilities.GetTotalSemitones(note2))
-        {
-            lowerNote = note2;
-            higherNote = note1;
-        }
-
-        var interval = Interval.Between(lowerNote, higherNote);
-        return interval.Quality == IntervalQuality.Augmented;
-    }
+    /// <summary>A melodic leap wider than <paramref name="maxSemitones"/> (an octave by default).</summary>
+    public static bool HasLargeMelodicLeap(Note note1, Note note2, int maxSemitones = 12) =>
+        Math.Abs(Pitch(note2, nameof(note2)) - Pitch(note1, nameof(note1))) > maxSemitones;
 
     /// <summary>
-    /// Checks if there is a large melodic leap (greater than an octave).
-    /// </summary>
-    public static bool HasLargeMelodicLeap(Note note1, Note note2, int maxSemitones = 12)
-    {
-        // Calculate semitone distance regardless of direction
-        int semitones1 = MusicTheoryUtilities.GetTotalSemitones(note1);
-        int semitones2 = MusicTheoryUtilities.GetTotalSemitones(note2);
-        int distance = Math.Abs(semitones2 - semitones1);
-
-        return distance > maxSemitones;
-    }
-
-    /// <summary>
-    /// Gets the type of motion between two voices.
+    /// The motion between two voices: oblique when one (or neither) moves, contrary in opposite directions,
+    /// parallel by the same distance, similar otherwise.
     /// </summary>
     public static MotionType GetMotionType(Note voice1Note1, Note voice1Note2, Note voice2Note1, Note voice2Note2)
     {
-        var voice1Semitones1 = MusicTheoryUtilities.GetTotalSemitones(voice1Note1);
-        var voice1Semitones2 = MusicTheoryUtilities.GetTotalSemitones(voice1Note2);
-        var voice2Semitones1 = MusicTheoryUtilities.GetTotalSemitones(voice2Note1);
-        var voice2Semitones2 = MusicTheoryUtilities.GetTotalSemitones(voice2Note2);
-
-        var voice1Movement = voice1Semitones2 - voice1Semitones1;
-        var voice2Movement = voice2Semitones2 - voice2Semitones1;
-
-        // Oblique: one voice stays, the other moves
-        if (voice1Movement == 0 && voice2Movement != 0)
+        int move1 = Pitch(voice1Note2, nameof(voice1Note2)) - Pitch(voice1Note1, nameof(voice1Note1));
+        int move2 = Pitch(voice2Note2, nameof(voice2Note2)) - Pitch(voice2Note1, nameof(voice2Note1));
+        if (move1 == 0 || move2 == 0)
             return MotionType.Oblique;
-        if (voice2Movement == 0 && voice1Movement != 0)
-            return MotionType.Oblique;
-
-        // No motion
-        if (voice1Movement == 0 && voice2Movement == 0)
-            return MotionType.Oblique;
-
-        // Contrary: voices move in opposite directions
-        if ((voice1Movement > 0 && voice2Movement < 0) || (voice1Movement < 0 && voice2Movement > 0))
+        if (Math.Sign(move1) != Math.Sign(move2))
             return MotionType.Contrary;
-
-        // Parallel: same direction and same interval
-        if (Math.Abs(voice1Movement) == Math.Abs(voice2Movement))
-            return MotionType.Parallel;
-
-        // Similar: same direction but different intervals
-        return MotionType.Similar;
+        return move1 == move2 ? MotionType.Parallel : MotionType.Similar;
     }
 
     /// <summary>
-    /// Validates voice leading between two chords and returns all violations.
+    /// Every violation between two chords given bass to soprano: parallel fifths, octaves and unisons,
+    /// crossing and overlap for each pair of voices; augmented intervals and leaps over an octave in each
+    /// voice; hidden fifths in the outer voices.
     /// </summary>
-    /// <param name="chord1">The first chord (array of notes from bass to soprano).</param>
-    /// <param name="chord2">The second chord (array of notes from bass to soprano).</param>
-    /// <returns>A list of voice leading violations.</returns>
-    public static List<VoiceLeadingViolation> ValidateVoiceLeading(Note[] chord1, Note[] chord2)
+    /// <exception cref="ArgumentNullException">A chord is null.</exception>
+    /// <exception cref="ArgumentException">The chords have different voice counts.</exception>
+    public static IReadOnlyList<VoiceLeadingViolation> ValidateVoiceLeading(Note[] chord1, Note[] chord2)
     {
+        ArgumentNullException.ThrowIfNull(chord1);
+        ArgumentNullException.ThrowIfNull(chord2);
         if (chord1.Length != chord2.Length)
-            throw new ArgumentException("Both chords must have the same number of voices.");
+            throw new ArgumentException("Both chords must have the same number of voices.", nameof(chord2));
 
         var violations = new List<VoiceLeadingViolation>();
-        int voiceCount = chord1.Length;
-
-        // Check all voice pairs
-        for (int i = 0; i < voiceCount; i++)
+        void Pair(bool found, VoiceLeadingViolationType type, string what, int i, int j)
         {
-            for (int j = i + 1; j < voiceCount; j++)
-            {
-                // Check parallel fifths
-                if (HasParallelFifths(chord1[i], chord2[i], chord1[j], chord2[j]))
-                {
-                    violations.Add(new VoiceLeadingViolation(
-                        VoiceLeadingViolationType.ParallelFifths,
-                        $"Parallel fifths between voice {i} and voice {j}",
-                        (i, j)));
-                }
-
-                // Check parallel octaves
-                if (HasParallelOctaves(chord1[i], chord2[i], chord1[j], chord2[j]))
-                {
-                    violations.Add(new VoiceLeadingViolation(
-                        VoiceLeadingViolationType.ParallelOctaves,
-                        $"Parallel octaves between voice {i} and voice {j}",
-                        (i, j)));
-                }
-
-                // Check parallel unisons
-                if (HasParallelUnisons(chord1[i], chord2[i], chord1[j], chord2[j]))
-                {
-                    violations.Add(new VoiceLeadingViolation(
-                        VoiceLeadingViolationType.ParallelUnisons,
-                        $"Parallel unisons between voice {i} and voice {j}",
-                        (i, j)));
-                }
-
-                // Check voice crossing
-                if (HasVoiceCrossing(chord2[i], chord2[j]))
-                {
-                    violations.Add(new VoiceLeadingViolation(
-                        VoiceLeadingViolationType.VoiceCrossing,
-                        $"Voice crossing between voice {i} and voice {j}",
-                        (i, j)));
-                }
-
-                // Check voice overlap
-                if (HasVoiceOverlap(chord1[i], chord2[i], chord1[j], chord2[j]))
-                {
-                    violations.Add(new VoiceLeadingViolation(
-                        VoiceLeadingViolationType.VoiceOverlap,
-                        $"Voice overlap between voice {i} and voice {j}",
-                        (i, j)));
-                }
-            }
-
-            // Check melodic intervals for each voice
-            if (HasAugmentedInterval(chord1[i], chord2[i]))
-            {
-                violations.Add(new VoiceLeadingViolation(
-                    VoiceLeadingViolationType.AugmentedInterval,
-                    $"Augmented interval in voice {i}",
-                    null));
-            }
-
-            if (HasLargeMelodicLeap(chord1[i], chord2[i]))
-            {
-                violations.Add(new VoiceLeadingViolation(
-                    VoiceLeadingViolationType.LargeMelodicLeap,
-                    $"Large melodic leap in voice {i}",
-                    null));
-            }
+            if (found)
+                violations.Add(new VoiceLeadingViolation(type, $"{what} between voice {i} and voice {j}", (i, j)));
+        }
+        void Single(bool found, VoiceLeadingViolationType type, string what, int i)
+        {
+            if (found)
+                violations.Add(new VoiceLeadingViolation(type, $"{what} in voice {i}"));
         }
 
-        // Check hidden fifths and octaves in outer voices (bass and soprano)
-        if (voiceCount >= 2)
+        for (int i = 0; i < chord1.Length; i++)
         {
-            int bassIndex = 0;
-            int sopranoIndex = voiceCount - 1;
-
-            if (HasHiddenFifths(chord1[bassIndex], chord2[bassIndex], chord1[sopranoIndex], chord2[sopranoIndex]))
+            for (int j = i + 1; j < chord1.Length; j++)
             {
-                violations.Add(new VoiceLeadingViolation(
-                    VoiceLeadingViolationType.HiddenFifths,
-                    "Hidden fifths in outer voices",
-                    (bassIndex, sopranoIndex)));
+                Pair(HasParallelFifths(chord1[i], chord2[i], chord1[j], chord2[j]), VoiceLeadingViolationType.ParallelFifths, "Parallel fifths", i, j);
+                Pair(HasParallelOctaves(chord1[i], chord2[i], chord1[j], chord2[j]), VoiceLeadingViolationType.ParallelOctaves, "Parallel octaves", i, j);
+                Pair(HasParallelUnisons(chord1[i], chord2[i], chord1[j], chord2[j]), VoiceLeadingViolationType.ParallelUnisons, "Parallel unisons", i, j);
+                Pair(HasVoiceCrossing(chord2[i], chord2[j]), VoiceLeadingViolationType.VoiceCrossing, "Voice crossing", i, j);
+                Pair(HasVoiceOverlap(chord1[i], chord2[i], chord1[j], chord2[j]), VoiceLeadingViolationType.VoiceOverlap, "Voice overlap", i, j);
             }
+            Single(HasAugmentedInterval(chord1[i], chord2[i]), VoiceLeadingViolationType.AugmentedInterval, "Augmented interval", i);
+            Single(HasLargeMelodicLeap(chord1[i], chord2[i]), VoiceLeadingViolationType.LargeMelodicLeap, "Large melodic leap", i);
         }
 
+        // With one voice the "outer voices" are the same voice, which never forms a fifth.
+        int soprano = chord1.Length - 1;
+        if (chord1.Length > 0 && HasHiddenFifths(chord1[0], chord2[0], chord1[soprano], chord2[soprano]))
+            violations.Add(new VoiceLeadingViolation(VoiceLeadingViolationType.HiddenFifths, "Hidden fifths in outer voices", (0, soprano)));
         return violations;
     }
+
+    private static readonly Interval Unison = new(IntervalQuality.Perfect, 1);
+
+    // A perfect interval whose number reduces to `simple` (1 for unisons and octaves, 5 for fifths).
+    private static bool IsPerfect(Note a, Note b, int simple)
+    {
+        var interval = Interval.Between(a, b);
+        return interval.Quality == IntervalQuality.Perfect && (interval.Number - 1) % 7 + 1 == simple;
+    }
+
+    private static int Pitch(Note note, string name) =>
+        note?.Semitones ?? throw new ArgumentNullException(name);
 }

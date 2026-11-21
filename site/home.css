@@ -1,0 +1,125 @@
+/* MusicTheory home page: a chaptered treatise. Tokens live in tokens.css; the engine in scrollcraft.css
+   is not restyled, only used. */
+
+.skip { position: absolute; left: var(--sc-4); top: -4rem; z-index: 100; padding: var(--sc-2) var(--sc-4);
+        background: var(--sc-ink); color: var(--sc-canvas); }
+.skip:focus { top: var(--sc-4); }
+
+code { font-family: var(--sc-font-mono); font-size: 0.86em; }
+
+/* ── Folio: chapter numeral and title in the margin ───────────────────────── */
+.folio {
+  position: fixed; z-index: var(--sc-z-chrome); top: 0; left: 0; right: 0;
+  padding: var(--sc-4) var(--sc-gutter) var(--sc-3); background: var(--sc-canvas);
+  border-bottom: 1px solid color-mix(in oklab, var(--sc-ink) 10%, transparent);
+  display: flex; gap: var(--sc-4); align-items: baseline;
+  font-size: var(--sc-t-sm); letter-spacing: var(--sc-track-wide); text-transform: uppercase;
+  font-variant-numeric: oldstyle-nums; color: var(--sc-ink-soft);
+  pointer-events: none;
+}
+.folio__mark { color: var(--sc-ink); text-decoration: none; font-weight: 600; pointer-events: auto; }
+.folio__chapter [data-folio-numeral] { color: var(--sc-accent); font-weight: 600; }
+
+/* ── Title page ────────────────────────────────────────────────────────────── */
+.title-page { min-height: 100svh; display: grid; align-items: end; padding-block-end: clamp(4rem, 14vh, 9rem); }
+.title-page__inner { max-width: 54rem; margin-inline: 0; }
+.title-page__title {
+  margin: 0; font-size: clamp(3.6rem, 1rem + 11vw, 9.5rem); line-height: 0.9;
+  font-weight: 300; font-variation-settings: "opsz" 72; letter-spacing: var(--sc-track-tight);
+}
+.title-page__promise { max-width: 34ch; font-size: var(--sc-t-xl); line-height: 1.3; text-wrap: balance; }
+.title-page__install code {
+  display: inline-block; padding: var(--sc-2) var(--sc-4); border: 1px solid var(--mt-rule);
+  background: var(--mt-code-bg); font-size: var(--sc-t-base);
+}
+.title-page__links a { font-size: var(--sc-t-lg); }
+
+/* ── Chapters ──────────────────────────────────────────────────────────────── */
+.chapter { border-top: 1px solid var(--mt-rule); }
+.chapter__grid { display: grid; grid-template-columns: minmax(9rem, 1fr) minmax(0, 3fr); gap: var(--sc-7); align-items: start; }
+.chapter__head { padding-block: var(--sc-2) var(--sc-4); }
+.chapter__numeral {
+  display: block; font-size: clamp(4rem, 2rem + 6vw, 7.5rem); line-height: 1; font-weight: 300;
+  font-variation-settings: "opsz" 72; color: var(--sc-accent); letter-spacing: var(--sc-track-tight);
+}
+.chapter__title { margin: var(--sc-2) 0 0; font-size: var(--sc-t-2xl); line-height: var(--sc-leading-tight);
+                  font-weight: 400; font-style: italic; letter-spacing: var(--sc-track-snug); }
+.chapter__body { max-width: var(--sc-measure); }
+.chapter__body > p { font-size: var(--sc-t-lg); line-height: 1.55; text-wrap: pretty; }
+.chapter__body > .aside { font-size: var(--sc-t-base); color: var(--sc-ink-soft); font-style: italic; }
+
+/* A sample: the code the visitor would write, and what the library returned when the page was built. */
+.sample { margin: var(--sc-5) 0; border: 1px solid var(--mt-rule); background: var(--mt-code-bg); }
+.sample pre { margin: 0; padding: var(--sc-4) var(--sc-5); overflow-x: auto; font-size: var(--sc-t-sm); line-height: 1.6; }
+.sample output {
+  display: block; padding: var(--sc-3) var(--sc-5); border-top: 1px solid var(--mt-rule);
+  font-family: var(--sc-font-mono); font-size: var(--sc-t-sm); color: var(--sc-accent); font-weight: 600;
+  white-space: pre-wrap; word-break: break-word;
+}
+.sample output::before { content: "→ "; color: var(--sc-ink-soft); font-weight: 400; }
+
+/* ── Authored silence before the peak ─────────────────────────────────────── */
+.silence { min-height: 70svh; display: grid; place-items: center; }
+.silence__line { margin: 0; font-size: var(--sc-t-2xl); font-style: italic; font-weight: 300; text-align: center;
+                 font-variation-settings: "opsz" 60; text-wrap: balance; }
+
+/* ── V. The key: the circle turns and the signature engraves itself ───────── */
+.key { border-top: 1px solid var(--mt-rule); }
+.key__stage { display: grid; grid-template-rows: auto 1fr; padding: var(--sc-9) var(--sc-gutter) var(--sc-6); height: 100svh; box-sizing: border-box; }
+.key__head { display: flex; align-items: baseline; gap: var(--sc-5); }
+.key__head .chapter__numeral { font-size: clamp(3rem, 1.5rem + 4vw, 5rem); }
+.key__live { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--sc-7); align-items: center; min-height: 0; }
+
+.circle { width: 100%; max-height: 72svh; overflow: visible; }
+.circle__ring { transform-origin: 0 0; }
+.circle__ring line { stroke: var(--mt-staff); stroke-width: 1; }
+.circle__ring .ring { fill: none; stroke: var(--mt-rule); stroke-width: 1; }
+.circle__major { font-size: 21px; fill: var(--sc-ink); text-anchor: middle; dominant-baseline: central; font-family: var(--sc-font-display); }
+.circle__minor { font-size: 13px; fill: var(--sc-ink-soft); text-anchor: middle; dominant-baseline: central; font-style: italic; font-family: var(--sc-font-display); }
+.circle__pointer { fill: none; stroke: var(--sc-accent); stroke-width: 1.5; }
+
+.key__name { margin: 0; font-size: var(--sc-t-3xl); line-height: 1; font-weight: 400; letter-spacing: var(--sc-track-snug); font-variation-settings: "opsz" 72; }
+.key__minor { display: block; margin-top: var(--sc-3); font-size: var(--sc-t-lg); font-style: italic; color: var(--sc-ink-soft); letter-spacing: 0; }
+.staff { width: min(100%, 26rem); margin-block: var(--sc-5) var(--sc-3); overflow: visible; }
+.staff__lines line { stroke: var(--mt-staff); stroke-width: 1.2; }
+.staff__clef { font-family: "Noto Music"; font-size: 88px; fill: var(--sc-ink); }
+.staff__accidental { font-family: "Noto Music"; font-size: 34px; fill: var(--sc-ink);
+                     transition: opacity var(--sc-d-base) var(--sc-ease-out), transform var(--sc-d-base) var(--sc-ease-out); }
+.staff__accidental[data-new] { opacity: 0; transform: translateY(-10px); }
+.key__signature { margin: 0; font-size: var(--sc-t-lg); color: var(--sc-accent); font-variant-numeric: oldstyle-nums; }
+.key__scale { margin: var(--sc-3) 0 0; font-size: var(--sc-t-xl); letter-spacing: 0.06em; }
+
+/* Without the circle (no JavaScript, or reduced motion) the same keys read as a table. */
+.circle-fallback { display: none; }
+html:not(.js) .key__live, html.reduce .key__live { display: none; }
+html:not(.js) .circle-fallback, html.reduce .circle-fallback { display: block; max-width: 60rem; }
+html:not(.js) .key__stage, html.reduce .key__stage { height: auto; }
+.circle-table { width: 100%; border-collapse: collapse; margin-top: var(--sc-5); font-size: var(--sc-t-base); }
+.circle-table th, .circle-table td { padding: var(--sc-2) var(--sc-3); border-bottom: 1px solid var(--mt-rule); text-align: left; }
+.circle-table thead th { font-size: var(--sc-t-sm); text-transform: uppercase; letter-spacing: var(--sc-track-wide); color: var(--sc-ink-soft); }
+
+.after-pin { padding-block-start: var(--sc-7); }
+
+/* ── Colophon ─────────────────────────────────────────────────────────────── */
+.colophon { border-top: 3px double var(--mt-rule); }
+.colophon__inner { max-width: 44rem; }
+.colophon__title { margin: 0; font-size: var(--sc-t-sm); text-transform: uppercase; letter-spacing: var(--sc-track-wide); font-weight: 600; }
+.colophon__inner p { font-size: var(--sc-t-base); }
+.colophon__small { color: var(--sc-ink-soft); font-size: var(--sc-t-sm) !important; }
+
+a { color: var(--sc-ink); text-decoration-color: var(--sc-accent); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+a:hover { color: var(--sc-accent); }
+a:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 3px; }
+
+@media (max-width: 860px) {
+  .folio { padding-block: var(--sc-3) var(--sc-2); font-size: var(--sc-t-xs); }
+  .chapter__grid { grid-template-columns: minmax(0, 1fr); gap: var(--sc-4); }
+  .chapter__head { position: static; display: flex; align-items: baseline; gap: var(--sc-4); }
+  .chapter__numeral { font-size: clamp(3rem, 10vw, 4rem); }
+  .key__stage { padding-top: var(--sc-8); }
+  .key__live { grid-template-columns: minmax(0, 1fr); gap: var(--sc-4); }
+  .circle { max-height: 38svh; }
+  .key__name { font-size: var(--sc-t-2xl); }
+  .staff { margin-block: var(--sc-3) var(--sc-2); width: min(100%, 20rem); }
+  .key__scale { font-size: var(--sc-t-lg); }
+}

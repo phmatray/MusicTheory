@@ -140,20 +140,18 @@ public class NoteEnharmonicTests
     }
 
     [Theory]
-    [InlineData("", "Note string cannot be empty.")]
-    [InlineData("   ", "Note string cannot be empty.")]
-    [InlineData("H", "Invalid note name: H")]
-    [InlineData("C$", "Invalid octave: $")]
-    [InlineData("C#b", "Invalid octave: b")]
-    [InlineData("Csharp", "Invalid octave: sharp")]
-    public void Note_Parse_WithInvalidInput_ShouldThrowArgumentException(string input, string expectedMessage)
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("H")]
+    [InlineData("C$")]
+    [InlineData("C#b")]
+    [InlineData("Csharp")]
+    [InlineData("C10")]
+    [InlineData("C-2")]
+    public void Note_Parse_WithInvalidInput_ShouldThrowFormatException(string input)
     {
-        // Act
-        Action act = () => Note.Parse(input);
-        
-        // Assert
-        act.ShouldThrow<ArgumentException>()
-            .Message.ShouldStartWith(expectedMessage);
+        Should.Throw<FormatException>(() => Note.Parse(input))
+            .Message.ShouldBe($"Not a note in English notation: '{input}'.");
     }
 
     [Theory]

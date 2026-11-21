@@ -222,7 +222,7 @@ public class ChordProgressionTests
         Action act = () => progression.ParseProgression("I - IX - V").ToList(); // IX is not valid
         
         // Assert
-        act.ShouldThrow<ArgumentException>()
-            .Message.ShouldBe("Invalid Roman numeral: IX");
+        act.ShouldThrow<FormatException>()
+            .Message.ShouldBe("Not a Roman numeral: 'IX'.");
     }
 }

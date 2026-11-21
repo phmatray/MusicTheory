@@ -20,7 +20,7 @@ public class PianoVoicingTests
     {
         var notes = ChordSymbol.Parse("E7#9").Voice(3);
         notes.Select(n => n.MidiNumber).ShouldBeInOrder(SortDirection.Ascending);
-        notes.Select(MusicTheoryUtilities.GetPitchClass).ShouldBe([4, 8, 11, 2, 7]);
+        notes.Select(n => n.PitchClass).ShouldBe([4, 8, 11, 2, 7]);
         notes[^1].GetName().ShouldBe("F##");
     }
 

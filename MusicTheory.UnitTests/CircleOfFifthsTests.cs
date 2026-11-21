@@ -60,31 +60,21 @@ public class CircleOfFifthsTests
     [Fact]
     public void KeySignature_NextInCircle_ShouldWrapAroundAtCSharp()
     {
-        // Arrange
-        var cSharpMajor = new KeySignature(new Note(NoteName.C, Alteration.Sharp), KeyMode.Major);
-        
-        // Act
-        var nextKey = cSharpMajor.NextInCircle();
-        
-        // Assert - C# major (7 sharps) wraps to Db major (5 flats)
-        nextKey.Tonic.Name.ShouldBe(NoteName.D);
-        nextKey.Tonic.Alteration.ShouldBe(Alteration.Flat);
-        nextKey.AccidentalCount.ShouldBe(-5);
+        // C# major's dominant is G# major (8 sharps), written as its enharmonic Ab major (4 flats).
+        var nextKey = new KeySignature(new Note(NoteName.C, Alteration.Sharp), KeyMode.Major).NextInCircle();
+
+        nextKey.ShouldBe(new KeySignature(new Note(NoteName.A, Alteration.Flat), KeyMode.Major));
+        nextKey.AccidentalCount.ShouldBe(-4);
     }
 
     [Fact]
     public void KeySignature_PreviousInCircle_ShouldWrapAroundAtCFlat()
     {
-        // Arrange
-        var cFlatMajor = new KeySignature(new Note(NoteName.C, Alteration.Flat), KeyMode.Major);
-        
-        // Act
-        var previousKey = cFlatMajor.PreviousInCircle();
-        
-        // Assert - Cb major (7 flats) wraps to B major (5 sharps)
-        previousKey.Tonic.Name.ShouldBe(NoteName.B);
-        previousKey.Tonic.Alteration.ShouldBe(Alteration.Natural);
-        previousKey.AccidentalCount.ShouldBe(5);
+        // Cb major's subdominant is Fb major (8 flats), written as its enharmonic E major (4 sharps).
+        var previousKey = new KeySignature(new Note(NoteName.C, Alteration.Flat), KeyMode.Major).PreviousInCircle();
+
+        previousKey.ShouldBe(new KeySignature(new Note(NoteName.E), KeyMode.Major));
+        previousKey.AccidentalCount.ShouldBe(4);
     }
 
     [Theory]
@@ -208,23 +198,23 @@ public class CircleOfFifthsTests
         subdominant.Mode.ShouldBe(mode);
     }
 
-    [Fact]
-    public void KeySignature_CircleNavigation_ShouldBeConsistent()
+    [Theory]
+    [InlineData(KeyMode.Major)]
+    [InlineData(KeyMode.Minor)]
+    public void KeySignature_CircleNavigation_TwelveFifthsComeHome(KeyMode mode)
     {
-        // Arrange
-        var cMajor = new KeySignature(new Note(NoteName.C), KeyMode.Major);
-        
-        // Act - Go around the entire circle
-        var current = cMajor;
+        var start = new KeySignature(new Note(mode == KeyMode.Major ? NoteName.C : NoteName.A), mode);
+        var up = start;
+        var down = start;
         for (int i = 0; i < 12; i++)
         {
-            current = current.NextInCircle();
+            var next = up.NextInCircle();
+            ((next.Tonic.PitchClass - up.Tonic.PitchClass + 12) % 12).ShouldBe(7, $"{up} to {next} is a fifth");
+            Math.Abs(next.AccidentalCount).ShouldBeLessThanOrEqualTo(7);
+            up = next;
+            down = down.PreviousInCircle();
         }
-        
-        // Assert - After 12 steps we should be at an enharmonic equivalent
-        // C -> G -> D -> A -> E -> B -> F# -> C# -> Db -> Ab -> Eb -> Bb -> F
-        current.Tonic.Name.ShouldBe(NoteName.F);
-        current.Tonic.Alteration.ShouldBe(Alteration.Natural);
-        current.AccidentalCount.ShouldBe(-1); // F major has 1 flat
+        up.ShouldBe(start);
+        down.ShouldBe(start);
     }
 }

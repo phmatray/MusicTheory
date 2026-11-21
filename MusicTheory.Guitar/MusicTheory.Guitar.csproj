@@ -14,7 +14,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EnablePackageValidation>true</EnablePackageValidation>
-    <PackageValidationBaselineVersion>1.6.0</PackageValidationBaselineVersion>
+    <!-- Baseline removed for the 2.0 break; set it to 2.0.0 once published. -->
   </PropertyGroup>
 
   <ItemGroup>

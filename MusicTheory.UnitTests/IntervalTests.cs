@@ -45,44 +45,37 @@ public class IntervalTests
         interval.Semitones.ShouldBe(7);
     }
 
-    [Fact]
-    public void Interval_CalculateSemitones_ForInvalidQualityCombinations_ShouldThrow()
+    [Theory]
+    [InlineData(IntervalQuality.Minor, 4, "A 4th is perfect, diminished or augmented, never minor.")]
+    [InlineData(IntervalQuality.Major, 5, "A 5th is perfect, diminished or augmented, never major.")]
+    [InlineData(IntervalQuality.Major, 8, "A octave is perfect, diminished or augmented, never major.")]
+    [InlineData(IntervalQuality.Minor, 1, "A unison is perfect, diminished or augmented, never minor.")]
+    [InlineData(IntervalQuality.Major, 22, "A 22nd is perfect, diminished or augmented, never major.")]
+    [InlineData(IntervalQuality.Perfect, 2, "A 2nd is major, minor, diminished or augmented, never perfect.")]
+    [InlineData(IntervalQuality.Perfect, 3, "A 3rd is major, minor, diminished or augmented, never perfect.")]
+    [InlineData(IntervalQuality.Perfect, 6, "A 6th is major, minor, diminished or augmented, never perfect.")]
+    [InlineData(IntervalQuality.Perfect, 7, "A 7th is major, minor, diminished or augmented, never perfect.")]
+    [InlineData(IntervalQuality.Perfect, 9, "A 9th is major, minor, diminished or augmented, never perfect.")]
+    [InlineData(IntervalQuality.Perfect, 21, "A 21st is major, minor, diminished or augmented, never perfect.")]
+    [InlineData(IntervalQuality.Perfect, 13, "A 13th is major, minor, diminished or augmented, never perfect.")]
+    [InlineData(IntervalQuality.Major, 11, "A 11th is perfect, diminished or augmented, never major.")]
+    [InlineData(IntervalQuality.Perfect, 111, "A 111th is major, minor, diminished or augmented, never perfect.")]
+    [InlineData(IntervalQuality.Perfect, 112, "A 112th is major, minor, diminished or augmented, never perfect.")]
+    [InlineData(IntervalQuality.Major, 113, "A 113th is perfect, diminished or augmented, never major.")]
+    [InlineData(IntervalQuality.Perfect, 101, "A 101st is major, minor, diminished or augmented, never perfect.")]
+    [InlineData(IntervalQuality.Major, 102, "A 102nd is perfect, diminished or augmented, never major.")]
+    [InlineData(IntervalQuality.Major, 103, "A 103rd is perfect, diminished or augmented, never major.")]
+    public void Interval_WithImpossibleQuality_ShouldThrowAtConstruction(IntervalQuality quality, int number, string message)
     {
-        // Arrange
-        var invalidMinorFourth = new Interval(IntervalQuality.Minor, 4); // 4th can't be minor
-        var invalidMajorFifth = new Interval(IntervalQuality.Major, 5);  // 5th can't be major
-        var invalidPerfectSecond = new Interval(IntervalQuality.Perfect, 2); // 2nd can't be perfect
-        var invalidPerfectThird = new Interval(IntervalQuality.Perfect, 3);  // 3rd can't be perfect
-        var invalidPerfectSixth = new Interval(IntervalQuality.Perfect, 6);  // 6th can't be perfect
-        var invalidPerfectSeventh = new Interval(IntervalQuality.Perfect, 7); // 7th can't be perfect
-        
-        // Act & Assert
-        Action act1 = () => { var _ = invalidMinorFourth.Semitones; };
-        Action act2 = () => { var _ = invalidMajorFifth.Semitones; };
-        Action act3 = () => { var _ = invalidPerfectSecond.Semitones; };
-        Action act4 = () => { var _ = invalidPerfectThird.Semitones; };
-        Action act5 = () => { var _ = invalidPerfectSixth.Semitones; };
-        Action act6 = () => { var _ = invalidPerfectSeventh.Semitones; };
-        
-        act1.ShouldThrow<InvalidOperationException>().Message.ShouldBe("Interval 4 cannot be minor");
-        act2.ShouldThrow<InvalidOperationException>().Message.ShouldBe("Interval 5 cannot be major");
-        act3.ShouldThrow<InvalidOperationException>().Message.ShouldBe("Interval 2 cannot be perfect");
-        act4.ShouldThrow<InvalidOperationException>().Message.ShouldBe("Interval 3 cannot be perfect");
-        act5.ShouldThrow<InvalidOperationException>().Message.ShouldBe("Interval 6 cannot be perfect");
-        act6.ShouldThrow<InvalidOperationException>().Message.ShouldBe("Interval 7 cannot be perfect");
+        Should.Throw<ArgumentOutOfRangeException>(() => new Interval(quality, number)).Message.ShouldStartWith(message);
     }
 
     [Fact]
-    public void Interval_CalculateSemitones_WithUnknownQuality_ShouldThrow()
+    public void Interval_WithUndefinedQualityDirectionOrNumber_ShouldThrow()
     {
-        // This tests the default case in the switch expression
-        // We need to use reflection to create an invalid enum value
-        var interval = new Interval((IntervalQuality)99, 3);
-        
-        // Act
-        Action act = () => { var _ = interval.Semitones; };
-        
-        // Assert
-        act.ShouldThrow<ArgumentOutOfRangeException>();
+        Should.Throw<ArgumentOutOfRangeException>(() => new Interval((IntervalQuality)99, 3)).ParamName.ShouldBe("quality");
+        Should.Throw<ArgumentOutOfRangeException>(() => new Interval(IntervalQuality.Major, 3, (Direction)7)).ParamName.ShouldBe("direction");
+        Should.Throw<ArgumentOutOfRangeException>(() => new Interval(IntervalQuality.Perfect, 0)).ParamName.ShouldBe("number");
+        Should.Throw<ArgumentOutOfRangeException>(() => new Interval(IntervalQuality.Perfect, 1, Direction.Down)).ParamName.ShouldBe("direction");
     }
 }

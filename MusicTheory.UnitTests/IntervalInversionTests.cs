@@ -151,11 +151,8 @@ public class IntervalInversionTests
     public void Interval_Invert_QualityInversionRules(IntervalQuality original, IntervalQuality expectedInverted)
     {
         // Arrange
-        var interval = new Interval(original, 2); // Using second as example for non-perfect intervals
-        if (original == IntervalQuality.Perfect)
-        {
-            interval = new Interval(original, 4); // Use fourth for perfect intervals
-        }
+        // A 4th for perfect, a 2nd for the others.
+        var interval = new Interval(original, original == IntervalQuality.Perfect ? 4 : 2);
         
         // Act
         var inverted = interval.Invert();

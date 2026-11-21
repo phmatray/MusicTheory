@@ -8,8 +8,9 @@ public static class ChordTransposer
 {
     /// <summary>
     /// Transposes a chord symbol by semitones. With a <paramref name="targetKey"/> the result is spelled in
-    /// that key. Without one, a sharp root keeps sharps, a flat root keeps flats, and a natural root uses
-    /// Db Eb F# Ab Bb, so a plain Bb is never written A#.
+    /// that key. Without one, the new root keeps the side of the old one (a sharp root keeps sharps, a flat
+    /// root flats, a natural root uses Db Eb F# Ab Bb, so a plain Bb is never written A#), and the slash bass
+    /// is spelled in the major key of the new root: D/F# up two semitones is E/G#.
     /// </summary>
     /// <param name="chordSymbol">The chord, e.g. <c>D/F#</c>.</param>
     /// <param name="semitones">Semitones up (positive) or down (negative).</param>
@@ -19,7 +20,7 @@ public static class ChordTransposer
     {
         if (!ChordSymbol.TryParse(chordSymbol, out var chord))
             return chordSymbol;
-        targetKey ??= DefaultKey(chord);
+        targetKey ??= KeyOfNewRoot(chord, semitones);
         return chord.Transpose(semitones, targetKey).ToString(style ?? StyleOf(chordSymbol));
     }
 
@@ -29,7 +30,15 @@ public static class ChordTransposer
             ? chord.Transpose(from, to).ToString(style ?? StyleOf(chordSymbol))
             : chordSymbol;
 
-    private static KeySignature DefaultKey(ChordSymbol chord) => Math.Sign((int)chord.Root.Alteration) switch
+    // The new root, spelled on the old root's side, then its major key when that key has a real signature.
+    private static KeySignature KeyOfNewRoot(ChordSymbol chord, int semitones)
+    {
+        var side = Side(chord);
+        var key = new KeySignature(chord.Root.TransposeBySemitones(semitones, side), KeyMode.Major);
+        return Math.Abs(key.AccidentalCount) <= 7 ? key : side;
+    }
+
+    private static KeySignature Side(ChordSymbol chord) => Math.Sign((int)chord.Root.Alteration) switch
     {
         > 0 => new KeySignature(new Note(NoteName.G), KeyMode.Major),  // sharp side
         < 0 => new KeySignature(new Note(NoteName.F), KeyMode.Major),  // flat side

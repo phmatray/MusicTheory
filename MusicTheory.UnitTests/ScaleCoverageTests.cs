@@ -35,7 +35,7 @@ public class ScaleCoverageTests
         
         // Assert
         act.ShouldThrow<ArgumentException>()
-            .Message.ShouldBe("Note C#4 is not in the C Major scale");
+            .Message.ShouldBe("C# is not in C Major. (Parameter 'note')");
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class ScaleCoverageTests
         var notes = chromaticC.GetNotes().ToList();
         
         // Assert
-        notes.Count.ShouldBe(12);
+        notes.Count.ShouldBe(13); // the tonic an octave up closes every scale
         notes[0].ToString().ShouldBe("C4");
         notes[1].ToString().ShouldBe("C#4");
         notes[2].ToString().ShouldBe("D4");
@@ -73,7 +73,7 @@ public class ScaleCoverageTests
         var notes = wholeToneC.GetNotes().ToList();
         
         // Assert
-        notes.Count.ShouldBe(6);
+        notes.Count.ShouldBe(7); // the tonic an octave up closes every scale
         notes[0].ToString().ShouldBe("C4");
         notes[1].ToString().ShouldBe("D4");
         notes[2].ToString().ShouldBe("E4");
@@ -83,9 +83,9 @@ public class ScaleCoverageTests
     }
 
     [Theory]
-    [InlineData(ScaleType.Blues, new[] { "C4", "Eb4", "F4", "F#4", "G4", "Bb4" })]
-    [InlineData(ScaleType.PentatonicMajor, new[] { "C4", "D4", "E4", "G4", "A4" })]
-    [InlineData(ScaleType.PentatonicMinor, new[] { "C4", "Eb4", "F4", "G4", "Bb4" })]
+    [InlineData(ScaleType.Blues, new[] { "C4", "Eb4", "F4", "F#4", "G4", "Bb4", "C5" })]
+    [InlineData(ScaleType.PentatonicMajor, new[] { "C4", "D4", "E4", "G4", "A4", "C5" })]
+    [InlineData(ScaleType.PentatonicMinor, new[] { "C4", "Eb4", "F4", "G4", "Bb4", "C5" })]
     public void Scale_GetNotes_ForOtherScales_ShouldReturnCorrectNotes(ScaleType scaleType, string[] expectedNotes)
     {
         // Arrange
@@ -128,7 +128,7 @@ public class ScaleCoverageTests
         var perfectFourth = new Interval(IntervalQuality.Perfect, 4);
         
         // Act
-        var dMajor = gMajor.Transpose(perfectFourth, Direction.Down);
+        var dMajor = gMajor.Transpose(perfectFourth.Reverse());
         
         // Assert
         dMajor.Root.Name.ShouldBe(NoteName.D);

@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <!-- Default TFM for every project in the repo.
-         net9.0 is out of support since 2026-05-12 and must not be reintroduced. -->
-    <TargetFramework>net10.0</TargetFramework>
+         net11.0 only since 2.0 (net9.0 is out of support, net10.0 dropped with the 2.0 break). -->
+    <TargetFramework>net11.0</TargetFramework>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

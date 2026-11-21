@@ -22,7 +22,7 @@ public interface IGuitarVoicingProvider
 public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
 {
     // Common open / first-position shapes (standard tuning). Any that sound the requested chord are offered.
-    private static readonly string[] Curated =
+    private static string[] Curated() =>
     [
         "x32010", "x02220", "320003", "320033", "022100", "xx0232", "x02210", "022000", "xx0231", "133211",
         "x02020", "x21202", "x32310", "xx0212", "020100", "320001", "x02120", "x32000", "xx0222", "xx3210",
@@ -31,7 +31,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
     ];
 
     // Movable shapes as fret offsets from the root's fret on the root string (null = muted).
-    private static readonly (string Name, int RootString, int?[] Offsets)[] Movable =
+    private static (string Name, int RootString, int?[] Offsets)[] Movable() =>
     [
         ("E-form", 0, [0, 2, 2, 1, 0, 0]), ("E-form", 0, [0, 2, 2, 0, 0, 0]), ("E-form", 0, [0, 2, 0, 1, 0, 0]),
         ("E-form", 0, [0, 2, 1, 1, 0, 0]), ("E-form", 0, [0, 2, 0, 0, 0, 0]), ("E-form", 0, [0, 2, 2, 2, 0, 0]),
@@ -48,9 +48,16 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
     ];
 
     /// <inheritdoc />
+    /// <exception cref="ArgumentNullException"><paramref name="chord"/> is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">A negative capo, or a max fret, stretch or count below 1.</exception>
     public IReadOnlyList<GuitarVoicing> GetVoicings(ChordSymbol chord, VoicingOptions? options = null)
     {
+        ArgumentNullException.ThrowIfNull(chord);
         options ??= new VoicingOptions();
+        ArgumentOutOfRangeException.ThrowIfNegative(options.Capo, nameof(options.Capo));
+        ArgumentOutOfRangeException.ThrowIfLessThan(options.MaxFret, 1, nameof(options.MaxFret));
+        ArgumentOutOfRangeException.ThrowIfLessThan(options.MaxStretch, 1, nameof(options.MaxStretch));
+        ArgumentOutOfRangeException.ThrowIfLessThan(options.Max, 1, nameof(options.Max));
         var tuning = options.Tuning ?? Tuning.Standard;
         if (!options.IncludeSlashBass)
             chord = chord with { Bass = null };
@@ -63,18 +70,19 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
             if (voicing is null)
                 return;
             var key = voicing.ToTab();
+            // Stryker disable once Equality: the same tab from the same source has the same difficulty, so < and <= keep the same voicing.
             if (!found.TryGetValue(key, out var existing) || voicing.Difficulty < existing.Difficulty)
                 found[key] = voicing;
         }
 
         if (tuning.Strings.Count == 6 && tuning.Strings.Select(n => n.MidiNumber).SequenceEqual(Tuning.Standard.Strings.Select(n => n.MidiNumber)))
         {
-            foreach (var tab in Curated)
+            foreach (var tab in Curated())
                 Offer(tab.Select(c => c == 'x' ? (int?)null : c - '0').ToArray(), VoicingSource.Curated, "open");
 
-            foreach (var (name, rootString, offsets) in Movable)
+            foreach (var (name, rootString, offsets) in Movable())
             {
-                int first = Mod12(MusicTheoryUtilities.GetPitchClass(chord.Root) - tuning.Strings[rootString].MidiNumber);
+                int first = Mod12(chord.Root.PitchClass - tuning.Strings[rootString].MidiNumber);
                 for (int fret = first; fret <= spec.MaxFret; fret += 12)
                     Offer(offsets.Select(o => o + fret).ToArray(), VoicingSource.MovableShape, name);
             }
@@ -117,12 +125,12 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
             _stretch = options.MaxStretch;
             MaxFret = options.MaxFret - options.Capo;
 
-            int root = MusicTheoryUtilities.GetPitchClass(chord.Root);
-            var intervals = new Chord(chord.Root, chord.Type).GetNotes()
-                .Select(n => Mod12(MusicTheoryUtilities.GetPitchClass(n) - root)).Distinct().ToList();
+            int root = chord.Root.PitchClass;
+            var intervals = (chord with { Bass = null }).ToChord().GetNotes()
+                .Select(n => Mod12(n.PitchClass - root)).Distinct().ToList();
             _allowed = intervals.Select(i => (i + root) % 12).ToHashSet();
             _required = intervals.Where(i => !Optional(chord.Type, i)).Select(i => (i + root) % 12).ToHashSet();
-            _bass = chord.Bass is null ? root : MusicTheoryUtilities.GetPitchClass(chord.Bass);
+            _bass = chord.Bass is null ? root : chord.Bass.PitchClass;
             _allowed.Add(_bass);
         }
 
@@ -158,6 +166,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
                 }
                 var options = new List<int?> { null };
                 // ponytail: open strings only next to low positions; a smarter reach model if mixed voicings matter.
+                // Stryker disable once Conditional: only prunes the search; TryBuild rejects a wrong bass either way.
                 if (window <= 3 && (!bassPlaced ? Pc(s, 0) == _bass : _allowed.Contains(Pc(s, 0))))
                     options.Add(0);
                 for (int f = window; f < window + _stretch && f <= MaxFret; f++)
@@ -175,7 +184,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
 
         public GuitarVoicing? TryBuild(int?[] frets, VoicingSource source, string? shape)
         {
-            if (frets.Length != _open.Length || frets.Any(f => f < 0 || f > MaxFret))
+            if (frets.Any(f => f < 0 || f > MaxFret))
                 return null;
             var sounding = Enumerable.Range(0, frets.Length).Where(s => frets[s] is not null).ToList();
             if (sounding.Count < 3)

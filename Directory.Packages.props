@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="10.0.15" />
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.404" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="11.0.0" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="11.0.100" />
     <!-- Testing. All suites run on xunit.v3 (4.x, Microsoft.Testing.Platform v2) through the
          native `dotnet test` MTP mode selected in global.json ("test": { "runner": ... }).
          xunit 2.x is deliberately absent: do not reintroduce it. -->
@@ -15,7 +15,12 @@
     <PackageVersion Include="xunit.v3" Version="4.0.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.1" />
     <PackageVersion Include="Shouldly" Version="4.3.0" />
+    <!-- Code coverage through Microsoft.Testing.Platform (dotnet test with the coverage switch). -->
+    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.12.0" />
     <PackageVersion Include="DaisyBlazor.Components" Version="0.12.0" />
+    <!-- Documentation: the doc-sample tests run every C# block of docs/*.md; SiteGen renders the site. -->
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="5.12.0" />
+    <PackageVersion Include="Markdig" Version="1.6.0" />
   </ItemGroup>
 
 </Project>

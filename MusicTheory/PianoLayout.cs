@@ -13,8 +13,12 @@ public static class PianoLayout
     private const double BlackWidth = 0.6;
 
     /// <summary>The keys from <paramref name="lowMidi"/> to <paramref name="highMidi"/> inclusive.</summary>
+    /// <exception cref="ArgumentOutOfRangeException">A bound outside 0..127, or <paramref name="highMidi"/> below <paramref name="lowMidi"/>.</exception>
     public static IReadOnlyList<PianoKey> Keys(int lowMidi, int highMidi)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(lowMidi, 0);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(highMidi, 127);
+        ArgumentOutOfRangeException.ThrowIfLessThan(highMidi, lowMidi);
         var keys = new List<PianoKey>();
         int whites = 0;
         for (int midi = lowMidi; midi <= highMidi; midi++)

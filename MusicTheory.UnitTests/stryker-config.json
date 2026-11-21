@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-net/master/src/Stryker.Core/Stryker.Core/assets/stryker-config.schema.json",
+  "stryker-config": {
+    "project": "MusicTheory.csproj",
+    "test-runner": "mtp",
+    "coverage-analysis": "all",
+    "reporters": ["html", "json", "progress", "cleartext"],
+    "thresholds": { "high": 100, "low": 95, "break": 95 }
+  }
+}

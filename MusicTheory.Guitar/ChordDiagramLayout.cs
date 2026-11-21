@@ -53,9 +53,15 @@ public sealed record ChordDiagramLayout(
     private static readonly int[] Inlays = [3, 5, 7, 9, 12, 15];
 
     /// <summary>Lays out <paramref name="voicing"/> in a window starting at its <see cref="GuitarVoicing.BaseFret"/>.</summary>
+    /// <exception cref="ArgumentNullException"><paramref name="voicing"/> is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The window shows fewer than one fret, or a spacing is not positive.</exception>
     public static ChordDiagramLayout For(GuitarVoicing voicing, DiagramOptions? options = null, Tuning? tuning = null)
     {
+        ArgumentNullException.ThrowIfNull(voicing);
         options ??= new DiagramOptions();
+        ArgumentOutOfRangeException.ThrowIfLessThan(options.Frets, 1, nameof(options.Frets));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(options.StringSpacing, nameof(options.StringSpacing));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(options.FretSpacing, nameof(options.FretSpacing));
         int strings = voicing.Frets.Count;
         double width = (strings - 1) * options.StringSpacing;
         double height = options.Frets * options.FretSpacing;

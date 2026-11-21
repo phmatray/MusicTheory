@@ -81,7 +81,7 @@ public class NoteTests
         var majorSecond = new Interval(IntervalQuality.Major, 2);
         
         // Act
-        var result = b4.Transpose(majorSecond, Direction.Up);
+        var result = b4.Transpose(majorSecond);
         
         // Assert
         result.Name.ShouldBe(NoteName.C);
@@ -97,7 +97,7 @@ public class NoteTests
         var majorSecond = new Interval(IntervalQuality.Major, 2);
         
         // Act
-        var result = c4.Transpose(majorSecond, Direction.Down);
+        var result = c4.Transpose(majorSecond.Reverse());
         
         // Assert
         result.Name.ShouldBe(NoteName.B);
