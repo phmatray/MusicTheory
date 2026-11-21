@@ -55,8 +55,8 @@ jobs:
         dotnet test --no-build -c Release --project MusicTheory.Guitar.UnitTests --coverage --coverage-output-format cobertura --coverage-output "$PWD/TestResults/guitar.cobertura.xml"
         dotnet test --no-build -c Release --project MusicTheory.ChordPro.UnitTests --coverage --coverage-output-format cobertura --coverage-output "$PWD/TestResults/chordpro.cobertura.xml"
         dotnet test --no-build -c Release --project MusicTheory.MusicXml.UnitTests --coverage --coverage-output-format cobertura --coverage-output "$PWD/TestResults/musicxml.cobertura.xml"
-    # Fails unless MusicTheory, MusicTheory.Guitar, MusicTheory.Guitar.Blazor, MusicTheory.ChordPro, MusicTheory.MusicXml and MusicTheory.Abc are at 100% of lines and branches.
         dotnet test --no-build -c Release --project MusicTheory.Abc.UnitTests --coverage --coverage-output-format cobertura --coverage-output "$PWD/TestResults/abc.cobertura.xml"
+    # Fails unless MusicTheory, MusicTheory.Guitar, MusicTheory.Guitar.Blazor, MusicTheory.ChordPro, MusicTheory.MusicXml and MusicTheory.Abc are at 100% of lines and branches.
     - name: Require 100% coverage
       run: python3 tools/coverage/check.py TestResults/*.xml
 
