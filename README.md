@@ -70,6 +70,10 @@ Note.Parse("A4").GetFrequency(442);                               // 442
 HarmonicAnalyzer.Analyze(
     new[] { "Dm7", "G7", "Cmaj7" }.Select(ChordSymbol.Parse),
     KeySignature.Parse("C"));                                     // ii7 V7 Imaj7
+
+CadenceDetector.Detect(
+    new[] { "C", "F", "G", "Am" }.Select(ChordSymbol.Parse).ToList(),
+    KeySignature.Parse("C"));                                     // Cadence(Deceptive, 3)
 ```
 
 ## 🎯 How it is checked
