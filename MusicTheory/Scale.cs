@@ -36,7 +36,51 @@ public enum ScaleType
     /// <summary>Major pentatonic (P1 M2 M3 P5 M6)</summary>
     PentatonicMajor,
     /// <summary>Minor pentatonic (P1 m3 P4 P5 m7)</summary>
-    PentatonicMinor
+    PentatonicMinor,
+    /// <summary>Dorian flat 2 (P1 m2 m3 P4 P5 M6 m7 P8)</summary>
+    DorianFlat2,
+    /// <summary>Lydian augmented (P1 M2 M3 A4 A5 M6 M7 P8)</summary>
+    LydianAugmented,
+    /// <summary>Lydian dominant (P1 M2 M3 A4 P5 M6 m7 P8)</summary>
+    LydianDominant,
+    /// <summary>Mixolydian flat 6 (P1 M2 M3 P4 P5 m6 m7 P8)</summary>
+    MixolydianFlat6,
+    /// <summary>Locrian natural 2 (P1 M2 m3 P4 d5 m6 m7 P8)</summary>
+    LocrianNatural2,
+    /// <summary>Altered scale (P1 m2 m3 d4 d5 m6 m7 P8)</summary>
+    Altered,
+    /// <summary>Locrian natural 6 (P1 m2 m3 P4 d5 M6 m7 P8)</summary>
+    LocrianNatural6,
+    /// <summary>Ionian augmented (P1 M2 M3 P4 A5 M6 M7 P8)</summary>
+    IonianAugmented,
+    /// <summary>Dorian sharp 4 (P1 M2 m3 A4 P5 M6 m7 P8)</summary>
+    DorianSharp4,
+    /// <summary>Phrygian dominant (P1 m2 M3 P4 P5 m6 m7 P8)</summary>
+    PhrygianDominant,
+    /// <summary>Lydian sharp 2 (P1 A2 M3 A4 P5 M6 M7 P8)</summary>
+    LydianSharp2,
+    /// <summary>Ultralocrian (P1 m2 m3 d4 d5 m6 d7 P8)</summary>
+    Ultralocrian,
+    /// <summary>Bebop dominant (P1 M2 M3 P4 P5 M6 m7 M7 P8)</summary>
+    BebopDominant,
+    /// <summary>Bebop major (P1 M2 M3 P4 P5 A5 M6 M7 P8)</summary>
+    BebopMajor,
+    /// <summary>Bebop Dorian (P1 M2 m3 M3 P4 P5 M6 m7 P8)</summary>
+    BebopDorian,
+    /// <summary>Hungarian minor (P1 M2 m3 A4 P5 m6 M7 P8)</summary>
+    HungarianMinor,
+    /// <summary>Double harmonic major (P1 m2 M3 P4 P5 m6 M7 P8)</summary>
+    DoubleHarmonicMajor,
+    /// <summary>Neapolitan minor (P1 m2 m3 P4 P5 m6 M7 P8)</summary>
+    NeapolitanMinor,
+    /// <summary>Neapolitan major (P1 m2 m3 P4 P5 M6 M7 P8)</summary>
+    NeapolitanMajor,
+    /// <summary>Hirajoshi (P1 M2 m3 P5 m6 P8)</summary>
+    Hirajoshi,
+    /// <summary>In sen (P1 m2 P4 P5 m7 P8)</summary>
+    InSen,
+    /// <summary>Iwato (P1 m2 P4 d5 m7 P8)</summary>
+    Iwato
 }
 
 /// <summary>
@@ -45,23 +89,49 @@ public enum ScaleType
 /// <remarks>Every scale's notes run from the tonic to the tonic an octave above, both included.</remarks>
 public sealed record Scale
 {
-    private static Interval[] Formula(ScaleType type) => Of(type switch
+    private static readonly Dictionary<ScaleType, Interval[]> Formulas = new()
     {
-        ScaleType.Major or ScaleType.Ionian => "M2 M3 P4 P5 M6 M7",
-        ScaleType.NaturalMinor or ScaleType.Aeolian => "M2 m3 P4 P5 m6 m7",
-        ScaleType.HarmonicMinor => "M2 m3 P4 P5 m6 M7",
-        ScaleType.MelodicMinor => "M2 m3 P4 P5 M6 M7",
-        ScaleType.Dorian => "M2 m3 P4 P5 M6 m7",
-        ScaleType.Phrygian => "m2 m3 P4 P5 m6 m7",
-        ScaleType.Lydian => "M2 M3 A4 P5 M6 M7",
-        ScaleType.Mixolydian => "M2 M3 P4 P5 M6 m7",
-        ScaleType.Locrian => "m2 m3 P4 d5 m6 m7",
-        ScaleType.Chromatic => "A1 M2 A2 M3 P4 A4 P5 A5 M6 A6 M7",
-        ScaleType.WholeTone => "M2 M3 A4 A5 A6",
-        ScaleType.Blues => "m3 P4 A4 P5 m7",
-        ScaleType.PentatonicMajor => "M2 M3 P5 M6",
-        _ => "m3 P4 P5 m7", // PentatonicMinor; the constructor rejects undefined types
-    });
+        [ScaleType.Major] = Of("M2 M3 P4 P5 M6 M7"),
+        [ScaleType.Ionian] = Of("M2 M3 P4 P5 M6 M7"),
+        [ScaleType.NaturalMinor] = Of("M2 m3 P4 P5 m6 m7"),
+        [ScaleType.Aeolian] = Of("M2 m3 P4 P5 m6 m7"),
+        [ScaleType.HarmonicMinor] = Of("M2 m3 P4 P5 m6 M7"),
+        [ScaleType.MelodicMinor] = Of("M2 m3 P4 P5 M6 M7"),
+        [ScaleType.Dorian] = Of("M2 m3 P4 P5 M6 m7"),
+        [ScaleType.Phrygian] = Of("m2 m3 P4 P5 m6 m7"),
+        [ScaleType.Lydian] = Of("M2 M3 A4 P5 M6 M7"),
+        [ScaleType.Mixolydian] = Of("M2 M3 P4 P5 M6 m7"),
+        [ScaleType.Locrian] = Of("m2 m3 P4 d5 m6 m7"),
+        [ScaleType.Chromatic] = Of("A1 M2 A2 M3 P4 A4 P5 A5 M6 A6 M7"),
+        [ScaleType.WholeTone] = Of("M2 M3 A4 A5 A6"),
+        [ScaleType.Blues] = Of("m3 P4 A4 P5 m7"),
+        [ScaleType.PentatonicMajor] = Of("M2 M3 P5 M6"),
+        [ScaleType.DorianFlat2] = Of("m2 m3 P4 P5 M6 m7"),
+        [ScaleType.LydianAugmented] = Of("M2 M3 A4 A5 M6 M7"),
+        [ScaleType.LydianDominant] = Of("M2 M3 A4 P5 M6 m7"),
+        [ScaleType.MixolydianFlat6] = Of("M2 M3 P4 P5 m6 m7"),
+        [ScaleType.LocrianNatural2] = Of("M2 m3 P4 d5 m6 m7"),
+        [ScaleType.Altered] = Of("m2 m3 d4 d5 m6 m7"),
+        [ScaleType.LocrianNatural6] = Of("m2 m3 P4 d5 M6 m7"),
+        [ScaleType.IonianAugmented] = Of("M2 M3 P4 A5 M6 M7"),
+        [ScaleType.DorianSharp4] = Of("M2 m3 A4 P5 M6 m7"),
+        [ScaleType.PhrygianDominant] = Of("m2 M3 P4 P5 m6 m7"),
+        [ScaleType.LydianSharp2] = Of("A2 M3 A4 P5 M6 M7"),
+        [ScaleType.Ultralocrian] = Of("m2 m3 d4 d5 m6 d7"),
+        [ScaleType.BebopDominant] = Of("M2 M3 P4 P5 M6 m7 M7"),
+        [ScaleType.BebopMajor] = Of("M2 M3 P4 P5 A5 M6 M7"),
+        [ScaleType.BebopDorian] = Of("M2 m3 M3 P4 P5 M6 m7"),
+        [ScaleType.HungarianMinor] = Of("M2 m3 A4 P5 m6 M7"),
+        [ScaleType.DoubleHarmonicMajor] = Of("m2 M3 P4 P5 m6 M7"),
+        [ScaleType.NeapolitanMinor] = Of("m2 m3 P4 P5 m6 M7"),
+        [ScaleType.NeapolitanMajor] = Of("m2 m3 P4 P5 M6 M7"),
+        [ScaleType.Hirajoshi] = Of("M2 m3 P5 m6"),
+        [ScaleType.InSen] = Of("m2 P4 P5 m7"),
+        [ScaleType.Iwato] = Of("m2 P4 d5 m7"),
+        [ScaleType.PentatonicMinor] = Of("m3 P4 P5 m7"),
+    };
+
+    private static Interval[] Formula(ScaleType type) => Formulas[type]; // the constructor rejects undefined types
 
     private static Interval[] Of(string names) =>
         $"P1 {names} P8".Split(' ').Select(Interval.Parse).ToArray();
