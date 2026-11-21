@@ -138,5 +138,6 @@ public sealed record PitchClassSet
         return bySpan != 0 ? bySpan : a.AsSpan().SequenceCompareTo(b);
     }
 
+    // Stryker disable once Equality: on a tie both arguments are equal arrays
     private static int[] Smaller(int[] a, int[] b) => Compare(a, b) <= 0 ? a : b;
 }

@@ -29,6 +29,8 @@ public class PitchClassSetTests
         var major = PitchClassSet.Of(0, 4, 7);
         major.Transpose(2).ShouldBe(PitchClassSet.Of(2, 6, 9));
         major.Transpose(12).ShouldBe(major);
+        PitchClassSet.Empty.Transpose(3).ShouldBe(PitchClassSet.Empty);
+        major.Transpose(0).ShouldBe(major);
         major.Transpose(-1).ShouldBe(PitchClassSet.Of(11, 3, 6));
     }
 
@@ -38,6 +40,7 @@ public class PitchClassSetTests
         var major = PitchClassSet.Of(0, 4, 7);
         major.Invert().ShouldBe(PitchClassSet.Of(0, 5, 8));
         major.Invert(7).ShouldBe(PitchClassSet.Of(0, 3, 7));
+        major.Invert(5).ShouldBe(PitchClassSet.Of(5, 1, 10));
         major.Invert().Invert().ShouldBe(major);
     }
 
