@@ -1,0 +1,51 @@
+name: Bug report
+description: Something behaves differently from what it promises
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happens
+    attributes:
+      label: What happens
+      description: >-
+        The observed behaviour, with the command and its output. A defect report that says
+        "it fails" sends the next reader to reproduce it before they can start.
+      placeholder: |
+        $ ./scripts/example.sh
+        …the actual output…
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should happen
+      description: The promise being broken, and where it is made (docs, a comment, a test name).
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: The shortest sequence that shows it. Say if it is intermittent.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: >-
+        Which part of the code this touches. Keep these options in step with the repo's
+        `area:` labels — `create-issue` picks the label matching whatever is chosen here.
+      options:
+        - "area: pitch"
+        - "area: scales"
+        - "area: harmony"
+        - "area: rhythm"
+        - "area: instruments"
+        - "area: io"
+        - "area: training"
+        - "area: docs"
+    validations:
+      required: true

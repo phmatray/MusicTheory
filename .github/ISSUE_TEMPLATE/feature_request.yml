@@ -1,0 +1,48 @@
+name: Feature request
+description: An idea, enhancement, or piece of work to track
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is missing or wrong today, and what does it cost? Lead with the evidence.
+      placeholder: Today X happens, which means Y. Measured on <file/command>, it looks like…
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What should happen instead. Name the files or surfaces it touches.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: >-
+        Which part of the code this touches. Keep these options in step with the repo's
+        `area:` labels — `create-issue` picks the label matching whatever is chosen here, and a
+        dropdown that disagrees with the label set makes the body and the label contradict.
+      options:
+        - "area: pitch"
+        - "area: scales"
+        - "area: harmony"
+        - "area: rhythm"
+        - "area: instruments"
+        - "area: io"
+        - "area: training"
+        - "area: docs"
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches, and why they lost. Optional, but it saves the next reader the detour.
+    validations:
+      required: false

@@ -1,0 +1,144 @@
+# repo-setup.yml — MusicTheory's GitHub configuration, converged by /tagout:init.
+#
+# `skills/init/scripts/repo-setup.sh plan` diffs this against the live repository and prints
+# the delta without touching anything; `apply` converges it. Both are idempotent.
+#
+# HOW TO USE THIS IN YOUR OWN REPO. Copy it to `.github/repo-setup.yml` there and edit that copy —
+# repo-setup.sh prefers the target repo's own file over this shipped default, so your taxonomy
+# survives a kit upgrade. The `area:` axis in particular CANNOT be defaulted: it names your code,
+# not the kit's.
+#
+# THE RULES `apply` FOLLOWS, so you can predict what editing this does:
+#   * Additive. A label that is live but absent from this file is reported and LEFT ALONE. Only
+#     `--prune` removes anything, and it is never the default — a repo that already runs P1/P2
+#     must not have its taxonomy renamed out from under it.
+#   * Never clobber. An issue form that already exists in the target repo is reported as !SKIP.
+#     Your tuned form outranks the kit's default.
+#   * A name containing <angle brackets> is a PLACEHOLDER: never created, and reported as !TODO on
+#     every run so an unfilled axis stays visible instead of looking converged. That visibility is
+#     the whole point of #192 — an absent axis used to be indistinguishable from a configured one.
+
+labels:
+  # ---------------------------------------------------------------- type: what kind of work it is
+  # These three are GitHub's own defaults, listed so a fresh repo reads as converged rather than
+  # as drift. `create-issue` derives the PR title's Conventional-Commits type from them
+  # (bug -> fix, enhancement -> feat).
+  - name: "bug"
+    color: "d73a4a"
+    description: "Something isn't working"
+  - name: "enhancement"
+    color: "a2eeef"
+    description: "New feature or request"
+  - name: "documentation"
+    color: "0075ca"
+    description: "Improvements or additions to documentation"
+
+  # ------------------------------------------------------- priority: which tier to pull from next
+  # `create-issue` Step 7 applies exactly one of these.
+  - name: "priority: high"
+    color: "b60205"
+    description: "Pull this before the other tiers"
+  - name: "priority: medium"
+    color: "d93f0b"
+    description: "The default tier — worth doing, not urgent"
+  - name: "priority: low"
+    color: "fbca04"
+    description: "Do it when the queue is otherwise empty"
+
+  # ------------------------------------------------------------------- effort: how big the job is
+  # This is the axis `auto-dev` sorts on ("small effort first, then medium"). Without it that
+  # ordering has nothing to read and the fleet takes issues in whatever order GitHub returns them.
+  #
+  # DECLARATION ORDER IS THE TIER ORDER: skills/auto-dev/scripts/survey.sh ranks an issue's
+  # effort: label by its position in this list (first = tier 1, smallest), not by parsing the
+  # label text itself (#213) — so list these smallest-to-largest, and any tier past the 2nd holds.
+  - name: "effort: small"
+    color: "c2e0c6"
+    description: "One task, one test cycle"
+  - name: "effort: medium"
+    color: "bfd4f2"
+    description: "A handful of tasks inside one layer"
+  - name: "effort: large"
+    color: "5319e7"
+    description: "Cross-layer or phased — expect several commits"
+
+  # ------------------------------------------------------------ area: which part of the code, and
+  # the axis `auto-dev` reads to give each parallel worker a NON-overlapping area. It cannot ship
+  # filled in: replace the placeholder below with one entry per area of YOUR repo, e.g.
+  #
+  #   - name: "area: api"
+  #     color: "c5def5"
+  #     description: "HTTP surface and controllers"
+  #
+  # Until you do, both verbs report `!TODO area: <your-area>` on every run.
+  # One area per part of the library. auto-dev gives parallel workers non-overlapping areas.
+  - name: "area: pitch"
+    color: "c5def5"
+    description: "Note, Interval, tuning and frequency, solfège, pitch-class sets"
+  - name: "area: scales"
+    color: "c5def5"
+    description: "Scale, modes, KeySignature, chord-scale matching"
+  - name: "area: harmony"
+    color: "c5def5"
+    description: "Chord, ChordSymbol, progressions, analysis, piano voicings, voice leading"
+  - name: "area: rhythm"
+    color: "c5def5"
+    description: "Duration, TimeSignature, measures, tempo"
+  - name: "area: instruments"
+    color: "c5def5"
+    description: "MusicTheory.Guitar, fretted tunings, fretboard, piano fingering"
+  - name: "area: io"
+    color: "c5def5"
+    description: "Import and export packages: ChordPro, MIDI, MusicXML, ABC"
+  - name: "area: training"
+    color: "c5def5"
+    description: "Seeded ear-training drills"
+  - name: "area: docs"
+    color: "c5def5"
+    description: "docs/, the site and SiteGen"
+
+# Labels `--prune` must never delete, as shell globs. These are labels a TOOL owns: they look
+# undeclared because no human declares them, and deleting them breaks the automation that reads
+# them. Found by running `plan` against this kit's own repository, where a single `apply --prune`
+# would have removed both of release-please's housekeeping labels.
+pruneKeep:
+  - "autorelease: *"   # release-please's housekeeping — never applied by hand, never deleted
+  - "dependencies"     # Renovate labels its own PRs with this
+
+# Issue forms copied into .github/ISSUE_TEMPLATE/ when absent. Bare file names: they are resolved
+# against templates/issue-forms/ in the kit.
+issueTemplates:
+  - feature_request.yml
+  - bug_report.yml
+
+# Repository settings, applied with `gh api -X PATCH repos/{owner}/{repo}`. Needs an admin-scoped
+# token; without one this surface is reported as refused and the run exits 3 with the label and
+# template halves still applied.
+settings:
+  # Two string settings the same PATCH carries (#400) — the repository's public face. The
+  # description is capped at 350 characters and refused locally past it. Uncomment and fill in:
+  # description: "<one sentence: what this repository is>"
+  homepage: "https://phmatray.github.io/MusicTheory/"
+  # GitHub's default is false. On a repo without it, every merge run from an implement-issue
+  # worktree leaks the remote branch permanently — see #185, which this setting is the cause of.
+  delete_branch_on_merge: true
+  # The kit's integration style is squash-only: a linear main whose every subject ends in (#N),
+  # which is what release-please parses and what the PR-title gate assumes.
+  allow_squash_merge: true
+  allow_merge_commit: false
+  allow_rebase_merge: false
+
+# Two more surfaces the same manifest converges (#400), commented out so the shipped default
+# applies nothing a consumer did not choose. Topics are a list GitHub validates (lowercase
+# letters, digits and hyphens, <= 50 characters each, <= 20 in all — refused locally otherwise).
+# `PUT …/topics` REPLACES the set, so `apply` writes the union of live and declared, and only
+# `--prune` drops one the manifest does not name; a manifest silent on `topics:` never touches
+# them. `pages.source` (or `pages.build_type: workflow`) creates the GitHub Pages site or updates
+# its source, and never disables it.
+#
+# topics:
+#   - <your-topic>
+#
+# pages: deployed by .github/workflows/docs.yml
+pages:
+  build_type: workflow
