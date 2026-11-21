@@ -63,5 +63,7 @@ public class ChordDiagramLayoutTests
         VoicingDescriber.AccessibleLabel(Voicing("Am", "x02210")).ShouldBe("A minor, x-0-2-2-1-0");
         VoicingDescriber.AccessibleLabel(Voicing("D/F#", "2x0232")).ShouldBe("D major over F sharp, 2-x-0-2-3-2");
         VoicingDescriber.ChordName(ChordSymbol.Parse("Bbmaj7")).ShouldBe("B flat major seven");
+        VoicingDescriber.AccessibleLabel(Voicing("Am", "x02210"), new System.Globalization.CultureInfo("fr")).ShouldBe("la mineur, x-0-2-2-1-0");
+        VoicingDescriber.AccessibleLabel(Voicing("D/F#", "2x0232"), new System.Globalization.CultureInfo("fr-BE")).ShouldBe("ré majeur sur fa dièse, 2-x-0-2-3-2");
     }
 }

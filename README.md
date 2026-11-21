@@ -44,7 +44,7 @@ doubly augmented fourth.
 - **Keys**: signatures including theoretical keys, the circle of fifths, relative and parallel keys.
 - **Harmony**: diatonic triads and sevenths, Roman-numeral analysis, key detection, voice-leading checks.
 - **Rhythm**: durations with dots and tuplets, time signatures.
-- **Guitar** (`MusicTheory.Guitar`): voicings for every chord type in any tuning, capo, chord-diagram geometry.
+- **Guitar** (`MusicTheory.Guitar`): voicings for every chord type in any tuning, capo, chord-diagram geometry, spoken chord names and screen-reader labels in English and French.
 - **Blazor** (`MusicTheory.Guitar.Blazor`): chord playback in the browser.
 
 ## 📦 Installation

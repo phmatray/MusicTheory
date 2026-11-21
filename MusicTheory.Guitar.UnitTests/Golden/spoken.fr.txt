@@ -1,0 +1,49 @@
+Major: si bémol majeur sur fa double dièse
+Minor: si bémol mineur sur fa double dièse
+Diminished: si bémol diminué sur fa double dièse
+Augmented: si bémol augmenté sur fa double dièse
+Major7: si bémol sept majeur sur fa double dièse
+Minor7: si bémol mineur sept sur fa double dièse
+Dominant7: si bémol sept sur fa double dièse
+MinorMajor7: si bémol mineur sept majeur sur fa double dièse
+HalfDiminished7: si bémol demi-diminué sept sur fa double dièse
+Diminished7: si bémol diminué sept sur fa double dièse
+Augmented7: si bémol augmenté sept sur fa double dièse
+AugmentedMajor7: si bémol augmenté sept majeur sur fa double dièse
+Sus2: si bémol suspendu deux sur fa double dièse
+Sus4: si bémol suspendu quatre sur fa double dièse
+Sus2Sus4: si bémol suspendu deux quatre sur fa double dièse
+Dominant7Sus4: si bémol sept suspendu quatre sur fa double dièse
+Major6: si bémol six sur fa double dièse
+Minor6: si bémol mineur six sur fa double dièse
+Major6Add9: si bémol six neuf sur fa double dièse
+Major9: si bémol neuf majeur sur fa double dièse
+Minor9: si bémol mineur neuf sur fa double dièse
+Dominant9: si bémol neuf sur fa double dièse
+Major11: si bémol onze majeur sur fa double dièse
+Minor11: si bémol mineur onze sur fa double dièse
+Dominant11: si bémol onze sur fa double dièse
+Major13: si bémol treize majeur sur fa double dièse
+Minor13: si bémol mineur treize sur fa double dièse
+Dominant13: si bémol treize sur fa double dièse
+MajorAdd9: si bémol ajout neuf sur fa double dièse
+MinorAdd9: si bémol mineur ajout neuf sur fa double dièse
+MajorAdd11: si bémol ajout onze sur fa double dièse
+MinorAdd11: si bémol mineur ajout onze sur fa double dièse
+Dominant7Flat5: si bémol sept bémol cinq sur fa double dièse
+Dominant7Sharp5: si bémol sept dièse cinq sur fa double dièse
+Dominant7Flat9: si bémol sept bémol neuf sur fa double dièse
+Dominant7Sharp9: si bémol sept dièse neuf sur fa double dièse
+Dominant7Flat5Flat9: si bémol sept bémol cinq bémol neuf sur fa double dièse
+Dominant7Flat5Sharp9: si bémol sept bémol cinq dièse neuf sur fa double dièse
+Dominant7Sharp5Flat9: si bémol sept dièse cinq bémol neuf sur fa double dièse
+Dominant7Sharp5Sharp9: si bémol sept dièse cinq dièse neuf sur fa double dièse
+Dominant7Alt: si bémol sept altéré sur fa double dièse
+Power5: si bémol cinq sur fa double dièse
+Dominant7Sus2: si bémol sept suspendu deux sur fa double dièse
+MinorMajor9: si bémol mineur neuf majeur sur fa double dièse
+Natural: mi majeur
+Sharp: mi dièse majeur
+DoubleSharp: mi double dièse majeur
+DoubleFlat: mi double bémol majeur
+Flat: mi bémol majeur

@@ -121,6 +121,16 @@ public class GoldenTests
     });
 
     [Fact]
+    public void SpokenNamesFrench() => Approve("spoken.fr.txt", sb =>
+    {
+        var fr = new CultureInfo("fr");
+        foreach (var type in Enum.GetValues<ChordType>())
+            sb.AppendLine($"{type}: {VoicingDescriber.ChordName(new ChordSymbol(Note.Parse("Bb"), type, Note.Parse("F##")), fr)}");
+        foreach (var alteration in Enum.GetValues<Alteration>())
+            sb.AppendLine($"{alteration}: {VoicingDescriber.ChordName(new ChordSymbol(new Note(NoteName.E, alteration), ChordType.Major), fr)}");
+    });
+
+    [Fact]
     public void Tuning_IsAValue()
     {
         Tuning.Standard.ShouldBe(Tuning.Standard);
