@@ -14,7 +14,7 @@ public interface IGuitarVoicingProvider
 /// </summary>
 /// <remarks>
 /// Every voicing is checked the same way whatever its source: sounding pitch classes are chord tones (plus a
-/// slash bass), the lowest note is the root or the slash bass, all required tones sound (root, 3rd or sus
+/// slash bass), on non-re-entrant tunings the lowest string sounds the root or the slash bass (on re-entrant tunings it sounds somewhere), all required tones sound (root, 3rd or sus
 /// tones, 7th, alterations and the top extension; the perfect 5th, and the 9th/11th of 11th/13th chords, may be
 /// left out), at most one muted string sits between sounding strings, and a fingering with fingers 1–4 (index
 /// barre allowed) exists. Curated and movable shapes are only used in standard tuning.
@@ -116,6 +116,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
         private readonly HashSet<int> _allowed;
         private readonly HashSet<int> _required;
         private readonly int _bass;
+        private readonly bool _reentrant;
         public readonly int MaxFret;
 
         public Spec(ChordSymbol chord, Tuning tuning, VoicingOptions options)
@@ -132,6 +133,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
             _required = intervals.Where(i => !Optional(chord.Type, i)).Select(i => (i + root) % 12).ToHashSet();
             _bass = chord.Bass is null ? root : chord.Bass.PitchClass;
             _allowed.Add(_bass);
+            _reentrant = tuning.IsReentrant;
         }
 
         // The perfect 5th may go (not in a power chord); so may the 9th/11th of 11th/13th chords and the b5 of 7alt.
@@ -153,7 +155,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
             var seen = new HashSet<string>();
             var frets = new int?[_open.Length];
             for (int window = 1; window + _stretch - 1 <= MaxFret; window++)
-                foreach (var f in Walk(0, window, bassPlaced: false))
+                foreach (var f in Walk(0, window, bassPlaced: _reentrant))
                     if (seen.Add(string.Join(",", f)))
                         yield return f;
 
@@ -166,7 +168,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
                 }
                 var options = new List<int?> { null };
                 // ponytail: open strings only next to low positions; a smarter reach model if mixed voicings matter.
-                // Stryker disable once Conditional: only prunes the search; TryBuild rejects a wrong bass either way.
+                // Stryker disable once Conditional: only prunes the search; TryBuild rejects a wrong bass either way (re-entrant tunings start with bassPlaced true and require no bass).
                 if (window <= 3 && (!bassPlaced ? Pc(s, 0) == _bass : _allowed.Contains(Pc(s, 0))))
                     options.Add(0);
                 for (int f = window; f < window + _stretch && f <= MaxFret; f++)
@@ -191,7 +193,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
                 return null;
 
             var pcs = sounding.Select(s => Pc(s, frets[s]!.Value)).ToList();
-            if (pcs[0] != _bass || !pcs.All(_allowed.Contains) || !_required.IsSubsetOf(pcs))
+            if ((_reentrant ? !pcs.Contains(_bass) : pcs[0] != _bass) || !pcs.All(_allowed.Contains) || !_required.IsSubsetOf(pcs))
                 return null;
 
             int innerMutes = sounding[^1] - sounding[0] + 1 - sounding.Count;
@@ -214,7 +216,8 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
                 + (high - low) * 0.5
                 + Math.Max(low - 1, 0) * 0.3
                 + innerMutes * 1.5
-                + (frets.Length - sounding.Count) * 0.5
+                // A muted string costs more on a re-entrant (4-string) instrument, where it drops a whole register: full chords rank first.
+                + (frets.Length - sounding.Count) * (_reentrant ? 2 : 0.5)
                 + source switch { VoicingSource.Curated => -3, VoicingSource.MovableShape => -1, _ => 2 };
 
             return new GuitarVoicing(_chord, frets, fingers, barre, high <= 4 ? 1 : low, source, shape, Math.Round(difficulty, 2));
