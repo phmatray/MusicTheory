@@ -84,4 +84,13 @@ public class ChordProTransposeTests
         var doc = ChordProDocument.Parse(Fixture(name));
         doc.Transpose(12).Chords.ShouldBe(doc.Chords);
     }
+
+    [Fact]
+    public void Transpose_updates_the_Key_property_for_both_overloads()
+    {
+        var doc = ChordProDocument.Parse("{key: G}\n[G]a");
+        doc.Transpose(2).Key.ShouldBe(KeySignature.Parse("A"));
+        doc.Transpose(2, SuffixHandling.Verbatim).Key.ShouldBe(KeySignature.Parse("A"));
+        doc.Transpose(new KeySignature(Note.Parse("Bb"), KeyMode.Major)).Key.ShouldBe(KeySignature.Parse("Bb"));
+    }
 }
