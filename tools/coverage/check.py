@@ -3,6 +3,7 @@
     dotnet test --project MusicTheory.UnitTests --coverage --coverage-output-format cobertura --coverage-output $PWD/TestResults/core.xml
     dotnet test --project MusicTheory.Guitar.UnitTests --coverage --coverage-output-format cobertura --coverage-output $PWD/TestResults/guitar.xml
     dotnet test --project MusicTheory.ChordPro.UnitTests --coverage --coverage-output-format cobertura --coverage-output $PWD/TestResults/chordpro.xml
+    dotnet test --project MusicTheory.MusicXml.UnitTests --coverage --coverage-output-format cobertura --coverage-output $PWD/TestResults/musicxml.xml
     dotnet test --project MusicTheory.Abc.UnitTests --coverage --coverage-output-format cobertura --coverage-output $PWD/TestResults/abc.xml
     python3 tools/coverage/check.py TestResults/*.xml
 
@@ -15,7 +16,7 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 
-LIBRARIES = {"MusicTheory", "MusicTheory.Guitar", "MusicTheory.Guitar.Blazor", "MusicTheory.ChordPro", "MusicTheory.Abc"}
+LIBRARIES = {"MusicTheory", "MusicTheory.Guitar", "MusicTheory.Guitar.Blazor", "MusicTheory.ChordPro", "MusicTheory.MusicXml", "MusicTheory.Abc"}
 
 
 def main(paths):
