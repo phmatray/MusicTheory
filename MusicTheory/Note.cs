@@ -199,6 +199,33 @@ public sealed record Note
     }
 
     /// <summary>
+    /// The nearest 12-TET note to <paramref name="hz"/> and the deviation in cents, in [-50, +50): an exact
+    /// quarter tone above a note reads as the next note at -50. Spelled like <see cref="FromMidiNumber"/>.
+    /// </summary>
+    /// <param name="hz">The measured frequency in Hz.</param>
+    /// <param name="a4">The frequency of A4 in Hz.</param>
+    /// <param name="preferFlats">Spell black keys with flats instead of sharps.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="hz"/> or <paramref name="a4"/> is not a positive, finite number, or the nearest note is outside MIDI's 0..127.
+    /// </exception>
+    public static TunedPitch FromFrequency(double hz, double a4 = StandardA4, bool preferFlats = false)
+    {
+        if (!double.IsFinite(hz) || hz <= 0)
+            throw new ArgumentOutOfRangeException(nameof(hz), hz, "Frequency must be positive and finite.");
+        if (!double.IsFinite(a4) || a4 <= 0)
+            throw new ArgumentOutOfRangeException(nameof(a4), a4, "A4 must be a positive, finite frequency.");
+        double exact = 69 + 12 * Math.Log2(hz / a4);
+        int midi = (int)Math.Floor(exact + 0.5);
+        if (midi is < 0 or > 127)
+            throw new ArgumentOutOfRangeException(nameof(hz), hz, "The nearest note is outside the MIDI range 0..127.");
+        var note = FromMidiNumber(midi, preferFlats);
+        // FromMidiNumber always spells MIDI 10 mod 12 as Bb; the tuning contract wants A# unless flats are preferred.
+        if (!preferFlats && midi % 12 == 10)
+            note = new Note(NoteName.A, Alteration.Sharp, note.Octave);
+        return new TunedPitch(note, (exact - midi) * 100);
+    }
+
+    /// <summary>
     /// The note for a MIDI number. Black keys are C#, Eb, F#, Ab, Bb by default, or Db, Eb, Gb, Ab, Bb with
     /// <paramref name="preferFlats"/>.
     /// </summary>
