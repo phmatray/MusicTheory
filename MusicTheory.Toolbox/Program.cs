@@ -11,6 +11,13 @@ builder.Services.AddScoped<ToolboxSession>();
 
 var host = builder.Build();
 // Read once: only used when the link carries no (valid) lang.
-host.Services.GetRequiredService<ToolboxSession>().BrowserLang =
-    await host.Services.GetRequiredService<IJSRuntime>().InvokeAsync<string>("tbBrowserLang");
+try
+{
+    host.Services.GetRequiredService<ToolboxSession>().BrowserLang =
+        await host.Services.GetRequiredService<IJSRuntime>().InvokeAsync<string>("tbBrowserLang");
+}
+catch (JSException)
+{
+    // No browser language: the session keeps its English default.
+}
 await host.RunAsync();
