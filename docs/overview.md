@@ -23,7 +23,7 @@ Console.WriteLine(string.Join(" ", scale.GetNotes())); // F#4 G#4 A#4 B4 C#5 D#5
 
 - **[Notes](notes.md)**: parsing (English and German names), MIDI numbers, frequencies at any concert pitch, enharmonic respelling.
 - **[Intervals](intervals.md)**: every quality from quintuply diminished to quintuply augmented, direction, compound intervals, inversion.
-- **[Chords](chords.md)**: 42 chord types, extensions, inversions, and lead-sheet symbols with tensions such as `C7b9#11`.
+- **[Chords](chords.md)**: 44 chord types, extensions, inversions, and lead-sheet symbols with tensions such as `C7b9#11`.
 - **[Scales](scales.md)**: major, the three minors, the seven modes, pentatonics, blues, whole tone and chromatic.
 - **[Keys](key-signatures.md)**: signatures (theoretical keys included), the circle of fifths, relative and parallel keys.
 - **[Harmony](chord-progressions.md)**: diatonic triads and sevenths, Roman-numeral analysis, key detection, voice-leading checks.

@@ -11,7 +11,7 @@ library, a chord is immutable.
 
 ## Chord types
 
-The 42 types cover triads, sevenths, suspended, sixth, extended, add, altered and power chords. Each type is
+The 44 types cover triads, sevenths, suspended, sixth, extended, add, altered and power chords. Each type is
 defined by its intervals above the root:
 
 ```csharp
@@ -85,7 +85,7 @@ catch (ArgumentOutOfRangeException e)
 
 ## Chord symbols
 
-`ChordSymbol` reads and writes lead-sheet symbols. It understands the common aliases (`m`, `min`, `-`,
+`ChordSymbol` reads and writes lead-sheet symbols. It understands the common aliases (`m`, `min`, `mi`, `-`,
 `maj7`, `M7`, `Δ`, `ø`, `°`, `+`, `sus`, `6/9`), a slash bass, and tensions on top of the type:
 
 ```csharp
@@ -95,6 +95,10 @@ Console.WriteLine(ChordSymbol.Parse("D/F#").Bass);                // F#4
 Console.WriteLine(ChordSymbol.Parse("C7b9#11"));                  // C7b9#11
 Console.WriteLine(ChordSymbol.Parse("C7(b9,#11)"));               // C7b9#11
 Console.WriteLine(ChordSymbol.Parse("Cmaj7(#11)"));               // Cmaj7#11
+Console.WriteLine(ChordSymbol.Parse("C7sus2").Type);              // Dominant7Sus2
+Console.WriteLine(ChordSymbol.Parse("Am(maj9)"));                 // AmMaj9
+Console.WriteLine(ChordSymbol.Parse("Cadd#11"));                  // Cadd#11
+Console.WriteLine(ChordSymbol.Parse("Cmi7"));                     // Cm7
 Console.WriteLine(ChordSymbol.TryParse("N.C.", out _));           // False
 ```
 

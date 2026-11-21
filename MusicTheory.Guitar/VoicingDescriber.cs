@@ -67,5 +67,7 @@ public static class VoicingDescriber
         [ChordType.Dominant7Sharp5Sharp9] = "seven sharp five sharp nine",
         [ChordType.Dominant7Alt] = "seven altered",
         [ChordType.Power5] = "five",
+        [ChordType.Dominant7Sus2] = "seven suspended two",
+        [ChordType.MinorMajor9] = "minor major nine",
     };
 }

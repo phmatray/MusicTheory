@@ -40,6 +40,8 @@ Dominant7Sharp5Flat9: B flat seven sharp five flat nine over F double sharp
 Dominant7Sharp5Sharp9: B flat seven sharp five sharp nine over F double sharp
 Dominant7Alt: B flat seven altered over F double sharp
 Power5: B flat five over F double sharp
+Dominant7Sus2: B flat seven suspended two over F double sharp
+MinorMajor9: B flat minor major nine over F double sharp
 Natural: E major
 Sharp: E sharp major
 DoubleSharp: E double sharp major

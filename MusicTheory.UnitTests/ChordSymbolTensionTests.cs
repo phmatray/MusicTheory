@@ -14,6 +14,8 @@ public class ChordSymbolTensionTests
     [InlineData("C7(13)", ChordType.Dominant7, "13")]
     [InlineData("C7add13", ChordType.Dominant7, "13")]
     [InlineData("Cadd13", ChordType.Major, "13")]
+    [InlineData("Cadd#11", ChordType.Major, "#11")]
+    [InlineData("C7add#11", ChordType.Dominant7, "#11")]
     [InlineData("C9#11", ChordType.Dominant9, "#11")]
     [InlineData("Cm#5", ChordType.Minor, "#5")]
     [InlineData("C7(9)", ChordType.Dominant7, "9")]
@@ -28,6 +30,15 @@ public class ChordSymbolTensionTests
     }
 
     [Fact]
+    public void NewTypes_ParseAndRoundTrip()
+    {
+        ChordSymbol.Parse("C7sus2").ToString().ShouldBe("C7sus2");
+        var s = ChordSymbol.Parse("Am(maj9)");
+        s.ToString().ShouldBe("AmMaj9");
+        string.Join(" ", s.ToChord().GetNotes()).ShouldBe("A4 C5 E5 G#5 B5");
+    }
+
+    [Fact]
     public void Parse_TwoTensions()
     {
         var symbol = ChordSymbol.Parse("C13(b9,#11)");
@@ -37,7 +48,6 @@ public class ChordSymbolTensionTests
 
     [Theory]
     [InlineData("C75")]
-    [InlineData("C7add#11")]
     [InlineData("C7b11")]
     [InlineData("C7#13")]
     [InlineData("C7xyz")]
@@ -50,6 +60,10 @@ public class ChordSymbolTensionTests
     [InlineData("C7(b9,#11)", "C7b9#11")]
     [InlineData("Cmaj7(#11)", "Cmaj7#11")]
     [InlineData("C7(13)", "C7add13")]
+    [InlineData("Cadd#11", "Cadd#11")]
+    [InlineData("Cadd13", "Cadd13")]
+    [InlineData("Cadd#11b13", "Cadd#11b13")]
+    [InlineData("Fmaj7#11", "Fmaj7#11")]
     [InlineData("Ebm9/Bb", "Ebm9/Bb")]
     [InlineData("F#7#9b13/A#", "F#7#9b13/A#")]
     public void ToString_IsCanonical_AndRoundTrips(string text, string canonical)
