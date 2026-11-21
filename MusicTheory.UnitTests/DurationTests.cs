@@ -3,44 +3,28 @@ namespace MusicTheory.UnitTests;
 public class DurationTests
 {
     [Theory]
-    [InlineData(DurationType.Whole, 1.0)]
-    [InlineData(DurationType.Half, 0.5)]
-    [InlineData(DurationType.Quarter, 0.25)]
-    [InlineData(DurationType.Eighth, 0.125)]
-    [InlineData(DurationType.Sixteenth, 0.0625)]
-    [InlineData(DurationType.ThirtySecond, 0.03125)]
-    [InlineData(DurationType.SixtyFourth, 0.015625)]
-    public void Duration_GetValueInWholeNotes_ShouldReturnCorrectValue(DurationType type, double expectedValue)
+    [InlineData(DurationType.Whole, 1, 1)]
+    [InlineData(DurationType.Half, 1, 2)]
+    [InlineData(DurationType.Quarter, 1, 4)]
+    [InlineData(DurationType.Eighth, 1, 8)]
+    [InlineData(DurationType.Sixteenth, 1, 16)]
+    [InlineData(DurationType.ThirtySecond, 1, 32)]
+    [InlineData(DurationType.SixtyFourth, 1, 64)]
+    public void Duration_Value_ShouldBeExact(DurationType type, long num, long den)
     {
-        // Arrange
-        var duration = new Duration(type);
-        
-        // Act
-        var value = duration.GetValueInWholeNotes();
-        
-        // Assert
-        value.ShouldBe(expectedValue);
+        new Duration(type).Value.ShouldBe(Rational.Of(num, den));
     }
 
     [Theory]
-    [InlineData(DurationType.Whole, 0, 1.0)]
-    [InlineData(DurationType.Half, 0, 0.5)]
-    [InlineData(DurationType.Quarter, 0, 0.25)]
-    [InlineData(DurationType.Half, 1, 0.75)]      // Dotted half
-    [InlineData(DurationType.Quarter, 1, 0.375)]   // Dotted quarter
-    [InlineData(DurationType.Eighth, 1, 0.1875)]   // Dotted eighth
-    [InlineData(DurationType.Quarter, 2, 0.4375)]  // Double dotted quarter
-    [InlineData(DurationType.Half, 2, 0.875)]      // Double dotted half
-    public void Duration_WithDots_ShouldCalculateCorrectValue(DurationType type, int dots, double expectedValue)
+    [InlineData(DurationType.Half, 1, 3, 4)]
+    [InlineData(DurationType.Quarter, 1, 3, 8)]
+    [InlineData(DurationType.Eighth, 1, 3, 16)]
+    [InlineData(DurationType.Quarter, 2, 7, 16)]
+    [InlineData(DurationType.Half, 2, 7, 8)]
+    [InlineData(DurationType.SixtyFourth, 3, 15, 512)]
+    public void Duration_WithDots_ShouldBeExact(DurationType type, int dots, long num, long den)
     {
-        // Arrange
-        var duration = new Duration(type, dots);
-        
-        // Act
-        var value = duration.GetValueInWholeNotes();
-        
-        // Assert
-        value.ShouldBe(expectedValue, 0.0001);
+        new Duration(type, dots).Value.ShouldBe(Rational.Of(num, den));
     }
 
     [Theory]
@@ -60,6 +44,24 @@ public class DurationTests
         
         // Assert
         seconds.ShouldBe(expectedSeconds, 0.0001);
+    }
+
+    [Fact]
+    public void Duration_GetTimeInSeconds_WithBeatUnit_ShouldScaleByBeat()
+    {
+        var dottedQuarter = new Duration(DurationType.Quarter, 1);
+        new Duration(DurationType.Half, 1).GetTimeInSeconds(60, dottedQuarter).ShouldBe(2.0);
+        new Duration(DurationType.Quarter).GetTimeInSeconds(90.5).ShouldBe(60.0 / 90.5);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    public void Duration_GetTimeInSeconds_WithInvalidTempo_ShouldThrow(double bpm)
+    {
+        Should.Throw<ArgumentOutOfRangeException>(() => new Duration(DurationType.Quarter).GetTimeInSeconds(bpm)).ParamName.ShouldBe("bpm");
     }
 
     [Theory]
@@ -137,38 +139,6 @@ public class DurationTests
         name.ShouldBe(expectedName);
     }
 
-    [Theory]
-    [InlineData(DurationType.Whole, DurationType.Half, 2)]         // 1 whole = 2 halves
-    [InlineData(DurationType.Whole, DurationType.Quarter, 4)]      // 1 whole = 4 quarters
-    [InlineData(DurationType.Half, DurationType.Eighth, 4)]        // 1 half = 4 eighths
-    [InlineData(DurationType.Quarter, DurationType.Sixteenth, 4)]  // 1 quarter = 4 sixteenths
-    public void Duration_Divide_ShouldReturnCorrectCount(DurationType dividend, DurationType divisor, int expectedCount)
-    {
-        // Arrange
-        var duration1 = new Duration(dividend);
-        var duration2 = new Duration(divisor);
-        
-        // Act
-        var count = duration1.Divide(duration2);
-        
-        // Assert
-        count.ShouldBe(expectedCount);
-    }
-
-    [Fact]
-    public void Duration_Add_ShouldCombineDurations()
-    {
-        // Arrange
-        var quarter = new Duration(DurationType.Quarter);
-        var eighth = new Duration(DurationType.Eighth);
-        
-        // Act
-        var sum = quarter.Add(eighth);
-        
-        // Assert
-        sum.GetValueInWholeNotes().ShouldBe(0.375); // Quarter + Eighth = 3/8
-    }
-
     [Fact]
     public void Duration_Equals_ShouldCompareCorrectly()
     {
@@ -192,26 +162,8 @@ public class DurationTests
     {
         // Act & Assert
         Action act = () => new Duration(DurationType.Quarter, dots);
-        act.ShouldThrow<ArgumentException>()
+        act.ShouldThrow<ArgumentOutOfRangeException>()
             .Message.ShouldContain("Dots must be between 0 and 3");
-    }
-
-    [Theory]
-    [InlineData(DurationType.Quarter, 3, 2, 0.166667)]   // Quarter in 3/2 time = 0.25 / 1.5
-    [InlineData(DurationType.Half, 6, 8, 0.666667)]      // Half note in 6/8 time = 0.5 / 0.75
-    [InlineData(DurationType.Whole, 4, 4, 1.0)]          // Whole note in 4/4 time = 1.0 / 1.0
-    public void Duration_GetValueInMeasures_ShouldCalculateCorrectly(
-        DurationType type, int numerator, int denominator, double expectedMeasures)
-    {
-        // Arrange
-        var duration = new Duration(type);
-        var timeSignature = new TimeSignature(numerator, denominator);
-        
-        // Act
-        var measures = duration.GetValueInMeasures(timeSignature);
-        
-        // Assert
-        measures.ShouldBe(expectedMeasures, 0.0001);
     }
 
     [Fact]
@@ -225,38 +177,95 @@ public class DurationTests
     }
 
     [Theory]
-    [InlineData(DurationType.Quarter, 3, 2, 0.166667)]  // Triplet quarter = 1/6
-    [InlineData(DurationType.Eighth, 3, 2, 0.083333)]   // Triplet eighth = 1/12
-    [InlineData(DurationType.Eighth, 5, 4, 0.1)]        // Quintuplet eighth = 1/10
-    [InlineData(DurationType.Sixteenth, 7, 4, 0.035714)] // Septuplet sixteenth
-    public void Duration_CreateTuplet_ShouldCalculateCorrectValue(
-        DurationType baseType, int tupletCount, int normalCount, double expectedValue)
+    [InlineData(DurationType.Quarter, 3, 2, 1, 6)]
+    [InlineData(DurationType.Eighth, 3, 2, 1, 12)]
+    [InlineData(DurationType.Eighth, 5, 4, 1, 10)]
+    [InlineData(DurationType.Sixteenth, 7, 4, 1, 28)]
+    public void Duration_CreateTuplet_ShouldCalculateExactValue(
+        DurationType type, int actual, int normal, long num, long den)
     {
-        // Arrange & Act
-        var tuplet = Duration.CreateTuplet(baseType, tupletCount, normalCount);
-        
-        // Assert
+        var tuplet = Duration.CreateTuplet(type, actual, normal);
+
         tuplet.IsTuplet.ShouldBeTrue();
-        tuplet.GetValueInWholeNotes().ShouldBe(expectedValue, 0.0001);
+        tuplet.Tuplet.ShouldBe((actual, normal));
+        tuplet.Value.ShouldBe(Rational.Of(num, den));
+    }
+
+    [Fact]
+    public void Duration_ThreeTripletEighths_SumToExactlyAQuarter()
+    {
+        var triplet = Duration.CreateTuplet(DurationType.Eighth, 3, 2);
+
+        (triplet.Value * Rational.Of(3)).ShouldBe(new Duration(DurationType.Quarter).Value);
+    }
+
+    [Fact]
+    public void Duration_TupletAndPlainWithEqualValue_ShouldNotBeEqual()
+    {
+        var tripletQuarter = Duration.CreateTuplet(DurationType.Quarter, 3, 2);
+        var plainEighthSixth = Duration.CreateTuplet(DurationType.Eighth, 3, 4);
+
+        tripletQuarter.Value.ShouldBe(plainEighthSixth.Value);
+        tripletQuarter.ShouldNotBe(plainEighthSixth);
+        new Duration(DurationType.Quarter, 1).ShouldBe(new Duration(DurationType.Quarter, 1));
     }
 
     [Fact]
     public void Duration_CreateTuplet_WithUndefinedType_ShouldThrow()
     {
-        Should.Throw<ArgumentOutOfRangeException>(() => Duration.CreateTuplet((DurationType)99, 3, 2)).ParamName.ShouldBe("baseType");
+        Should.Throw<ArgumentOutOfRangeException>(() => Duration.CreateTuplet((DurationType)99, 3, 2)).ParamName.ShouldBe("type");
     }
 
     [Theory]
-    [InlineData(0, 2, "tupletCount")]
-    [InlineData(3, 0, "normalCount")]
-    public void Duration_CreateTuplet_WithCountBelowOne_ShouldThrow(int tupletCount, int normalCount, string param)
+    [InlineData(0, 2, "actual")]
+    [InlineData(3, 0, "normal")]
+    public void Duration_CreateTuplet_WithCountBelowOne_ShouldThrow(int actual, int normal, string param)
     {
-        Should.Throw<ArgumentOutOfRangeException>(() => Duration.CreateTuplet(DurationType.Eighth, tupletCount, normalCount)).ParamName.ShouldBe(param);
+        Should.Throw<ArgumentOutOfRangeException>(() => Duration.CreateTuplet(DurationType.Eighth, actual, normal)).ParamName.ShouldBe(param);
     }
 
     [Fact]
     public void Duration_WithUndefinedType_ShouldThrowAtConstruction()
     {
         Should.Throw<ArgumentOutOfRangeException>(() => new Duration((DurationType)99)).ParamName.ShouldBe("type");
+    }
+
+    [Theory]
+    [InlineData(3, 8, DurationType.Quarter, 1)]
+    [InlineData(1, 4, DurationType.Quarter, 0)]
+    [InlineData(7, 8, DurationType.Half, 2)]
+    [InlineData(15, 512, DurationType.SixtyFourth, 3)]
+    public void Duration_TryFromValue_ShouldFindNotatableDuration(long num, long den, DurationType type, int dots)
+    {
+        Duration.TryFromValue(Rational.Of(num, den), out var duration).ShouldBeTrue();
+        duration.ShouldBe(new Duration(type, dots));
+    }
+
+    [Theory]
+    [InlineData(5, 8)]
+    [InlineData(1, 3)]
+    [InlineData(0, 1)]
+    public void Duration_TryFromValue_ShouldRejectUnnotatableValue(long num, long den)
+    {
+        Duration.TryFromValue(Rational.Of(num, den), out var duration).ShouldBeFalse();
+        duration.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Duration_Decompose_ShouldSplitGreedilyLargestFirst()
+    {
+        Duration.Decompose(Rational.Of(7, 8)).ShouldBe([new Duration(DurationType.Half, 2)]);
+        Duration.Decompose(Rational.Of(5, 8)).ShouldBe([new Duration(DurationType.Half), new Duration(DurationType.Eighth)]);
+        Duration.Decompose(Rational.Of(5, 4)).ShouldBe([new Duration(DurationType.Whole), new Duration(DurationType.Quarter)]);
+    }
+
+    [Theory]
+    [InlineData(1, 3)]
+    [InlineData(1, 128)]
+    [InlineData(0, 1)]
+    [InlineData(-1, 4)]
+    public void Duration_Decompose_ShouldThrowForUnnotatableValue(long num, long den)
+    {
+        Should.Throw<ArgumentException>(() => Duration.Decompose(Rational.Of(num, den))).ParamName.ShouldBe("value");
     }
 }

@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace MusicTheory;
 
 /// <summary>
@@ -22,9 +24,9 @@ public enum DurationType
 }
 
 /// <summary>
-/// Represents a musical duration (note or rest length).
+/// Represents a musical duration (note or rest length), exact to the fraction.
 /// </summary>
-public class Duration : IEquatable<Duration>
+public sealed record Duration
 {
     /// <summary>
     /// Gets the base duration type.
@@ -37,99 +39,86 @@ public class Duration : IEquatable<Duration>
     public int Dots { get; }
 
     /// <summary>
-    /// Gets whether this is a tuplet duration.
+    /// Gets the tuplet ratio (actual notes in the space of normal ones, e.g. 3:2 for a triplet), or null.
     /// </summary>
-    public bool IsTuplet => TupletRatio is not null;
+    public (int Actual, int Normal)? Tuplet { get; }
 
     /// <summary>
-    /// Gets the tuplet ratio (e.g., 3:2 for triplet).
+    /// Gets whether this is a tuplet duration.
     /// </summary>
-    private (int Count, int Normal)? TupletRatio { get; }
+    public bool IsTuplet => Tuplet is not null;
+
+    /// <summary>
+    /// Gets the exact value of this duration in whole notes.
+    /// </summary>
+    public Rational Value { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Duration"/> class.
     /// </summary>
     /// <param name="type">The duration type.</param>
     /// <param name="dots">The number of dots (0-3).</param>
+    /// <exception cref="ArgumentOutOfRangeException">An undefined type, or dots outside 0-3.</exception>
     public Duration(DurationType type, int dots = 0)
     {
         if (!Enum.IsDefined(type))
             throw new ArgumentOutOfRangeException(nameof(type), type, "Undefined duration type.");
         if (dots < 0 || dots > 3)
-            throw new ArgumentException("Dots must be between 0 and 3.", nameof(dots));
+            throw new ArgumentOutOfRangeException(nameof(dots), dots, "Dots must be between 0 and 3.");
 
         Type = type;
         Dots = dots;
+
+        // Whole = 1, half = 1/2, ... sixty-fourth = 1/64; each dot adds half the previous addend.
+        var dot = Rational.Of(1, 1 << (int)type);
+        var total = dot;
+        for (int i = 0; i < dots; i++)
+        {
+            dot *= Rational.Of(1, 2);
+            total += dot;
+        }
+
+        Value = total;
     }
 
-    /// <summary>
-    /// Private constructor for creating tuplet durations.
-    /// </summary>
-    private Duration(DurationType type, int tupletCount, int normalCount)
+    private Duration(DurationType type, int actual, int normal)
     {
         Type = type;
-        TupletRatio = (tupletCount, normalCount);
+        Tuplet = (actual, normal);
+        Value = Rational.Of(1, 1 << (int)type) * Rational.Of(normal, actual);
     }
 
     /// <summary>
     /// Creates a tuplet duration.
     /// </summary>
-    /// <param name="baseType">The base duration type.</param>
-    /// <param name="tupletCount">Number of notes in the tuplet.</param>
-    /// <param name="normalCount">Number of normal notes it replaces.</param>
+    /// <param name="type">The base duration type.</param>
+    /// <param name="actual">Number of notes in the tuplet.</param>
+    /// <param name="normal">Number of normal notes it replaces.</param>
     /// <returns>A new tuplet duration.</returns>
     /// <exception cref="ArgumentOutOfRangeException">An undefined type, or a count below 1.</exception>
-    public static Duration CreateTuplet(DurationType baseType, int tupletCount, int normalCount)
+    public static Duration CreateTuplet(DurationType type, int actual, int normal)
     {
-        if (!Enum.IsDefined(baseType))
-            throw new ArgumentOutOfRangeException(nameof(baseType), baseType, "Undefined duration type.");
-        ArgumentOutOfRangeException.ThrowIfLessThan(tupletCount, 1);
-        ArgumentOutOfRangeException.ThrowIfLessThan(normalCount, 1);
-        return new Duration(baseType, tupletCount, normalCount);
-    }
-
-    /// <summary>
-    /// Gets the value of this duration in whole notes.
-    /// </summary>
-    /// <returns>The duration value as a fraction of a whole note.</returns>
-    public virtual double GetValueInWholeNotes()
-    {
-        // Whole = 1, half = 1/2, ... sixty-fourth = 1/64.
-        double baseValue = 1.0 / (1 << (int)Type);
-
-        // Handle tuplets
-        if (TupletRatio is var (count, normal))
-            return baseValue * normal / count;
-
-        // Apply dots
-        double totalValue = baseValue;
-        double dotValue = baseValue;
-        
-        for (int i = 0; i < Dots; i++)
-        {
-            dotValue /= 2;
-            totalValue += dotValue;
-        }
-
-        return totalValue;
+        if (!Enum.IsDefined(type))
+            throw new ArgumentOutOfRangeException(nameof(type), type, "Undefined duration type.");
+        ArgumentOutOfRangeException.ThrowIfLessThan(actual, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(normal, 1);
+        return new Duration(type, actual, normal);
     }
 
     /// <summary>
     /// Gets the time of this duration in seconds at a given tempo.
     /// </summary>
-    /// <param name="bpm">The tempo in beats per minute (quarter note = 1 beat).</param>
+    /// <param name="bpm">The tempo in beats per minute.</param>
+    /// <param name="beat">The duration that counts as one beat; a quarter note when null.</param>
     /// <returns>The duration in seconds.</returns>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="bpm"/> is not positive.</exception>
-    public double GetTimeInSeconds(int bpm)
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="bpm"/> is not a positive finite number.</exception>
+    public double GetTimeInSeconds(double bpm, Duration? beat = null)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(bpm, 1);
-        // Calculate seconds per quarter note
-        double secondsPerQuarter = 60.0 / bpm;
-        
-        // Get this duration's value relative to a quarter note
-        double valueInQuarters = GetValueInWholeNotes() * 4;
-        
-        return valueInQuarters * secondsPerQuarter;
+        if (!double.IsFinite(bpm) || bpm <= 0)
+            throw new ArgumentOutOfRangeException(nameof(bpm), bpm, "Tempo must be a positive number.");
+
+        var beats = Value / (beat ?? new Duration(DurationType.Quarter)).Value;
+        return beats.ToDouble() * 60.0 / bpm;
     }
 
     /// <summary>
@@ -145,44 +134,68 @@ public class Duration : IEquatable<Duration>
     }
 
     /// <summary>
-    /// Gets the value of this duration in measures for a given time signature.
+    /// Finds the plain or dotted (up to 3 dots) duration of exactly the given value. Tuplets are never returned.
     /// </summary>
-    /// <param name="timeSignature">The time signature.</param>
-    /// <returns>The number of measures this duration spans.</returns>
-    public double GetValueInMeasures(TimeSignature timeSignature)
+    /// <param name="value">The value in whole notes.</param>
+    /// <param name="duration">The matching duration, or null.</param>
+    /// <returns>True when a notatable duration has this value.</returns>
+    public static bool TryFromValue(Rational value, [NotNullWhen(true)] out Duration? duration)
     {
-        ArgumentNullException.ThrowIfNull(timeSignature);
-        double measureDuration = timeSignature.GetMeasureDuration();
-        return GetValueInWholeNotes() / measureDuration;
+        for (var type = DurationType.Whole; type <= DurationType.SixtyFourth; type++)
+        {
+            for (int dots = 0; dots <= 3; dots++)
+            {
+                var candidate = new Duration(type, dots);
+                if (candidate.Value == value)
+                {
+                    duration = candidate;
+                    return true;
+                }
+            }
+        }
+
+        duration = null;
+        return false;
     }
 
     /// <summary>
-    /// Divides this duration by another duration.
+    /// Splits a value into notatable durations, greedily and largest first. Tuplets are never produced.
     /// </summary>
-    /// <param name="other">The duration to divide by.</param>
-    /// <returns>The number of times the other duration fits into this one.</returns>
-    public int Divide(Duration other)
+    /// <param name="value">The value in whole notes.</param>
+    /// <returns>The durations, whose values sum to <paramref name="value"/>.</returns>
+    /// <exception cref="ArgumentException">The value is not positive or is not a finite sum of binary durations down to a 64th.</exception>
+    public static IReadOnlyList<Duration> Decompose(Rational value)
     {
-        ArgumentNullException.ThrowIfNull(other);
-        double thisValue = GetValueInWholeNotes();
-        double otherValue = other.GetValueInWholeNotes();
-        return (int)Math.Round(thisValue / otherValue);
+        if (value <= Rational.Zero)
+            throw new ArgumentException("Value must be positive.", nameof(value));
+
+        var parts = new List<Duration>();
+        var remaining = value;
+        while (remaining > Rational.Zero)
+        {
+            var next = LargestAtMost(remaining)
+                ?? throw new ArgumentException($"{value} is not a sum of notatable durations.", nameof(value));
+            parts.Add(next);
+            remaining -= next.Value;
+        }
+
+        return parts;
     }
 
-    /// <summary>
-    /// Adds two durations together.
-    /// </summary>
-    /// <param name="other">The duration to add.</param>
-    /// <returns>A new duration representing the sum.</returns>
-    public Duration Add(Duration other)
+    private static Duration? LargestAtMost(Rational limit)
     {
-        ArgumentNullException.ThrowIfNull(other);
-        double totalValue = GetValueInWholeNotes() + other.GetValueInWholeNotes();
-        
-        // This is a simplified implementation that returns a duration
-        // with the combined value. In practice, this might need to handle
-        // more complex scenarios like tied notes.
-        return new CompoundDuration(totalValue);
+        // Longest first: within a type the triple-dotted form is longest, and each type is shorter than the previous one's plain form.
+        for (var type = DurationType.Whole; type <= DurationType.SixtyFourth; type++)
+        {
+            for (int dots = 3; dots >= 0; dots--)
+            {
+                var candidate = new Duration(type, dots);
+                if (candidate.Value <= limit)
+                    return candidate;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -192,66 +205,12 @@ public class Duration : IEquatable<Duration>
     public override string ToString()
     {
         string baseName = Names[(int)Type];
-        if (TupletRatio is var (count, normal))
-            return $"{count}:{normal} {baseName}";
+        if (Tuplet is var (actual, normal))
+            return $"{actual}:{normal} {baseName}";
         return DotPrefixes[Dots] + baseName;
     }
 
     private static readonly string[] Symbols = ["𝅝", "𝅗𝅥", "𝅘𝅥", "𝅘𝅥𝅮", "𝅘𝅥𝅯", "𝅘𝅥𝅰", "𝅘𝅥𝅱"];
     private static readonly string[] Names = ["whole", "half", "quarter", "eighth", "16th", "32nd", "64th"];
     private static readonly string[] DotPrefixes = ["", "dotted ", "double dotted ", "triple dotted "];
-
-    /// <summary>
-    /// Determines whether this duration equals another.
-    /// </summary>
-    /// <param name="other">The other duration.</param>
-    /// <returns>True if equal; otherwise, false.</returns>
-    public bool Equals(Duration? other)
-    {
-        if (other is null)
-            return false;
-
-        // A sum (from Add) is equal only to another sum of the same length.
-        return GetType() == other.GetType() &&
-               Type == other.Type &&
-               Dots == other.Dots &&
-               TupletRatio == other.TupletRatio &&
-               GetValueInWholeNotes() == other.GetValueInWholeNotes();
-    }
-
-    /// <summary>
-    /// Determines whether this duration equals another object.
-    /// </summary>
-    /// <param name="obj">The object to compare.</param>
-    /// <returns>True if equal; otherwise, false.</returns>
-    public override bool Equals(object? obj)
-    {
-        return Equals(obj as Duration);
-    }
-
-    /// <summary>
-    /// Gets the hash code for this duration.
-    /// </summary>
-    /// <returns>The hash code.</returns>
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Type, Dots, TupletRatio, GetValueInWholeNotes());
-    }
-
-    /// <summary>
-    /// Represents a compound duration (sum of multiple durations).
-    /// </summary>
-    private class CompoundDuration : Duration
-    {
-        private readonly double _valueInWholeNotes;
-
-        public CompoundDuration(double valueInWholeNotes) : base(DurationType.Whole, 0)
-        {
-            _valueInWholeNotes = valueInWholeNotes;
-        }
-
-        public override double GetValueInWholeNotes() => _valueInWholeNotes;
-
-        public override string ToString() => FormattableString.Invariant($"{_valueInWholeNotes} whole notes");
-    }
 }
