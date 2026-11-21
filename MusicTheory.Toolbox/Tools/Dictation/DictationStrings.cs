@@ -35,6 +35,8 @@ public sealed class DictationStrings : IStringTable
         ["dictation.score"] = "Total score: {0} out of {1}.",
         ["dictation.restart"] = "Start again",
         ["dictation.teacher"] = "Answer key",
+        ["dictation.export.midi"] = "Download MIDI",
+        ["dictation.export.xml"] = "Download MusicXML",
         ["dictation.understand"] = "Each exercise is drawn from a number called a seed: the same seed, difficulty and count always give the same melodies, in any browser. "
             + "The link is enough to share an exercise, and the answer key is the same link with the key view switched on. "
             + "Each note is scored by pitch, so an enharmonic spelling such as Db for C# counts as right, but the octave matters. "
@@ -72,6 +74,8 @@ public sealed class DictationStrings : IStringTable
         ["dictation.score"] = "Score total : {0} sur {1}.",
         ["dictation.restart"] = "Recommencer",
         ["dictation.teacher"] = "Corrigé",
+        ["dictation.export.midi"] = "Télécharger le MIDI",
+        ["dictation.export.xml"] = "Télécharger le MusicXML",
         ["dictation.understand"] = "Chaque exercice est tiré d'un nombre appelé graine : la même graine, la même difficulté et le même nombre de mélodies donnent toujours les mêmes mélodies, dans n'importe quel navigateur. "
             + "Le lien suffit à partager un exercice, et le corrigé est le même lien avec la vue enseignant activée. "
             + "Chaque note est notée selon sa hauteur : une enharmonie comme ré bémol pour do dièse est juste, mais l'octave compte. "
