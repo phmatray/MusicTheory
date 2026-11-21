@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Standard MIDI files: write measures and a tempo map. -->
+    <PackageId>MusicTheory.Midi</PackageId>
+    <Product>MusicTheory.Midi</Product>
+    <Description>Standard MIDI files for MusicTheory: writes measures, a tempo map and a key as a format 1 file.</Description>
+    <PackageTags>music;theory;midi;smf;music-theory;dotnet</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <!-- No baseline: the package has not been published yet. -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\icon.png" Pack="true" PackagePath="" />
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MusicTheory\MusicTheory.csproj" />
+  </ItemGroup>
+
+</Project>
