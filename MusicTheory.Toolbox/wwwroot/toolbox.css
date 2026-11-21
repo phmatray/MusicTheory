@@ -23,3 +23,5 @@ a { color: var(--sc-accent); }
 .tb-pc-on { background: var(--sc-accent); }
 .tb-results span { opacity: .75; }
 .tb-form { display: flex; gap: .5rem; align-items: end; flex-wrap: wrap; }
+.tb-form { display: grid; gap: .5rem; max-width: 36rem; }
+.tb-form button { justify-self: start; }
