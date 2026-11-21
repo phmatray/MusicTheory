@@ -8,7 +8,7 @@ public partial class HelpModelTests
 {
     [Fact]
     public void The_list_is_the_shell_parameters_plus_the_union_of_the_tools_parameters() =>
-        HelpModel.UrlParameters().ShouldBe(["t", "lang", "v", "chords", "d", "dir", "inst", "key", "n", "seed"]);
+        HelpModel.UrlParameters().ShouldBe(["t", "lang", "v", "chord", "chords", "d", "dir", "frets", "hand", "inst", "key", "n", "oct", "pcs", "root", "scale", "seed", "show", "triad", "tuning", "type"]);
 
     [Fact]
     public void Every_parameter_the_source_reads_is_declared_by_a_tool()

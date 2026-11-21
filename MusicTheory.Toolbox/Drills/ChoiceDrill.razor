@@ -1,0 +1,125 @@
+@typeparam T
+@using MusicTheory.Training
+@inject NavigationManager Nav
+@{
+    var lang = State.Lang;
+    var l = Link;
+}
+<PageTitle>@Strings.T(lang, Prefix + ".title") - @Strings.T(lang, "shell.title")</PageTitle>
+
+<h1>@Strings.T(lang, Prefix + ".title")</h1>
+<p>@Strings.T(lang, Prefix + ".blurb")</p>
+
+<div class="tb-controls">
+    <label>
+        @Strings.T(lang, Prefix + ".difficulty")
+        <select class="tb-difficulty" value="@l.Difficulty.ToString().ToLowerInvariant()" @onchange="OnDifficulty">
+            @foreach (var d in new[] { "beginner", "intermediate", "advanced" })
+            {
+                <option value="@d">@Strings.T(lang, Prefix + ".d." + d)</option>
+            }
+        </select>
+    </label>
+    <label>
+        @Strings.T(lang, Prefix + ".count")
+        <input class="tb-count" type="number" min="1" max="@DrillLink.MaxCount" value="@l.Count" @onchange="OnCount" />
+    </label>
+    <button type="button" class="tb-btn tb-generate" @onclick="Generate">@Strings.T(lang, Prefix + (l.Seed is null ? ".generate" : ".new"))</button>
+</div>
+
+@if (_session is null)
+{
+    <p class="tb-notice" role="status">@Strings.T(lang, Prefix + ".new.blurb")</p>
+}
+else
+{
+    @if (_shown is { } q)
+    {
+        <h2 class="tb-progress">@Strings.T(lang, Prefix + ".question", _session.Index + (_last is null ? 1 : 0), _session.Questions.Count)</h2>
+        <DrillPlayer Sounds="q.Sounds" Lang="lang" GapMs="GapMs" @key="q" />
+        <div class="tb-answers" role="group" aria-label="@Strings.T(lang, Prefix + ".choices")">
+            @foreach (var choice in q.Choices)
+            {
+                <button type="button" class="tb-btn tb-answer" disabled="@(_last is not null)" @onclick="() => Answer(choice)">@Label(choice, lang)</button>
+            }
+        </div>
+        @if (_last is { } r)
+        {
+            <p class="tb-result @(r.IsCorrect ? "tb-right" : "tb-wrong")" role="status">
+                @Strings.T(lang, Prefix + (r.IsCorrect ? ".right" : ".wrong"), Label(r.Expected, lang))
+            </p>
+            <button type="button" class="tb-btn tb-next" @onclick="Next">
+                @Strings.T(lang, Prefix + (_session.IsFinished ? ".finish" : ".next"))
+            </button>
+        }
+    }
+    else
+    {
+        <p class="tb-score" role="status">@Strings.T(lang, Prefix + ".score", _session.Summary.Correct, _session.Summary.Total)</p>
+        <button type="button" class="tb-btn tb-restart" @onclick="Restart">@Strings.T(lang, Prefix + ".restart")</button>
+    }
+
+    <ShareButton Url="@ShareUrl" Lang="lang" />
+
+    @if (l.TeacherKey)
+    {
+        <h2>@Strings.T(lang, Prefix + ".teacher")</h2>
+        <ol class="tb-key-list">
+            @foreach (var keyed in _session.Questions)
+            {
+                <li>@Label(keyed.Answer, lang)</li>
+            }
+        </ol>
+    }
+}
+
+<Understand Lang="lang" TextKey="@(Prefix + ".understand")" />
+
+@code {
+    /// <summary>The string-key prefix (<c>chords</c>, <c>scales</c>).</summary>
+    [Parameter, EditorRequired] public string Prefix { get; set; } = "";
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+    [Parameter, EditorRequired] public Func<DrillLink, ulong, DrillSessionModel<T>> Build { get; set; } = default!;
+    [Parameter, EditorRequired] public Func<T, Lang, string> Label { get; set; } = default!;
+    [Parameter] public int GapMs { get; set; } = 700;
+
+    private DrillLink Link => DrillLink.FromState(State);
+    private DrillSessionModel<T>? _session;
+    private AnswerResult<T>? _last;
+    private Question<T>? _shown;
+    private DrillLink? _built;
+
+    private string ShareUrl => Nav.Uri.Split('?')[0] + ToolboxUrl.Build((Link with { TeacherKey = false }).ToState(State.Lang));
+
+    // The session is rebuilt only when the link's exercise changes, not on a language switch.
+    protected override void OnParametersSet()
+    {
+        var l = Link with { TeacherKey = false };
+        if (_built == l) return;
+        _built = l;
+        Restart();
+    }
+
+    private void Restart()
+    {
+        _last = null;
+        var l = Link;
+        if (l.Seed is not { } seed) { _session = null; _shown = null; return; }
+        _session = Build(l, seed);
+        _shown = _session.Current;
+    }
+
+    private void Answer(T choice) => _last = _session!.Answer(choice);
+
+    private void Next() { _last = null; _shown = _session!.Current; }
+
+    private void Go(DrillLink l) => Nav.NavigateTo(ToolboxUrl.Build(l.ToState(State.Lang)));
+
+    private void Generate() => Go(Link with { Seed = (ulong)Random.Shared.Next(1, 1_000_000_000) });
+
+    private void OnDifficulty(ChangeEventArgs e) =>
+        Go(DrillLink.FromState(State with { Params = new Dictionary<string, string>(State.Params) { ["d"] = e.Value?.ToString() ?? "" } }));
+
+    private void OnCount(ChangeEventArgs e) =>
+        Go(DrillLink.FromState(State with { Params = new Dictionary<string, string>(State.Params) { ["n"] = e.Value?.ToString() ?? "" } }));
+}

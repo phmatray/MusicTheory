@@ -1,0 +1,188 @@
+@using System.Globalization
+@using MusicTheory.Toolbox.Drills
+@using MusicTheory.Toolbox.Tools.Dictation
+@using MusicTheory.Training
+@using Microsoft.JSInterop
+@using MusicTheory.Toolbox.Rendering
+@inject NavigationManager Nav
+@inject IJSRuntime Js
+@{
+    var lang = State.Lang;
+    var l = Link;
+}
+<PageTitle>@Strings.T(lang, "dictation.title") - @Strings.T(lang, "shell.title")</PageTitle>
+
+<h1>@Strings.T(lang, "dictation.title")</h1>
+<p>@Strings.T(lang, "dictation.blurb")</p>
+
+<div class="tb-controls">
+    <label>
+        @Strings.T(lang, "dictation.difficulty")
+        <select class="tb-difficulty" value="@l.Difficulty.ToString().ToLowerInvariant()" @onchange="OnDifficulty">
+            @foreach (var d in new[] { "beginner", "intermediate", "advanced" })
+            {
+                <option value="@d">@Strings.T(lang, "dictation.d." + d)</option>
+            }
+        </select>
+    </label>
+    <label>
+        @Strings.T(lang, "dictation.count")
+        <input class="tb-count" type="number" min="1" max="@DrillLink.MaxCount" value="@l.Count" @onchange="OnCount" />
+    </label>
+    <button type="button" class="tb-btn tb-generate" @onclick="Generate">@Strings.T(lang, l.Seed is null ? "dictation.generate" : "dictation.new")</button>
+</div>
+
+@if (_session is null)
+{
+    <p class="tb-notice" role="status">@Strings.T(lang, "dictation.new.blurb")</p>
+}
+else
+{
+    @if (_shown is { } q)
+    {
+        var (low, high) = MelodyInputModel.KeyboardRange(q.Answer);
+        <h2 class="tb-progress">@Strings.T(lang, "dictation.question", _session.Index + (_last is null ? 1 : 0), _session.Questions.Count)</h2>
+        <p>@Strings.T(lang, "dictation.key", KeyName(q.Key))</p>
+        <DrillPlayer Sounds="q.Sounds" Lang="lang" @key="q" />
+        @if (_last is null)
+        {
+            <p class="tb-entered" role="status">@Strings.T(lang, "dictation.entered", Entered())</p>
+            <MelodyKeyboard Low="low" High="high" Key="q.Key" Lang="lang" Disabled="_input!.IsComplete" OnPick="Pick" />
+            <div class="tb-controls">
+                <button type="button" class="tb-btn tb-undo" @onclick="_input.Undo">@Strings.T(lang, "dictation.undo")</button>
+                <button type="button" class="tb-btn tb-submit" disabled="@(!_input.IsComplete)" @onclick="Submit">@Strings.T(lang, "dictation.submit")</button>
+            </div>
+        }
+        else
+        {
+            var given = _input!.Value;
+            <p class="tb-result" role="status">@Strings.T(lang, "dictation.result", Right(q, given), q.Answer.Count) (@_last.Score.ToString("P0", CultureInfo.InvariantCulture))</p>
+            <h3>@Strings.T(lang, "dictation.expected")</h3>
+            <Staff Abc="@Abc(q, q.Answer)" Alt="@Alt(q.Answer, lang)" />
+            <h3>@Strings.T(lang, "dictation.given")</h3>
+            <Staff Abc="@Abc(q, given)" Alt="@Alt(given, lang)" />
+            <ol class="tb-marks">
+                @for (var i = 0; i < q.Answer.Count; i++)
+                {
+                    var n = i + 1;
+                    var exp = q.Answer[i];
+                    @if (i >= given.Count)
+                    {
+                        <li class="tb-wrong">@Strings.T(lang, "dictation.note.missing", n, Name(exp))</li>
+                    }
+                    else if (given[i].MidiNumber == exp.MidiNumber)
+                    {
+                        <li class="tb-right">@Strings.T(lang, "dictation.note.right", n, Name(exp))</li>
+                    }
+                    else
+                    {
+                        <li class="tb-wrong">@Strings.T(lang, "dictation.note.wrong", n, Name(given[i]), Name(exp))</li>
+                    }
+                }
+            </ol>
+            <button type="button" class="tb-btn tb-next" @onclick="Next">
+                @Strings.T(lang, _session.IsFinished ? "dictation.finish" : "dictation.next")
+            </button>
+        }
+    }
+    else
+    {
+        <p class="tb-score" role="status">@Strings.T(lang, "dictation.score", _session.Score.ToString("0.##", CultureInfo.InvariantCulture), _session.Questions.Count)</p>
+        <button type="button" class="tb-btn tb-restart" @onclick="Restart">@Strings.T(lang, "dictation.restart")</button>
+    }
+
+    <ShareButton Url="@ShareUrl" Lang="lang" />
+
+    @if (l.TeacherKey)
+    {
+        <h2>@Strings.T(lang, "dictation.teacher")</h2>
+        @foreach (var (keyed, i) in _session.Questions.Select((k, i) => (k, i + 1)))
+        {
+            <Staff Abc="@Abc(keyed, keyed.Answer)" Alt="@Alt(keyed.Answer, lang)" />
+            <div class="tb-controls">
+                <button type="button" class="tb-btn tb-export-midi" @onclick="() => DownloadMidi(keyed, i)">@Strings.T(lang, "dictation.export.midi")</button>
+                <button type="button" class="tb-btn tb-export-xml" @onclick="() => DownloadXml(keyed, i)">@Strings.T(lang, "dictation.export.xml")</button>
+            </div>
+        }
+    }
+}
+
+<Understand Lang="lang" TextKey="dictation.understand" />
+
+@code {
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+
+    // A melody is a few notes long, so a class works through a few of them: 3 unless the link says otherwise.
+    private DrillLink Link => State.Params.ContainsKey("n") ? DrillLink.FromState(State) : DrillLink.FromState(State) with { Count = 3 };
+    private DrillSessionModel<IReadOnlyList<Note>>? _session;
+    private AnswerResult<IReadOnlyList<Note>>? _last;
+    private Question<IReadOnlyList<Note>>? _shown;
+    private MelodyInputModel? _input;
+    private DrillLink? _built;
+
+    private string ShareUrl => Nav.Uri.Split('?')[0] + ToolboxUrl.Build((Link with { TeacherKey = false }).ToState(State.Lang));
+
+    // The session is rebuilt only when the link's exercise changes, not on a language switch.
+    protected override void OnParametersSet()
+    {
+        var l = Link;
+        if (_built == (l with { TeacherKey = false })) return;
+        _built = l with { TeacherKey = false };
+        Restart();
+    }
+
+    private void Restart()
+    {
+        _last = null;
+        var l = Link;
+        if (l.Seed is not { } seed) { _session = null; _shown = null; return; }
+        var drill = new MelodyDrill(MelodyDrillOptions.For(l.Difficulty), seed);
+        var questions = Enumerable.Range(0, l.Count).Select(_ => drill.Next()).ToArray();
+        _session = new DrillSessionModel<IReadOnlyList<Note>>(questions, drill.Check);
+        Show();
+    }
+
+    private void Show()
+    {
+        _shown = _session!.Current;
+        _input = _shown is { } q ? new MelodyInputModel(q.Answer.Count) : null;
+    }
+
+    private void Pick(Note note) { if (!_input!.IsComplete) _input.Add(note); }
+
+    private void Submit() => _last = _session!.Answer(_input!.Value);
+
+    private void Next() { _last = null; Show(); }
+
+    private static int Right(Question<IReadOnlyList<Note>> q, IReadOnlyList<Note> given) =>
+        Enumerable.Range(0, Math.Min(given.Count, q.Answer.Count)).Count(i => given[i].MidiNumber == q.Answer[i].MidiNumber);
+
+    private string Name(Note n) => NoteNames.Format(n, State.Lang) + n.Octave;
+
+    private string Entered() => _input!.Value.Count == 0 ? Strings.T(State.Lang, "dictation.none") : string.Join(' ', _input.Value.Select(Name));
+
+    private string KeyName(KeySignature? key) =>
+        key is null ? "" : NoteNames.Format(key.Tonic, State.Lang) + (key.Mode == KeyMode.Minor ? (State.Lang == Lang.Fr ? " mineur" : " minor") : (State.Lang == Lang.Fr ? " majeur" : " major"));
+
+    private static string Abc(Question<IReadOnlyList<Note>> q, IReadOnlyList<Note> notes) => StaffAbc.FromNotes(q.Key!, notes);
+
+    private static string Alt(IReadOnlyList<Note> notes, Lang lang) =>
+        Strings.T(lang, "dictation.staff.alt", string.Join(' ', notes.Select(n => NoteNames.Format(n, lang) + n.Octave)));
+
+    private ValueTask DownloadMidi(Question<IReadOnlyList<Note>> q, int n) =>
+        Js.InvokeVoidAsync("toolboxDownload", ExportModel.FileName(Link.Seed!.Value, n, "mid"), "audio/midi", Convert.ToBase64String(ExportModel.Midi(q)));
+
+    private ValueTask DownloadXml(Question<IReadOnlyList<Note>> q, int n) =>
+        Js.InvokeVoidAsync("toolboxDownload", ExportModel.FileName(Link.Seed!.Value, n, "musicxml"), "application/vnd.recordare.musicxml+xml",
+            Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(ExportModel.MusicXml(q))));
+
+    private void Go(DrillLink l) => Nav.NavigateTo(ToolboxUrl.Build(l.ToState(State.Lang)));
+
+    private void Generate() => Go(Link with { Seed = (ulong)Random.Shared.Next(1, 1_000_000_000) });
+
+    private void OnDifficulty(ChangeEventArgs e) =>
+        Go(DrillLink.FromState(State with { Params = new Dictionary<string, string>(Link.ToState(State.Lang).Params) { ["d"] = e.Value?.ToString() ?? "" } }));
+
+    private void OnCount(ChangeEventArgs e) =>
+        Go(DrillLink.FromState(State with { Params = new Dictionary<string, string>(Link.ToState(State.Lang).Params) { ["n"] = e.Value?.ToString() ?? "" } }));
+}

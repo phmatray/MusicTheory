@@ -9,8 +9,7 @@ public static class StaffAbc
     public static string FromNotes(KeySignature key, IReadOnlyList<Note> notes)
     {
         var time = new TimeSignature(4, 4);
-        var events = notes.Select(n => new RhythmEvent([n], new Duration(DurationType.Quarter)));
-        var tune = new AbcTune(1, null, time, Rational.Of(1, 4), key, null, Measure.Split(time, events));
+        var tune = new AbcTune(1, null, time, Rational.Of(1, 4), key, null, MelodyMeasures.FromNotes(notes));
         return tune.ToString();
     }
 }

@@ -9,7 +9,7 @@ public sealed class HelpStrings : IStringTable
         ["help.title"] = "Teacher guide and privacy",
         ["help.blurb"] = "How to share an exercise with a class, and exactly what this app does with your data.",
         ["help.share.h"] = "Sharing a drill",
-        ["help.share.p"] = "Open a drill, choose a difficulty and a number of questions, then generate an exercise and use Share. "
+        ["help.share.p"] = "Open a drill (intervals, chords, scales, progressions or melodic dictation), choose a difficulty and a number of questions, then generate an exercise and use Share. "
             + "The address in your browser now holds the whole exercise: send it by message, mail or a learning platform, and every student who opens it gets the same questions.",
         ["help.seed.h"] = "What a seed is",
         ["help.seed.p"] = "The seed is a number in the address. The same seed, difficulty and count always produce the same questions, in any browser. "
@@ -24,7 +24,7 @@ public sealed class HelpStrings : IStringTable
         ["help.privacy.p"] = "The whole state of the app is in the address: the tool, the language and the settings of the exercise. "
             + "These are the parameters it can contain, computed from the tools themselves:",
         ["help.privacy.none"] = "There are no cookies, no local or session storage, no accounts, no analytics and no request to a third-party server: "
-            + "the page, its notation library and its sounds all come from the same site, and the sounds are generated in your browser. "
+            + "the page, its notation library and its sounds all come from the same site, and the sounds are generated in your browser. The export of a dictation is built in your browser and saved as a file by a local download: nothing is uploaded. "
             + "The notation library we bundle contains the addresses of downloadable instrument sounds, but the app never uses that feature, so those addresses are never contacted. "
             + "Your host (GitHub Pages) sees the page request like any website does. We state technical facts only; whether this suits your school's rules is for your school to judge.",
         ["help.verify.h"] = "Check it yourself",
@@ -37,7 +37,7 @@ public sealed class HelpStrings : IStringTable
         ["help.title"] = "Guide enseignant et confidentialité",
         ["help.blurb"] = "Comment partager un exercice avec une classe, et ce que cette application fait exactement de vos données.",
         ["help.share.h"] = "Partager un exercice",
-        ["help.share.p"] = "Ouvrez un exercice, choisissez une difficulté et un nombre de questions, générez l'exercice puis utilisez Partager. "
+        ["help.share.p"] = "Ouvrez un exercice (intervalles, accords, gammes, progressions ou dictée mélodique), choisissez une difficulté et un nombre de questions, générez l'exercice puis utilisez Partager. "
             + "L'adresse de votre navigateur contient alors tout l'exercice : envoyez-la par message, par courriel ou sur une plateforme d'apprentissage, et chaque élève qui l'ouvre obtient les mêmes questions.",
         ["help.seed.h"] = "Ce qu'est une graine",
         ["help.seed.p"] = "La graine est un nombre présent dans l'adresse. La même graine, la même difficulté et le même nombre de questions donnent toujours les mêmes questions, dans tous les navigateurs. "
@@ -52,7 +52,7 @@ public sealed class HelpStrings : IStringTable
         ["help.privacy.p"] = "Tout l'état de l'application tient dans l'adresse : l'outil, la langue et les réglages de l'exercice. "
             + "Voici les paramètres qu'elle peut contenir, calculés à partir des outils eux-mêmes :",
         ["help.privacy.none"] = "Il n'y a ni cookie, ni stockage local ou de session, ni compte, ni outil de mesure d'audience, ni requête vers un serveur tiers : "
-            + "la page, sa bibliothèque de notation et ses sons viennent tous du même site, et les sons sont produits dans votre navigateur. "
+            + "la page, sa bibliothèque de notation et ses sons viennent tous du même site, et les sons sont produits dans votre navigateur. L'export d'une dictée est construit dans votre navigateur et enregistré comme fichier par un téléchargement local : rien n'est envoyé. "
             + "La bibliothèque de notation que nous embarquons contient des adresses de sons d'instruments téléchargeables, mais l'application n'utilise jamais cette fonction : ces adresses ne sont jamais contactées. "
             + "Votre hébergeur (GitHub Pages) voit la requête de la page, comme tout site web. Nous énonçons des faits techniques uniquement : c'est à votre établissement de juger si cela convient à ses règles.",
         ["help.verify.h"] = "Vérifiez par vous-même",

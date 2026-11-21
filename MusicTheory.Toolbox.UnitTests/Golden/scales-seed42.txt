@@ -1,0 +1,3 @@
+beginner: Major NaturalMinor Major Major NaturalMinor Major NaturalMinor NaturalMinor NaturalMinor NaturalMinor
+intermediate: NaturalMinor PentatonicMinor HarmonicMinor HarmonicMinor MelodicMinor HarmonicMinor PentatonicMinor MelodicMinor PentatonicMajor PentatonicMajor
+advanced: MelodicMinor Mixolydian MelodicMinor PentatonicMinor Phrygian PentatonicMinor Locrian Dorian Lydian Phrygian
