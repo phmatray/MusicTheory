@@ -31,3 +31,4 @@ a { color: var(--sc-accent); }
 .tb-dot-root { fill: var(--sc-accent); }
 .tb-dot-label { font-size: 8px; fill: var(--sc-ink); pointer-events: none; }
 .tb-dot-label-root { fill: var(--sc-canvas); }
+.tb-dot-long { font-size: 5.5px; }

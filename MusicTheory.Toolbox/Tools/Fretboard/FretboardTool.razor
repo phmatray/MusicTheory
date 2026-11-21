@@ -14,13 +14,13 @@
     var mode = show is "scale" or "chord" ? show : "note";
     var types = FretboardModel.TypeIds(mode);
     var rootIds = new[] { "C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B" };
-    const int nutX = 44, fretW = 40, rowH = 26, top = 20;
+    const int nutX = 58, fretW = 40, rowH = 26, top = 20;
     var n = view.Strings.Count;
     var width = nutX + view.Frets * fretW + 12;
     var height = top + (n - 1) * rowH + 34;
     string Num(double v) => v.ToString("0.##", CultureInfo.InvariantCulture);
     double RowY(int s) => top + (n - 1 - s) * rowH;   // first listed string at the bottom; no pitch ordering assumed
-    double DotX(int fret) => fret == 0 ? nutX - 20 : nutX + (fret - 0.5) * fretW;
+    double DotX(int fret) => fret == 0 ? nutX - 24 : nutX + (fret - 0.5) * fretW;
 }
 <PageTitle>@Strings.T(lang, "fretboard.title") - @Strings.T(lang, "shell.title")</PageTitle>
 
@@ -94,8 +94,8 @@
     {
         <g>
             <title>@d.Label@(d.Degree is { } deg ? " (" + Strings.T(lang, "fretboard.degree", deg) + ")" : "")</title>
-            <circle cx="@Num(DotX(d.Fret))" cy="@Num(RowY(d.String))" r="10" class="@(d.IsRoot ? "tb-dot tb-dot-root" : "tb-dot")" />
-            <text x="@Num(DotX(d.Fret))" y="@Num(RowY(d.String))" text-anchor="middle" dominant-baseline="central" class="@(d.IsRoot ? "tb-dot-label tb-dot-label-root" : "tb-dot-label")">@d.Label</text>
+            <circle cx="@Num(DotX(d.Fret))" cy="@Num(RowY(d.String))" r="11" class="@(d.IsRoot ? "tb-dot tb-dot-root" : "tb-dot")" />
+            <text x="@Num(DotX(d.Fret))" y="@Num(RowY(d.String))" text-anchor="middle" dominant-baseline="central" class="@LabelClass(d)">@d.Label</text>
         </g>
     }
 </svg>
@@ -105,6 +105,9 @@
 
 @code {
     [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+
+    private static string LabelClass(FretDot d) =>
+        (d.IsRoot ? "tb-dot-label tb-dot-label-root" : "tb-dot-label") + (d.Label.Length > 3 ? " tb-dot-long" : "");
 
     private void Set(string key, string? value)
     {
