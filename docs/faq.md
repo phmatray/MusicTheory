@@ -64,6 +64,25 @@ Console.WriteLine(Note.Parse("H", NoteNotation.German));   // B4
   and `Interval.Semitones` instead.
 - The library targets .NET 11.
 
+### Since 2.0.0
+
+Changes merged to `dev` after the 2.0.0 release in `CHANGELOG.md`, so they ship in the next release.
+
+- **Rhythm break.** `Duration` is an exact sealed record on `Rational`, and `TimeSignature` is a record
+  with an exact `MeasureLength`. `Duration.Add`, `Duration.Divide` and `CompoundDuration` are removed;
+  [Measures and tempo](measures-and-tempo.md) shows what replaces them.
+- **Four new packages:** `MusicTheory.ChordPro`, `MusicTheory.Midi`, `MusicTheory.MusicXml` and
+  `MusicTheory.Abc`. See the [overview](overview.md).
+- `KeySignature.TryParse` accepts theoretical keys, and chord transposition spells by interval.
+- `ChordSymbol` parses `7sus2`, `m(maj9)`, `add#11` and the `mi` alias, and has an opt-in
+  `ChordSymbolParseOptions` for lower-case roots.
+- Transposition takes a `SuffixHandling`: `KeepUnparsed` moves the root and bass of a chord it cannot
+  parse, and `Verbatim` keeps the writer's suffix.
+- `VoicingDescriber` speaks chord names and voicing labels in French.
+- Voicings that drop a chord tone rank behind complete ones.
+- New features: tuning and temperaments, solfège, pitch-class sets, piano voicings, modulation and
+  cadence detection, ear-training drills. The [overview](overview.md) links each guide.
+
 ## Is it checked against a reference?
 
 Yes. The tests replay intervals, transpositions, scales and key signatures computed by music21, the theory
