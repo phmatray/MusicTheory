@@ -45,25 +45,23 @@ public enum ScaleType
 /// <remarks>Every scale's notes run from the tonic to the tonic an octave above, both included.</remarks>
 public sealed record Scale
 {
-    private static readonly Dictionary<ScaleType, Interval[]> Formulas = new()
+    private static Interval[] Formula(ScaleType type) => Of(type switch
     {
-        [ScaleType.Major] = Of("M2 M3 P4 P5 M6 M7"),
-        [ScaleType.Ionian] = Of("M2 M3 P4 P5 M6 M7"),
-        [ScaleType.NaturalMinor] = Of("M2 m3 P4 P5 m6 m7"),
-        [ScaleType.Aeolian] = Of("M2 m3 P4 P5 m6 m7"),
-        [ScaleType.HarmonicMinor] = Of("M2 m3 P4 P5 m6 M7"),
-        [ScaleType.MelodicMinor] = Of("M2 m3 P4 P5 M6 M7"),
-        [ScaleType.Dorian] = Of("M2 m3 P4 P5 M6 m7"),
-        [ScaleType.Phrygian] = Of("m2 m3 P4 P5 m6 m7"),
-        [ScaleType.Lydian] = Of("M2 M3 A4 P5 M6 M7"),
-        [ScaleType.Mixolydian] = Of("M2 M3 P4 P5 M6 m7"),
-        [ScaleType.Locrian] = Of("m2 m3 P4 d5 m6 m7"),
-        [ScaleType.Chromatic] = Of("A1 M2 A2 M3 P4 A4 P5 A5 M6 A6 M7"),
-        [ScaleType.WholeTone] = Of("M2 M3 A4 A5 A6"),
-        [ScaleType.Blues] = Of("m3 P4 A4 P5 m7"),
-        [ScaleType.PentatonicMajor] = Of("M2 M3 P5 M6"),
-        [ScaleType.PentatonicMinor] = Of("m3 P4 P5 m7"),
-    };
+        ScaleType.Major or ScaleType.Ionian => "M2 M3 P4 P5 M6 M7",
+        ScaleType.NaturalMinor or ScaleType.Aeolian => "M2 m3 P4 P5 m6 m7",
+        ScaleType.HarmonicMinor => "M2 m3 P4 P5 m6 M7",
+        ScaleType.MelodicMinor => "M2 m3 P4 P5 M6 M7",
+        ScaleType.Dorian => "M2 m3 P4 P5 M6 m7",
+        ScaleType.Phrygian => "m2 m3 P4 P5 m6 m7",
+        ScaleType.Lydian => "M2 M3 A4 P5 M6 M7",
+        ScaleType.Mixolydian => "M2 M3 P4 P5 M6 m7",
+        ScaleType.Locrian => "m2 m3 P4 d5 m6 m7",
+        ScaleType.Chromatic => "A1 M2 A2 M3 P4 A4 P5 A5 M6 A6 M7",
+        ScaleType.WholeTone => "M2 M3 A4 A5 A6",
+        ScaleType.Blues => "m3 P4 A4 P5 m7",
+        ScaleType.PentatonicMajor => "M2 M3 P5 M6",
+        _ => "m3 P4 P5 m7", // PentatonicMinor; the constructor rejects undefined types
+    });
 
     private static Interval[] Of(string names) =>
         $"P1 {names} P8".Split(' ').Select(Interval.Parse).ToArray();
@@ -87,14 +85,14 @@ public sealed record Scale
     }
 
     /// <summary>The intervals above the tonic, from P1 to P8.</summary>
-    public IReadOnlyList<Interval> Intervals => Formulas[Type];
+    public IReadOnlyList<Interval> Intervals => Formula(Type);
 
     /// <summary>The notes from the tonic to its octave, both included: C major is C4 D4 E4 F4 G4 A4 B4 C5.</summary>
     /// <exception cref="InvalidOperationException">A degree needs more than two accidentals (B## major).</exception>
     public IEnumerable<Note> GetNotes()
     {
         var root = Root;
-        return Formulas[Type].Select(root.Transpose).ToList();
+        return Formula(Type).Select(root.Transpose).ToList();
     }
 
     /// <summary>The same scale on a tonic transposed by <paramref name="interval"/>.</summary>

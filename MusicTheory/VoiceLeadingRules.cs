@@ -63,8 +63,9 @@ public static class VoiceLeadingRules
 
     /// <summary>Parallel perfect octaves (or compound octaves) between two voices; two unisons are not octaves.</summary>
     public static bool HasParallelOctaves(Note voice1Note1, Note voice1Note2, Note voice2Note1, Note voice2Note2) =>
+        // Parallel motion keeps the distance, so if the first interval is an octave (not a unison) so is the second.
         IsPerfect(voice1Note1, voice2Note1, 1) && IsPerfect(voice1Note2, voice2Note2, 1)
-        && !(Interval.Between(voice1Note1, voice2Note1).Number == 1 && Interval.Between(voice1Note2, voice2Note2).Number == 1)
+        && Interval.Between(voice1Note1, voice2Note1).Number > 1
         && GetMotionType(voice1Note1, voice1Note2, voice2Note1, voice2Note2) == MotionType.Parallel;
 
     /// <summary>Parallel perfect unisons between two voices.</summary>
@@ -155,8 +156,9 @@ public static class VoiceLeadingRules
             Single(HasLargeMelodicLeap(chord1[i], chord2[i]), VoiceLeadingViolationType.LargeMelodicLeap, "Large melodic leap", i);
         }
 
+        // With one voice the "outer voices" are the same voice, which never forms a fifth.
         int soprano = chord1.Length - 1;
-        if (soprano > 0 && HasHiddenFifths(chord1[0], chord2[0], chord1[soprano], chord2[soprano]))
+        if (chord1.Length > 0 && HasHiddenFifths(chord1[0], chord2[0], chord1[soprano], chord2[soprano]))
             violations.Add(new VoiceLeadingViolation(VoiceLeadingViolationType.HiddenFifths, "Hidden fifths in outer voices", (0, soprano)));
         return violations;
     }

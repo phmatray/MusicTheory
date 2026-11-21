@@ -22,7 +22,7 @@ public interface IGuitarVoicingProvider
 public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
 {
     // Common open / first-position shapes (standard tuning). Any that sound the requested chord are offered.
-    private static readonly string[] Curated =
+    private static string[] Curated() =>
     [
         "x32010", "x02220", "320003", "320033", "022100", "xx0232", "x02210", "022000", "xx0231", "133211",
         "x02020", "x21202", "x32310", "xx0212", "020100", "320001", "x02120", "x32000", "xx0222", "xx3210",
@@ -31,7 +31,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
     ];
 
     // Movable shapes as fret offsets from the root's fret on the root string (null = muted).
-    private static readonly (string Name, int RootString, int?[] Offsets)[] Movable =
+    private static (string Name, int RootString, int?[] Offsets)[] Movable() =>
     [
         ("E-form", 0, [0, 2, 2, 1, 0, 0]), ("E-form", 0, [0, 2, 2, 0, 0, 0]), ("E-form", 0, [0, 2, 0, 1, 0, 0]),
         ("E-form", 0, [0, 2, 1, 1, 0, 0]), ("E-form", 0, [0, 2, 0, 0, 0, 0]), ("E-form", 0, [0, 2, 2, 2, 0, 0]),
@@ -70,16 +70,17 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
             if (voicing is null)
                 return;
             var key = voicing.ToTab();
+            // Stryker disable once Equality: the same tab from the same source has the same difficulty, so < and <= keep the same voicing.
             if (!found.TryGetValue(key, out var existing) || voicing.Difficulty < existing.Difficulty)
                 found[key] = voicing;
         }
 
         if (tuning.Strings.Count == 6 && tuning.Strings.Select(n => n.MidiNumber).SequenceEqual(Tuning.Standard.Strings.Select(n => n.MidiNumber)))
         {
-            foreach (var tab in Curated)
+            foreach (var tab in Curated())
                 Offer(tab.Select(c => c == 'x' ? (int?)null : c - '0').ToArray(), VoicingSource.Curated, "open");
 
-            foreach (var (name, rootString, offsets) in Movable)
+            foreach (var (name, rootString, offsets) in Movable())
             {
                 int first = Mod12(chord.Root.PitchClass - tuning.Strings[rootString].MidiNumber);
                 for (int fret = first; fret <= spec.MaxFret; fret += 12)
@@ -165,6 +166,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
                 }
                 var options = new List<int?> { null };
                 // ponytail: open strings only next to low positions; a smarter reach model if mixed voicings matter.
+                // Stryker disable once Conditional: only prunes the search; TryBuild rejects a wrong bass either way.
                 if (window <= 3 && (!bassPlaced ? Pc(s, 0) == _bass : _allowed.Contains(Pc(s, 0))))
                     options.Add(0);
                 for (int f = window; f < window + _stretch && f <= MaxFret; f++)

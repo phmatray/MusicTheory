@@ -190,6 +190,7 @@ public sealed record Note
     {
         if (!Enum.IsDefined(letter))
             throw new ArgumentOutOfRangeException(nameof(letter), letter, "Undefined note name.");
+        // Stryker disable once Arithmetic: Mod12(x + 6) and Mod12(x - 6) are the same number.
         int alteration = MusicTheoryUtilities.Mod12(Semitones - MusicTheoryConstants.SemitonesFromC[(int)letter] + 6) - 6;
         if (Math.Abs(alteration) > 2)
             return null;
@@ -346,7 +347,7 @@ public sealed record Note
     }
 
     // German names, longest first so "eses" wins over "es" and "heses" over "h". H is B, B is B flat.
-    private static readonly (string Name, NoteName Letter, Alteration Alteration)[] German = new (string, NoteName, Alteration)[]
+    private static (string Name, NoteName Letter, Alteration Alteration)[] German() => new (string, NoteName, Alteration)[]
     {
         ("ceses", NoteName.C, Alteration.DoubleFlat), ("ces", NoteName.C, Alteration.Flat), ("c", NoteName.C, Alteration.Natural),
         ("cis", NoteName.C, Alteration.Sharp), ("cisis", NoteName.C, Alteration.DoubleSharp),
@@ -366,7 +367,7 @@ public sealed record Note
 
     private static bool TryParseGermanPitchClass(ReadOnlySpan<char> s, [NotNullWhen(true)] out Note? note, out int consumed)
     {
-        foreach (var (name, letter, alteration) in German)
+        foreach (var (name, letter, alteration) in German())
         {
             if (s.StartsWith(name, StringComparison.OrdinalIgnoreCase))
             {

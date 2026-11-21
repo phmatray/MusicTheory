@@ -22,19 +22,25 @@ public sealed record Tuning(string Name, IReadOnlyList<Note> Strings)
     }
 
     /// <summary>Standard tuning: E2 A2 D3 G3 B3 E4.</summary>
-    public static readonly Tuning Standard = Of("Standard", "E2", "A2", "D3", "G3", "B3", "E4");
+    public static Tuning Standard => Of("Standard", "E2", "A2", "D3", "G3", "B3", "E4");
 
     /// <summary>Drop D: D2 A2 D3 G3 B3 E4.</summary>
-    public static readonly Tuning DropD = Of("Drop D", "D2", "A2", "D3", "G3", "B3", "E4");
+    public static Tuning DropD => Of("Drop D", "D2", "A2", "D3", "G3", "B3", "E4");
 
     /// <summary>DADGAD: D2 A2 D3 G3 A3 D4.</summary>
-    public static readonly Tuning DADGAD = Of("DADGAD", "D2", "A2", "D3", "G3", "A3", "D4");
+    public static Tuning DADGAD => Of("DADGAD", "D2", "A2", "D3", "G3", "A3", "D4");
 
     /// <summary>Open G: D2 G2 D3 G3 B3 D4.</summary>
-    public static readonly Tuning OpenG = Of("Open G", "D2", "G2", "D3", "G3", "B3", "D4");
+    public static Tuning OpenG => Of("Open G", "D2", "G2", "D3", "G3", "B3", "D4");
 
     /// <summary>Half step down: Eb2 Ab2 Db3 Gb3 Bb3 Eb4.</summary>
-    public static readonly Tuning HalfStepDown = Of("Half step down", "Eb2", "Ab2", "Db3", "Gb3", "Bb3", "Eb4");
+    public static Tuning HalfStepDown => Of("Half step down", "Eb2", "Ab2", "Db3", "Gb3", "Bb3", "Eb4");
 
     private static Tuning Of(string name, params string[] notes) => new(name, notes.Select(Note.Parse).ToArray());
+
+    /// <summary>Equal when the names and the open strings, in order, are equal.</summary>
+    public bool Equals(Tuning? other) => other is not null && Name == other.Name && Strings.SequenceEqual(other.Strings);
+
+    /// <inheritdoc />
+    public override int GetHashCode() => HashCode.Combine(Name, Strings.Count, Strings[0]);
 }

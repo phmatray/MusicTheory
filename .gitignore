@@ -19,3 +19,5 @@ build.log
 
 # Coverage and test reports
 TestResults/
+StrykerOutput/
+_site/

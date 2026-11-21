@@ -1,0 +1,52 @@
+Major: B flat major over F double sharp
+Minor: B flat minor over F double sharp
+Diminished: B flat diminished over F double sharp
+Augmented: B flat augmented over F double sharp
+Major7: B flat major seven over F double sharp
+Minor7: B flat minor seven over F double sharp
+Dominant7: B flat seven over F double sharp
+MinorMajor7: B flat minor major seven over F double sharp
+HalfDiminished7: B flat half-diminished seven over F double sharp
+Diminished7: B flat diminished seven over F double sharp
+Augmented7: B flat augmented seven over F double sharp
+AugmentedMajor7: B flat augmented major seven over F double sharp
+Sus2: B flat suspended two over F double sharp
+Sus4: B flat suspended four over F double sharp
+Sus2Sus4: B flat suspended two four over F double sharp
+Dominant7Sus4: B flat seven suspended four over F double sharp
+Major6: B flat six over F double sharp
+Minor6: B flat minor six over F double sharp
+Major6Add9: B flat six nine over F double sharp
+Major9: B flat major nine over F double sharp
+Minor9: B flat minor nine over F double sharp
+Dominant9: B flat nine over F double sharp
+Major11: B flat major eleven over F double sharp
+Minor11: B flat minor eleven over F double sharp
+Dominant11: B flat eleven over F double sharp
+Major13: B flat major thirteen over F double sharp
+Minor13: B flat minor thirteen over F double sharp
+Dominant13: B flat thirteen over F double sharp
+MajorAdd9: B flat add nine over F double sharp
+MinorAdd9: B flat minor add nine over F double sharp
+MajorAdd11: B flat add eleven over F double sharp
+MinorAdd11: B flat minor add eleven over F double sharp
+Dominant7Flat5: B flat seven flat five over F double sharp
+Dominant7Sharp5: B flat seven sharp five over F double sharp
+Dominant7Flat9: B flat seven flat nine over F double sharp
+Dominant7Sharp9: B flat seven sharp nine over F double sharp
+Dominant7Flat5Flat9: B flat seven flat five flat nine over F double sharp
+Dominant7Flat5Sharp9: B flat seven flat five sharp nine over F double sharp
+Dominant7Sharp5Flat9: B flat seven sharp five flat nine over F double sharp
+Dominant7Sharp5Sharp9: B flat seven sharp five sharp nine over F double sharp
+Dominant7Alt: B flat seven altered over F double sharp
+Power5: B flat five over F double sharp
+Natural: E major
+Sharp: E sharp major
+DoubleSharp: E double sharp major
+DoubleFlat: E double flat major
+Flat: E flat major
+Standard: E2 A2 D3 G3 B3 E4
+Drop D: D2 A2 D3 G3 B3 E4
+DADGAD: D2 A2 D3 G3 A3 D4
+Open G: D2 G2 D3 G3 B3 D4
+Half step down: Eb2 Ab2 Db3 Gb3 Bb3 Eb4

@@ -51,7 +51,9 @@ public sealed record KeySignature
         Mode = mode;
         AccidentalCount = PositionOf(tonic, mode);
         if (Math.Abs(AccidentalCount) > 14)
+            // Stryker disable once Equality: the count is beyond ±14 here, never 0, so > and >= agree.
             throw new ArgumentOutOfRangeException(nameof(tonic), tonic, $"{ToString()} needs {Math.Abs(AccidentalCount)} {(AccidentalCount > 0 ? "sharps" : "flats")}; at most 14 (two per note) are supported.");
+        // Stryker disable once Equality: with no accidentals nothing is taken from either order, so >= and > agree.
         var order = AccidentalCount >= 0 ? SharpOrder : FlatOrder;
         AlteredNotes = order.Take(Math.Min(Math.Abs(AccidentalCount), 7)).ToList();
     }

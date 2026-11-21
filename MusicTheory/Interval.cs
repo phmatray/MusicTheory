@@ -140,13 +140,13 @@ public sealed record Interval
 
     /// <summary>The same interval in the other direction; a unison mirrors instead (A1 ↔ d1, P1 stays).</summary>
     public Interval Reverse() => Number == 1
-        ? new Interval(IntervalQuality.Perfect - (Quality - IntervalQuality.Perfect), 1)
+        ? new Interval(Mirror(Quality), 1)
         : new Interval(Quality, Number, Direction == Direction.Up ? Direction.Down : Direction.Up);
 
     /// <summary>
     /// The interval reduced to an octave or less, keeping quality and direction: M9 → M2, P15 → P8, P8 stays.
     /// </summary>
-    public Interval ToSimple() => Number <= 8 ? this : new Interval(Quality, (Number - 2) % 7 + 2, Direction);
+    public Interval ToSimple() => new(Quality, (Number - 2) % 7 + 2, Direction);
 
     /// <summary>
     /// The inversion, keeping direction: the numbers add up to 9 and the quality mirrors (M ↔ m, A ↔ d,
@@ -155,10 +155,7 @@ public sealed record Interval
     public Interval Invert()
     {
         int number = 9 - ToSimple().Number;
-        var quality = IsPerfectNumber(number)
-            ? IntervalQuality.Perfect - (Quality - IntervalQuality.Perfect)
-            : MirrorImperfect(Quality);
-        return new Interval(quality, number, number == 1 ? Direction.Up : Direction);
+        return new Interval(Mirror(Quality), number, number == 1 ? Direction.Up : Direction);
     }
 
     /// <summary>True when both intervals move by the same number of semitones in the same direction (A4 and d5).</summary>
@@ -181,7 +178,8 @@ public sealed record Interval
         int letters = 0;
         while (letters < s.Length && s[letters] is 'P' or 'M' or 'm' or 'd' or 'A')
             letters++;
-        int quality = Array.IndexOf(Abbreviations, s[..letters].ToString());
+        var abbreviation = s[..letters].ToString();
+        int quality = Array.FindIndex(Enum.GetValues<IntervalQuality>(), q => Abbreviation(q) == abbreviation);
         if (quality < 0)
             return false;
 
@@ -209,20 +207,22 @@ public sealed record Interval
     /// <summary>Semitones with the direction's sign: 4 for M3, −4 for M-3, −1 for d1.</summary>
     public int DirectedSemitones => Direction == Direction.Down ? -Semitones : Semitones;
 
-    private static readonly string[] Abbreviations =
-        ["ddddd", "dddd", "ddd", "dd", "d", "m", "P", "M", "A", "AA", "AAA", "AAAA", "AAAAA"];
-
-    private static string Abbreviation(IntervalQuality quality) => Abbreviations[(int)quality];
+    // d, m, P, M, A with the d or A repeated for each further degree.
+    private static string Abbreviation(IntervalQuality quality) => quality switch
+    {
+        IntervalQuality.Minor => "m",
+        IntervalQuality.Perfect => "P",
+        IntervalQuality.Major => "M",
+        < IntervalQuality.Minor => new string('d', IntervalQuality.Minor - quality),
+        _ => new string('A', quality - IntervalQuality.Major),
+    };
 
     internal static bool IsPerfectNumber(int number) => ((number - 1) % 7) is 0 or 3 or 4;
 
-    private static IntervalQuality MirrorImperfect(IntervalQuality quality) => quality switch
-    {
-        IntervalQuality.Minor => IntervalQuality.Major,
-        IntervalQuality.Major => IntervalQuality.Minor,
-        // Diminished (−1 below minor) mirrors augmented (+1 above major), and so on outward.
-        _ => (IntervalQuality)((int)IntervalQuality.Minor + (int)IntervalQuality.Major - (int)quality),
-    };
+    // The enum is symmetric around Perfect (and Minor/Major around it), so mirroring is one subtraction:
+    // M <-> m, A <-> d, AA <-> dd, P stays.
+    private static IntervalQuality Mirror(IntervalQuality quality) =>
+        (IntervalQuality)(2 * (int)IntervalQuality.Perfect - (int)quality);
 
     /// <summary>The quality of a number spanning <paramref name="semitones"/>.</summary>
     private static IntervalQuality QualityOf(int number, int semitones)

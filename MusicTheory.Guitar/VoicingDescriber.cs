@@ -17,14 +17,13 @@ public static class VoicingDescriber
         return c.Bass is null ? name : $"{name} over {NoteName(c.Bass)}";
     }
 
-    private static string NoteName(Note n) => n.Name + Accidentals[(int)n.Alteration + 2];
+    private static string NoteName(Note n) =>
+        n.Name + new[] { " double flat", " flat", "", " sharp", " double sharp" }[(int)n.Alteration + 2];
 
-    private static readonly string[] Accidentals = [" double flat", " flat", "", " sharp", " double sharp"];
+    private static string TypeName(ChordType t) => TypeNames()[t];
 
-    private static string TypeName(ChordType t) => TypeNames[t];
-
-    // Every ChordType, spoken; VoicingDescriberTests checks none is missing.
-    private static readonly Dictionary<ChordType, string> TypeNames = new()
+    // Every ChordType, spoken; GuitarValueTests checks each one. Built per call: a describer is not hot.
+    private static Dictionary<ChordType, string> TypeNames() => new()
     {
         [ChordType.Major] = "major",
         [ChordType.Minor] = "minor",
