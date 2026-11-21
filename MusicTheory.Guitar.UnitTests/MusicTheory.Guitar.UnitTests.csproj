@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../MusicTheory.Guitar/MusicTheory.Guitar.csproj" />
+    <ProjectReference Include="../MusicTheory.Guitar.Blazor/MusicTheory.Guitar.Blazor.csproj" />
   </ItemGroup>
 
 </Project>

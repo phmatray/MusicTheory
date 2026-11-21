@@ -48,9 +48,16 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
     ];
 
     /// <inheritdoc />
+    /// <exception cref="ArgumentNullException"><paramref name="chord"/> is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">A negative capo, or a max fret, stretch or count below 1.</exception>
     public IReadOnlyList<GuitarVoicing> GetVoicings(ChordSymbol chord, VoicingOptions? options = null)
     {
+        ArgumentNullException.ThrowIfNull(chord);
         options ??= new VoicingOptions();
+        ArgumentOutOfRangeException.ThrowIfNegative(options.Capo, nameof(options.Capo));
+        ArgumentOutOfRangeException.ThrowIfLessThan(options.MaxFret, 1, nameof(options.MaxFret));
+        ArgumentOutOfRangeException.ThrowIfLessThan(options.MaxStretch, 1, nameof(options.MaxStretch));
+        ArgumentOutOfRangeException.ThrowIfLessThan(options.Max, 1, nameof(options.Max));
         var tuning = options.Tuning ?? Tuning.Standard;
         if (!options.IncludeSlashBass)
             chord = chord with { Bass = null };
@@ -175,7 +182,7 @@ public sealed class GuitarVoicingProvider : IGuitarVoicingProvider
 
         public GuitarVoicing? TryBuild(int?[] frets, VoicingSource source, string? shape)
         {
-            if (frets.Length != _open.Length || frets.Any(f => f < 0 || f > MaxFret))
+            if (frets.Any(f => f < 0 || f > MaxFret))
                 return null;
             var sounding = Enumerable.Range(0, frets.Length).Where(s => frets[s] is not null).ToList();
             if (sounding.Count < 3)
