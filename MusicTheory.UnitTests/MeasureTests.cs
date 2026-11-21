@@ -41,6 +41,15 @@ public class MeasureTests
         Should.Throw<ArgumentException>(() => new Measure(TimeSignature.CommonTime, [], Rational.Of(n, d)));
 
     [Fact]
+    public void Events_AreCopied()
+    {
+        var list = new List<RhythmEvent> { Ev(DurationType.Quarter) };
+        var m = new Measure(TimeSignature.CommonTime, list);
+        list.Add(Ev(DurationType.Whole));
+        m.Events.Count.ShouldBe(1);
+    }
+
+    [Fact]
     public void NullArguments_Throw()
     {
         Should.Throw<ArgumentNullException>(() => new Measure(null!, []));
@@ -67,5 +76,6 @@ public class MeasureTests
         var moved = Ev(DurationType.Quarter) with { Pitches = [Note.Parse("D4")], Duration = new Duration(DurationType.Half) };
         moved.Pitches.ShouldBe([Note.Parse("D4")]);
         moved.Duration.Value.ShouldBe(Rational.Of(1, 2));
+        Should.Throw<ArgumentException>(() => (Ev(DurationType.Quarter) with { TiedToNext = true }) with { Pitches = [] });
     }
 }

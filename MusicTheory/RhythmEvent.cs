@@ -7,7 +7,7 @@ namespace MusicTheory;
 public sealed record RhythmEvent(IReadOnlyList<Note> Pitches, Duration Duration, bool TiedToNext = false)
 {
     /// <summary>The sounding notes; empty for a rest.</summary>
-    public IReadOnlyList<Note> Pitches { get; init => field = value ?? throw new ArgumentNullException(nameof(Pitches)); } =
+    public IReadOnlyList<Note> Pitches { get; init => field = CheckPitches(value ?? throw new ArgumentNullException(nameof(Pitches)), TiedToNext); } =
         Pitches ?? throw new ArgumentNullException(nameof(Pitches));
 
     /// <summary>How long the event lasts.</summary>
@@ -29,6 +29,9 @@ public sealed record RhythmEvent(IReadOnlyList<Note> Pitches, Duration Duration,
     /// <param name="duration">The rest's duration.</param>
     /// <returns>A rest event.</returns>
     public static RhythmEvent Rest(Duration duration) => new([], duration);
+
+    private static IReadOnlyList<Note> CheckPitches(IReadOnlyList<Note> pitches, bool tied) =>
+        tied && pitches.Count == 0 ? throw new ArgumentException("A rest cannot be tied.", nameof(TiedToNext)) : pitches;
 
     private static bool CheckTie(IReadOnlyList<Note> pitches, bool tied) =>
         tied && pitches.Count == 0 ? throw new ArgumentException("A rest cannot be tied.", nameof(TiedToNext)) : tied;

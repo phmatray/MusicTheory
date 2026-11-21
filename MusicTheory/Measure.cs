@@ -13,14 +13,14 @@ public sealed record Measure
         ArgumentNullException.ThrowIfNull(timeSignature);
         ArgumentNullException.ThrowIfNull(events);
         TimeSignature = timeSignature;
-        Events = events;
+        Events = events.ToArray();
         Capacity = capacity ?? timeSignature.MeasureLength;
         if (Capacity <= Rational.Zero || Capacity > timeSignature.MeasureLength)
             throw new ArgumentException($"Capacity {Capacity} must be above 0 and at most {timeSignature.MeasureLength} for {timeSignature}.", nameof(capacity));
 
         var onsets = new List<Rational>();
         var filled = Rational.Zero;
-        foreach (var e in events)
+        foreach (var e in Events)
         {
             onsets.Add(filled);
             filled += e.Duration.Value;
@@ -59,12 +59,15 @@ public sealed record Measure
     /// <param name="timeSignature">The time signature of every bar.</param>
     /// <param name="events">The events, in order.</param>
     /// <param name="pickup">The first bar's capacity, for an anacrusis.</param>
-    /// <returns>The measures; only the last may be incomplete.</returns>
+    /// <returns>The measures; apart from a pickup bar at the start, only the last may be incomplete.</returns>
     /// <exception cref="ArgumentException">A tuplet event crosses a barline.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The pickup is not in (0, bar length].</exception>
     public static IReadOnlyList<Measure> Split(TimeSignature timeSignature, IEnumerable<RhythmEvent> events, Rational? pickup = null)
     {
         ArgumentNullException.ThrowIfNull(timeSignature);
         ArgumentNullException.ThrowIfNull(events);
+        if (pickup is { } p && (p <= Rational.Zero || p > timeSignature.MeasureLength))
+            throw new ArgumentOutOfRangeException(nameof(pickup), pickup, $"Pickup must be above 0 and at most {timeSignature.MeasureLength}.");
         var bars = new List<Measure>();
         var current = new List<RhythmEvent>();
         var capacity = pickup ?? timeSignature.MeasureLength;

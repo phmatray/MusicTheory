@@ -41,6 +41,12 @@ public class MeasureSplitTests
         Should.Throw<ArgumentException>(() => Measure.Split(TimeSignature.CommonTime,
             [N(C4, D(DurationType.Half, 1)), N(C4, D(DurationType.Eighth)), N(C4, Duration.CreateTuplet(DurationType.Quarter, 3, 2))]));
 
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(5, 4)]
+    public void BadPickup_Throws(long n, long d) =>
+        Should.Throw<ArgumentOutOfRangeException>(() => Measure.Split(TimeSignature.CommonTime, [], Rational.Of(n, d)));
+
     [Fact]
     public void TupletInsideBar_Fits() =>
         Measure.Split(TimeSignature.CommonTime, [N(C4, Duration.CreateTuplet(DurationType.Quarter, 3, 2))]).Count.ShouldBe(1);
