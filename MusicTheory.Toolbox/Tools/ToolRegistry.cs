@@ -21,6 +21,8 @@ public static class ToolRegistry
         new("fretboard", "fretboard.title", typeof(Fretboard.FretboardTool)),
         new("analysis", "analysis.title", typeof(AnalysisTool)),
         new("intervals", "intervals.title", typeof(IntervalDrillTool)),
+        new("voicings", "voicings.title", typeof(Voicings.VoicingsTool)),
+        new("piano", "piano.title", typeof(Piano.PianoTool)),
     ];
 
     public static ToolInfo? Find(string id) => All.FirstOrDefault(t => t.Id == id);

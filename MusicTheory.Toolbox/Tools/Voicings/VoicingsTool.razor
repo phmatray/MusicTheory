@@ -1,0 +1,133 @@
+@using System.Globalization
+@using MusicTheory.Guitar
+@using MusicTheory.Guitar.Blazor
+@using MusicTheory.Toolbox.Tools.Fretboard
+@inject NavigationManager Nav
+@inject ChordAudio Audio
+@{
+    var lang = State.Lang;
+    State.Params.TryGetValue("chord", out var chord);
+    State.Params.TryGetValue("tuning", out var tuning);
+    var view = VoicingsModel.For(chord, tuning, lang);
+    const double sx = 18, sy = 22, ox = 26, oy = 26;
+    var options = new DiagramOptions(4, sx, sy);
+    string Num(double v) => v.ToString("0.##", CultureInfo.InvariantCulture);
+}
+<PageTitle>@Strings.T(lang, "voicings.title") - @Strings.T(lang, "shell.title")</PageTitle>
+
+<h1>@Strings.T(lang, "voicings.title")</h1>
+<p>@Strings.T(lang, "voicings.blurb")</p>
+@if (view.Notice is not null)
+{
+    <p class="tb-notice" role="status">@view.Notice</p>
+}
+
+<div class="tb-controls">
+    <label>@Strings.T(lang, "voicings.chord")
+        <input type="text" value="@view.ChordText" spellcheck="false" autocapitalize="off" @onchange='e => Set("chord", e.Value?.ToString())' />
+    </label>
+    <label>@Strings.T(lang, "voicings.tuning")
+        <select @onchange='e => Set("tuning", e.Value?.ToString())'>
+            @foreach (var t in TuningPresets.All)
+            {
+                <option value="@t.Id" selected="@(t.Id == view.Tuning.Id)">@(lang == Lang.Fr ? t.Fr : t.En)</option>
+            }
+        </select>
+    </label>
+</div>
+
+@if (view.Error is not null)
+{
+    <p class="tb-notice" role="alert">@view.Error</p>
+}
+else if (view.Cards.Count == 0)
+{
+    <p class="tb-notice" role="status">@Strings.T(lang, "voicings.empty")</p>
+}
+else
+{
+    <div class="tb-voicings">
+        @foreach (var c in view.Cards)
+        {
+            var l = ChordDiagramLayout.For(c.Voicing, options, view.Tuning.Tuning);
+            var w = l.Width + 2 * ox;
+            var h = l.Height + oy + 12;
+            <figure class="tb-voicing">
+                <svg viewBox="0 0 @Num(w) @Num(h)" role="img" aria-label="@Strings.T(lang, "voicings.diagram", c.Tab)">
+                    <g transform="translate(@Num(ox) @Num(oy))">
+                        @foreach (var m in l.Markers)
+                        {
+                            if (m.Kind == MarkerKind.Open)
+                            {
+                                <circle class="tb-vo-open" cx="@Num(m.X)" cy="@Num(m.Y)" r="4"><title>@Strings.T(lang, "voicings.open")</title></circle>
+                            }
+                            else
+                            {
+                                <g><text class="tb-vo-muted" x="@Num(m.X)" y="@Num(m.Y)" text-anchor="middle" dominant-baseline="central"><title>@Strings.T(lang, "voicings.muted")</title>x</text></g>
+                            }
+                        }
+                        @foreach (var f in l.FretLines)
+                        {
+                            <line class="@(l.ShowNut && f == l.FretLines[0] ? "tb-nut" : "tb-fret")" x1="@Num(f.X1)" x2="@Num(f.X2)" y1="@Num(f.Y1)" y2="@Num(f.Y2)" />
+                        }
+                        @foreach (var s in l.Strings)
+                        {
+                            <line class="tb-string" x1="@Num(s.X1)" x2="@Num(s.X2)" y1="@Num(s.Y1)" y2="@Num(s.Y2)" />
+                        }
+                        @if (l.PositionLabel is { } pos)
+                        {
+                            <g><text class="tb-vo-pos" x="@Num(-8)" y="@Num(sy / 2)" text-anchor="end" dominant-baseline="central">@pos</text></g>
+                        }
+                        @if (l.Barre is { } b)
+                        {
+                            <line class="tb-vo-barre" x1="@Num(b.X1)" x2="@Num(b.X2)" y1="@Num(b.Y)" y2="@Num(b.Y)" />
+                        }
+                        @foreach (var d in l.Dots)
+                        {
+                            <circle class="tb-dot tb-dot-root" cx="@Num(d.X)" cy="@Num(d.Y)" r="7"><title>@d.NoteName</title></circle>
+                            @if (d.Finger is { } fg)
+                            {
+                                <g><text class="tb-dot-label tb-dot-label-root" x="@Num(d.X)" y="@Num(d.Y)" text-anchor="middle" dominant-baseline="central">@fg</text></g>
+                            }
+                        }
+                    </g>
+                </svg>
+                <figcaption>
+                    <strong>@c.Shape</strong>
+                    <span>@Strings.T(lang, "voicings.tab"): <code>@c.Tab</code></span>
+                    @if (c.Voicing.Barre is { } bar)
+                    {
+                        <span>@Strings.T(lang, "voicings.barre.detail", bar.Fret)</span>
+                    }
+                    @if (c.Voicing.BaseFret > 1)
+                    {
+                        <span>@Strings.T(lang, "voicings.fromfret", c.Voicing.BaseFret)</span>
+                    }
+                    <button type="button" @onclick="() => Play(c.Voicing, view.Tuning.Tuning)">@Strings.T(lang, "voicings.play")</button>
+                </figcaption>
+            </figure>
+        }
+    </div>
+}
+
+<Understand Lang="lang" TextKey="voicings.understand" />
+
+@code {
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+
+    private async Task Play(GuitarVoicing voicing, Tuning tuning)
+    {
+        try { await Audio.PlayAsync(voicing, tuning); }
+        catch (Microsoft.JSInterop.JSException)
+        {
+            // No audio in this browser: the button does nothing rather than break the page.
+        }
+    }
+
+    private void Set(string key, string? value)
+    {
+        var next = new Dictionary<string, string>(State.Params);
+        if (string.IsNullOrWhiteSpace(value)) next.Remove(key); else next[key] = value.Trim();
+        Nav.NavigateTo(ToolboxUrl.Build(State with { Params = next }));
+    }
+}
