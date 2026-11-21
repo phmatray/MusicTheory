@@ -242,16 +242,14 @@ public sealed record Note
     /// The usual alternative spelling of this pitch: C# ↔ Db, E ↔ Fb, B# → C, C## → D, Cbb → Bb.
     /// Null for D, G and A, which have no common alternative.
     /// </summary>
-    public Note? GetEnharmonicEquivalent() => (Name, Alteration) switch
+    public Note? GetEnharmonicEquivalent()
     {
-        (NoteName.D or NoteName.G or NoteName.A, Alteration.Natural) => null,
-        (_, Alteration.Sharp) when Name is not (NoteName.E or NoteName.B) => Respell(Next(Name)),
-        (_, Alteration.Flat) when Name is not (NoteName.F or NoteName.C) => Respell(Previous(Name)),
-        (NoteName.E or NoteName.B, Alteration.Natural) => Respell(Next(Name)),
-        (NoteName.F or NoteName.C, Alteration.Natural) => Respell(Previous(Name)),
-        (_, Alteration.Sharp or Alteration.DoubleSharp) => Respell(Next(Name)),
-        _ => Respell(Previous(Name)),
-    };
+        if (Alteration == Alteration.Natural && Name is NoteName.D or NoteName.G or NoteName.A)
+            return null;
+        // Sharps, E and B move to the next letter (C# -> Db, E -> Fb); flats, F and C to the previous one.
+        bool next = Alteration > 0 || (Alteration == Alteration.Natural && Name is NoteName.E or NoteName.B);
+        return Respell(next ? (NoteName)(((int)Name + 1) % 7) : (NoteName)(((int)Name + 6) % 7));
+    }
 
     /// <summary>Every other spelling of this pitch with at most two accidentals: C4 gives B#3 and Dbb4.</summary>
     public IEnumerable<Note> GetAllEnharmonicEquivalents() =>
@@ -261,11 +259,13 @@ public sealed record Note
     /// The plainest spelling: double accidentals and E#, Fb, B#, Cb become their natural or single-accidental
     /// equivalent; every other note is returned as is.
     /// </summary>
-    public Note SimplifyEnharmonic() =>
-        Alteration is Alteration.DoubleSharp or Alteration.DoubleFlat
-        || (Name, Alteration) is (NoteName.E or NoteName.B, Alteration.Sharp) or (NoteName.F or NoteName.C, Alteration.Flat)
-            ? GetEnharmonicEquivalent() ?? this
-            : this;
+    public Note SimplifyEnharmonic()
+    {
+        bool awkward = Math.Abs((int)Alteration) == 2
+            || (Alteration == Alteration.Sharp && Name is NoteName.E or NoteName.B)
+            || (Alteration == Alteration.Flat && Name is NoteName.F or NoteName.C);
+        return awkward ? GetEnharmonicEquivalent() ?? this : this;
+    }
 
     /// <summary>
     /// Parses a note in English notation: a letter in any case, up to two accidentals in ASCII (<c>#</c>,
@@ -299,7 +299,7 @@ public sealed record Note
             note = pitch;
             return true;
         }
-        if (!int.TryParse(s[consumed..], System.Globalization.NumberStyles.AllowLeadingSign,
+        if (s[consumed] == '+' || !int.TryParse(s[consumed..], System.Globalization.NumberStyles.AllowLeadingSign,
                 System.Globalization.CultureInfo.InvariantCulture, out var octave) || octave is < MinOctave or > MaxOctave)
             return false;
         note = new Note(pitch.Name, pitch.Alteration, octave);
@@ -345,32 +345,24 @@ public sealed record Note
         return true;
     }
 
-    // German names, longest first so "eses" wins over "es" and "heses" over "h".
-    private static readonly (string Name, NoteName Letter, Alteration Alteration)[] German = BuildGerman();
-
-    private static (string, NoteName, Alteration)[] BuildGerman()
+    // German names, longest first so "eses" wins over "es" and "heses" over "h". H is B, B is B flat.
+    private static readonly (string Name, NoteName Letter, Alteration Alteration)[] German = new (string, NoteName, Alteration)[]
     {
-        var names = new List<(string, NoteName, Alteration)>
-        {
-            ("heses", NoteName.B, Alteration.DoubleFlat), ("hes", NoteName.B, Alteration.Flat),
-            ("asas", NoteName.A, Alteration.DoubleFlat), ("eses", NoteName.E, Alteration.DoubleFlat),
-            ("as", NoteName.A, Alteration.Flat), ("es", NoteName.E, Alteration.Flat),
-            ("h", NoteName.B, Alteration.Natural), ("b", NoteName.B, Alteration.Flat),
-        };
-        foreach (var (letter, name) in new[] { ('c', NoteName.C), ('d', NoteName.D), ('e', NoteName.E), ('f', NoteName.F), ('g', NoteName.G), ('a', NoteName.A), ('h', NoteName.B) })
-        {
-            names.Add(($"{letter}isis", name, Alteration.DoubleSharp));
-            names.Add(($"{letter}is", name, Alteration.Sharp));
-            if (letter is not ('e' or 'a' or 'h'))
-            {
-                names.Add(($"{letter}eses", name, Alteration.DoubleFlat));
-                names.Add(($"{letter}es", name, Alteration.Flat));
-            }
-            if (letter != 'h')
-                names.Add(($"{letter}", name, Alteration.Natural));
-        }
-        return names.OrderByDescending(n => n.Item1.Length).ToArray();
-    }
+        ("ceses", NoteName.C, Alteration.DoubleFlat), ("ces", NoteName.C, Alteration.Flat), ("c", NoteName.C, Alteration.Natural),
+        ("cis", NoteName.C, Alteration.Sharp), ("cisis", NoteName.C, Alteration.DoubleSharp),
+        ("deses", NoteName.D, Alteration.DoubleFlat), ("des", NoteName.D, Alteration.Flat), ("d", NoteName.D, Alteration.Natural),
+        ("dis", NoteName.D, Alteration.Sharp), ("disis", NoteName.D, Alteration.DoubleSharp),
+        ("eses", NoteName.E, Alteration.DoubleFlat), ("es", NoteName.E, Alteration.Flat), ("e", NoteName.E, Alteration.Natural),
+        ("eis", NoteName.E, Alteration.Sharp), ("eisis", NoteName.E, Alteration.DoubleSharp),
+        ("feses", NoteName.F, Alteration.DoubleFlat), ("fes", NoteName.F, Alteration.Flat), ("f", NoteName.F, Alteration.Natural),
+        ("fis", NoteName.F, Alteration.Sharp), ("fisis", NoteName.F, Alteration.DoubleSharp),
+        ("geses", NoteName.G, Alteration.DoubleFlat), ("ges", NoteName.G, Alteration.Flat), ("g", NoteName.G, Alteration.Natural),
+        ("gis", NoteName.G, Alteration.Sharp), ("gisis", NoteName.G, Alteration.DoubleSharp),
+        ("asas", NoteName.A, Alteration.DoubleFlat), ("as", NoteName.A, Alteration.Flat), ("a", NoteName.A, Alteration.Natural),
+        ("ais", NoteName.A, Alteration.Sharp), ("aisis", NoteName.A, Alteration.DoubleSharp),
+        ("heses", NoteName.B, Alteration.DoubleFlat), ("hes", NoteName.B, Alteration.Flat), ("b", NoteName.B, Alteration.Flat),
+        ("h", NoteName.B, Alteration.Natural), ("his", NoteName.B, Alteration.Sharp), ("hisis", NoteName.B, Alteration.DoubleSharp),
+    }.OrderByDescending(n => n.Item1.Length).ToArray();
 
     private static bool TryParseGermanPitchClass(ReadOnlySpan<char> s, [NotNullWhen(true)] out Note? note, out int consumed)
     {
@@ -401,8 +393,4 @@ public sealed record Note
             throw new InvalidOperationException($"{what()} needs {Math.Abs(alteration)} {(alteration > 0 ? "sharps" : "flats")} on {(NoteName)letter}; at most two are supported.");
         return new Note((NoteName)letter, (Alteration)alteration, octave);
     }
-
-    private static NoteName Next(NoteName n) => (NoteName)(((int)n + 1) % 7);
-
-    private static NoteName Previous(NoteName n) => (NoteName)(((int)n + 6) % 7);
 }

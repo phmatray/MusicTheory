@@ -28,8 +28,7 @@ public class TimeSignature : IEquatable<TimeSignature>
     /// <summary>
     /// Gets whether this is a complex (odd/irregular) time signature.
     /// </summary>
-    public bool IsComplex => Numerator == 5 || Numerator == 7 || Numerator == 11 || 
-                            (Numerator > 4 && !IsCompound && Numerator % 2 != 0);
+    public bool IsComplex => Numerator > 4 && Numerator % 2 != 0 && !IsCompound;
 
     /// <summary>
     /// Common time (4/4).

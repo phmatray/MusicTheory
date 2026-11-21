@@ -6,7 +6,8 @@
 music21 (MIT Lab, BSD) is the reference implementation of spelled music theory. The tables are
 committed so the tests need neither Python nor network. Spellings use MusicTheory's syntax:
 b/bb for flats, #/## for sharps. Rows music21 cannot express (beyond quadruple
-augmented/diminished) are skipped here and covered by MusicTheory's own tests.
+augmented/diminished, or that music21 wraps inconsistently around the octave) are skipped here and
+covered by MusicTheory's own tests.
 """
 import csv
 import itertools
@@ -49,6 +50,10 @@ def intervals():
             try:
                 i = interval.Interval(start, end)
                 name = i.directedName
+                # Past quadruple, music21 wraps the quality around the octave (B##4 -> Fbb5 comes out
+                # as AAAA5 of 2 semitones). Keep only rows music21 itself reads back consistently.
+                if interval.Interval(name).semitones != i.semitones:
+                    continue
             except interval.IntervalException:
                 continue
             rows.append([f"{l1}{OURS[a1]}4", f"{l2}{OURS[a2]}{o2}", name, i.semitones])

@@ -39,13 +39,13 @@ public sealed record ChordSymbolStyle(AccidentalStyle Accidentals, bool UseJazzG
 public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null, IReadOnlyList<Interval>? Tensions = null)
 {
     /// <summary>The root.</summary>
-    public Note Root { get; init => field = value ?? throw new ArgumentNullException(nameof(Root)); } = Root;
+    public Note Root { get; init => field = value ?? throw new ArgumentNullException(nameof(Root)); } = Root ?? throw new ArgumentNullException(nameof(Root));
 
     /// <summary>The chord type.</summary>
-    public ChordType Type { get; init => field = ChordTypes.Checked(value, nameof(Type)); } = Type;
+    public ChordType Type { get; init => field = ChordTypes.Checked(value, nameof(Type)); } = ChordTypes.Checked(Type, nameof(Type));
 
     /// <summary>The tensions, never null (empty when there are none).</summary>
-    public IReadOnlyList<Interval> Tensions { get; init => field = CheckTensions(value); } = Tensions ?? [];
+    public IReadOnlyList<Interval> Tensions { get; init => field = CheckTensions(value); } = CheckTensions(Tensions);
 
     // Tension text (ASCII, lower case) → interval. Altered tensions are written inline, natural ones with "add".
     private static readonly Dictionary<string, Interval> TensionNames = new()
@@ -56,11 +56,14 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null, I
         ["b13"] = Interval.Parse("m13"), ["13"] = Interval.Parse("M13"),
     };
 
+    /// <summary>True for the intervals a symbol can carry as tensions: b5 #5 b9 9 #9 11 #11 b13 13.</summary>
+    internal static bool IsTension(Interval interval) => TensionNames.ContainsValue(interval);
+
     private static IReadOnlyList<Interval> CheckTensions(IReadOnlyList<Interval>? tensions)
     {
         var list = (tensions ?? []).ToArray();
         foreach (var t in list)
-            if (t is null || !TensionNames.ContainsValue(t))
+            if (t is null || !IsTension(t))
                 throw new ArgumentException($"Not a chord tension: {t?.ToString() ?? "null"}. Use b5, #5, b9, 9, #9, 11, #11, b13 or 13.", nameof(Tensions));
         return list;
     }
@@ -254,16 +257,9 @@ public sealed record ChordSymbol(Note Root, ChordType Type, Note? Bass = null, I
     private static bool SameSpelling(Note a, Note b) => a.Name == b.Name && a.Alteration == b.Alteration;
 
     /// <summary>Note name without octave, e.g. <c>Bb</c> or <c>B♭</c>.</summary>
-    internal static string Spell(Note note, AccidentalStyle style) => note.Name + (style, note.Alteration) switch
-    {
-        (_, Alteration.Natural) => "",
-        (AccidentalStyle.Ascii, Alteration.Flat) => "b",
-        (AccidentalStyle.Ascii, Alteration.DoubleFlat) => "bb",
-        (AccidentalStyle.Ascii, Alteration.Sharp) => "#",
-        (AccidentalStyle.Ascii, Alteration.DoubleSharp) => "##",
-        (_, Alteration.Flat) => "♭",
-        (_, Alteration.DoubleFlat) => "𝄫",
-        (_, Alteration.Sharp) => "♯",
-        _ => "𝄪",
-    };
+    internal static string Spell(Note note, AccidentalStyle style) =>
+        note.Name + (style == AccidentalStyle.Unicode ? UnicodeAccidentals : AsciiAccidentals)[(int)note.Alteration + 2];
+
+    private static readonly string[] AsciiAccidentals = ["bb", "b", "", "#", "##"];
+    private static readonly string[] UnicodeAccidentals = ["𝄫", "♭", "", "♯", "𝄪"];
 }

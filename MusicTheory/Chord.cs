@@ -325,15 +325,34 @@ public sealed record Chord
         return root is null ? null : new Chord(root, Type, _extensions, Inversion);
     }
 
-    /// <summary>The chord as a lead-sheet symbol, with its extensions and slash bass.</summary>
+    /// <summary>
+    /// The chord as a lead-sheet symbol with its slash bass. Extensions that turn the chord into another
+    /// type are folded into it (a triad plus a minor 7th is <c>C7</c>, C7 plus a ♭9 is <c>C7b9</c>); the rest
+    /// become tensions (<c>C7#11</c>).
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The extensions are not lead-sheet tensions (an added
+    /// 2nd, say); <see cref="Intervals"/> still describes the chord.</exception>
     public ChordSymbol ToChordSymbol() =>
-        new(Root, Type, Inversion == ChordInversion.Root ? null : GetBassNote(), _extensions);
+        TryToChordSymbol() ?? throw new InvalidOperationException($"{this} has no lead-sheet symbol: its extensions are not tensions.");
+
+    private ChordSymbol? TryToChordSymbol()
+    {
+        var bass = Inversion == ChordInversion.Root ? null : GetBassNote();
+        var intervals = Intervals.ToHashSet();
+        // The chord's own type first: Augmented7 and Dominant7Sharp5 share their intervals.
+        foreach (var type in ChordTypes.All.Prepend(Type))
+            if (intervals.SetEquals(ChordTypes.Intervals(type)))
+                return new ChordSymbol(Root, type, bass);
+        return _extensions.All(ChordSymbol.IsTension) ? new ChordSymbol(Root, Type, bass, _extensions) : null;
+    }
 
     /// <summary>The symbol in the given style (ASCII by default): <c>Cmaj7</c>, <c>F#m/A</c>, <c>C7b9</c>.</summary>
+    /// <exception cref="InvalidOperationException">See <see cref="ToChordSymbol"/>.</exception>
     public string GetSymbol(ChordSymbolStyle? style = null) => ToChordSymbol().ToString(style ?? ChordSymbolStyle.Ascii);
 
-    /// <summary>The ASCII symbol; see <see cref="GetSymbol"/>.</summary>
-    public override string ToString() => GetSymbol();
+    /// <summary>The ASCII symbol, or the root and intervals when there is none: <c>C4 (M3 P5 M2)</c>.</summary>
+    public override string ToString() =>
+        TryToChordSymbol()?.ToString() ?? $"{Root} ({string.Join(" ", Intervals)})";
 
     /// <inheritdoc />
     public bool Equals(Chord? other) =>

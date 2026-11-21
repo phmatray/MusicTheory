@@ -181,11 +181,7 @@ public sealed record Interval
         int letters = 0;
         while (letters < s.Length && s[letters] is 'P' or 'M' or 'm' or 'd' or 'A')
             letters++;
-        if (letters == 0 || letters > 5)
-            return false;
-
-        var abbreviation = s[..letters].ToString();
-        int quality = Array.IndexOf(Abbreviations, abbreviation);
+        int quality = Array.IndexOf(Abbreviations, s[..letters].ToString());
         if (quality < 0)
             return false;
 
@@ -196,8 +192,8 @@ public sealed record Interval
             direction = Direction.Down;
             rest = rest[1..];
         }
-        if (rest.IsEmpty || !char.IsAsciiDigit(rest[0]) || !int.TryParse(rest, System.Globalization.NumberStyles.None,
-                System.Globalization.CultureInfo.InvariantCulture, out int number) || number < 1)
+        if (!int.TryParse(rest, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out int number)
+            || number < 1)
             return false;
 
         var q = (IntervalQuality)quality;
@@ -210,8 +206,8 @@ public sealed record Interval
         return true;
     }
 
-    /// <summary>Semitones with the direction's sign.</summary>
-    internal int DirectedSemitones => Direction == Direction.Down ? -Semitones : Semitones;
+    /// <summary>Semitones with the direction's sign: 4 for M3, −4 for M-3, −1 for d1.</summary>
+    public int DirectedSemitones => Direction == Direction.Down ? -Semitones : Semitones;
 
     private static readonly string[] Abbreviations =
         ["ddddd", "dddd", "ddd", "dd", "d", "m", "P", "M", "A", "AA", "AAA", "AAAA", "AAAAA"];

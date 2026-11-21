@@ -81,7 +81,8 @@ public sealed record RomanNumeral(
             return suffix + (inv == 1 ? "6" : "64");
         if (IsSeventh)
             return suffix.Replace("7", inv switch { 1 => "65", 2 => "43", _ => "42" });
-        return suffix + "/" + (inv switch { 1 => "3", 2 => "5", _ => "7" });
+        // Neither a triad nor a seventh (6, add9, 6/9): name the bass by its interval above the root.
+        return suffix + "/" + ChordTypes.Intervals(Type)[inv - 1].Number;
     }
 
     private bool IsSeventh => Type is ChordType.Major7 or ChordType.Minor7 or ChordType.Dominant7 or ChordType.MinorMajor7
@@ -105,10 +106,8 @@ public static class HarmonicAnalyzer
         int tonic = MusicTheoryUtilities.GetPitchClass(key.Tonic);
         int interval = (MusicTheoryUtilities.GetPitchClass(chord.Root) - tonic + 12) % 12;
         var triad = Diatonic.TriadOf(chord.Type);
-        int? inversion = chord.Bass is null ? null : chord.ToChord().Inversion switch
-        {
-            ChordInversion.First => 1, ChordInversion.Second => 2, ChordInversion.Third => 3, _ => null,
-        };
+        var inverted = chord.Bass is null ? ChordInversion.Root : chord.ToChord().Inversion;
+        int? inversion = inverted == ChordInversion.Root ? null : (int)inverted;
         var home = Diatonic.Degrees(key.Mode);
 
         RomanNumeral Make(int index, (int Step, Triad Triad)[] table, HarmonicFunction function)

@@ -221,54 +221,13 @@ public sealed record KeySignature
     /// <inheritdoc />
     public override int GetHashCode() => HashCode.Combine(Mode, Tonic.Name, Tonic.Alteration);
 
-    /// <summary>
-    /// Creates a KeySignature from a position in the circle of fifths.
-    /// </summary>
+    /// <summary>The key whose signature has <paramref name="position"/> accidentals (sharps positive).</summary>
     private static KeySignature GetKeyFromPosition(int position, KeyMode mode)
     {
-        if (mode == KeyMode.Major)
-        {
-            return position switch
-            {
-                0 => new KeySignature(new Note(NoteName.C), KeyMode.Major),
-                1 => new KeySignature(new Note(NoteName.G), KeyMode.Major),
-                2 => new KeySignature(new Note(NoteName.D), KeyMode.Major),
-                3 => new KeySignature(new Note(NoteName.A), KeyMode.Major),
-                4 => new KeySignature(new Note(NoteName.E), KeyMode.Major),
-                5 => new KeySignature(new Note(NoteName.B), KeyMode.Major),
-                6 => new KeySignature(new Note(NoteName.F, Alteration.Sharp), KeyMode.Major),
-                7 => new KeySignature(new Note(NoteName.C, Alteration.Sharp), KeyMode.Major),
-                -1 => new KeySignature(new Note(NoteName.F), KeyMode.Major),
-                -2 => new KeySignature(new Note(NoteName.B, Alteration.Flat), KeyMode.Major),
-                -3 => new KeySignature(new Note(NoteName.E, Alteration.Flat), KeyMode.Major),
-                -4 => new KeySignature(new Note(NoteName.A, Alteration.Flat), KeyMode.Major),
-                -5 => new KeySignature(new Note(NoteName.D, Alteration.Flat), KeyMode.Major),
-                -6 => new KeySignature(new Note(NoteName.G, Alteration.Flat), KeyMode.Major),
-                -7 => new KeySignature(new Note(NoteName.C, Alteration.Flat), KeyMode.Major),
-                _ => throw new ArgumentOutOfRangeException(nameof(position), "Position must be between -7 and 7")
-            };
-        }
-        else
-        {
-            return position switch
-            {
-                0 => new KeySignature(new Note(NoteName.A), KeyMode.Minor),
-                1 => new KeySignature(new Note(NoteName.E), KeyMode.Minor),
-                2 => new KeySignature(new Note(NoteName.B), KeyMode.Minor),
-                3 => new KeySignature(new Note(NoteName.F, Alteration.Sharp), KeyMode.Minor),
-                4 => new KeySignature(new Note(NoteName.C, Alteration.Sharp), KeyMode.Minor),
-                5 => new KeySignature(new Note(NoteName.G, Alteration.Sharp), KeyMode.Minor),
-                6 => new KeySignature(new Note(NoteName.D, Alteration.Sharp), KeyMode.Minor),
-                7 => new KeySignature(new Note(NoteName.A, Alteration.Sharp), KeyMode.Minor),
-                -1 => new KeySignature(new Note(NoteName.D), KeyMode.Minor),
-                -2 => new KeySignature(new Note(NoteName.G), KeyMode.Minor),
-                -3 => new KeySignature(new Note(NoteName.C), KeyMode.Minor),
-                -4 => new KeySignature(new Note(NoteName.F), KeyMode.Minor),
-                -5 => new KeySignature(new Note(NoteName.B, Alteration.Flat), KeyMode.Minor),
-                -6 => new KeySignature(new Note(NoteName.E, Alteration.Flat), KeyMode.Minor),
-                -7 => new KeySignature(new Note(NoteName.A, Alteration.Flat), KeyMode.Minor),
-                _ => throw new ArgumentOutOfRangeException(nameof(position), "Position must be between -7 and 7")
-            };
-        }
+        // The major key with this signature sits on the line of fifths (F C G D A E B, one more accidental
+        // every seven steps); the minor key with the same signature is its relative, a minor 3rd below.
+        int step = position + 1;
+        var major = new Note(SharpOrder[MusicTheoryUtilities.Mod7(step)], (Alteration)MusicTheoryUtilities.FloorDiv(step, 7));
+        return new KeySignature(mode == KeyMode.Minor ? major.Transpose(new Interval(IntervalQuality.Minor, 3, Direction.Down)) : major, mode);
     }
 }

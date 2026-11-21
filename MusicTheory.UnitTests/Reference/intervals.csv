@@ -1676,7 +1676,6 @@ Fbb4,B5,AAA11,20
 Fbb4,B#3,dddd-5,-3
 Fbb4,B#4,AAAA4,9
 Fbb4,B#5,AAAA11,21
-Fbb4,B##3,AAAA-5,-2
 Fb4,Cbb3,A-11,-18
 Fb4,Cbb4,A-4,-6
 Fb4,Cbb5,d5,6
@@ -3612,7 +3611,6 @@ B##4,E#5,d4,4
 B##4,E##3,P-12,-19
 B##4,E##4,P-5,-7
 B##4,E##5,P4,5
-B##4,Fbb5,AAAA5,2
 B##4,Fb3,AAAA-11,-21
 B##4,Fb4,AAAA-4,-9
 B##4,Fb5,dddd5,3
