@@ -57,6 +57,14 @@ The default leaves text it cannot read alone, because a word like `Chorus` also 
 input is known to be chords, pass `SuffixHandling.KeepUnparsed` to move the root and the slash bass and keep
 the rest as written.
 
+Transposition also rewrites a suffix to its canonical form. To keep a chart's own notation, pass
+`SuffixHandling.Verbatim`: only the root and the slash bass move, and the suffix stays as typed.
+
+```csharp
+Console.WriteLine(ChordTransposer.Transpose("C-7", 2));                                     // Dm7
+Console.WriteLine(ChordTransposer.Transpose("C-7", 2, suffix: SuffixHandling.Verbatim));    // D-7
+```
+
 Moving a whole song from one key to another spells every chord in the target key:
 
 ```csharp

@@ -28,4 +28,5 @@ Every chord goes through `ChordTransposer` and the `{key:}` directive is rewritt
 `Transpose(2, SuffixHandling.KeepUnparsed)` also moves the root and bass of chords the library cannot read
 (`[Gfoo/B]` becomes `[Afoo/C#]`). Only changed lines
 get new text. `Transpose(KeySignature)` needs a parseable `{key:}`, else it throws `InvalidOperationException`.
-Suffixes are rewritten to their canonical form (`CM7` becomes `Dmaj7`), see issue #104.
+Suffixes are rewritten to their canonical form by default (`CM7` becomes `Dmaj7`);
+`Transpose(2, SuffixHandling.Verbatim)` keeps the writer's spelling and moves only root and bass (`CM7` becomes `DM7`, `C-7` becomes `D-7`).
