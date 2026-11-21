@@ -241,6 +241,68 @@ def tempo():
     write("tempo.csv", ["changes", "position", "seconds"], rows)
 
 
+# (meter, whole-note values; an "r" prefix is a rest). Each case fills one bar.
+BEAMING = [
+    ("2/4", "1/8 1/8 1/8 1/8"), ("2/4", "1/16 1/16 1/16 1/16 1/8 1/8"), ("2/4", "1/4 1/8 1/8"),
+    ("2/4", "1/8 1/8 r1/4"), ("2/4", "3/16 1/16 1/8 1/8"),
+    ("3/4", "1/8 1/8 1/8 1/8 1/8 1/8"), ("3/4", "1/8 1/8 1/4 1/8 1/8"), ("3/4", "1/8 r1/8 1/8 1/8 1/4"),
+    ("3/4", "1/16 1/16 1/16 1/16 1/4 1/4"),
+    ("4/4", "1/8 1/8 1/8 1/8 1/8 1/8 1/8 1/8"), ("4/4", "1/8 1/8 1/8 1/8 1/2"), ("4/4", "1/4 1/4 1/4 1/4"),
+    ("4/4", "1/8 1/8 r1/8 1/8 1/4 1/4"),
+    ("3/8", "1/8 1/8 1/8"), ("3/8", "1/4 1/8"), ("3/8", "1/16 1/16 1/16 1/16 1/8"),
+    ("6/8", "1/8 1/8 1/8 1/8 1/8 1/8"), ("6/8", "1/8 r1/8 1/8 1/8 1/8 1/8"), ("6/8", "1/4 1/8 1/8 1/8 1/8"),
+    ("9/8", "1/8 1/8 1/8 1/8 1/8 1/8 1/8 1/8 1/8"), ("9/8", "1/8 1/8 1/8 1/4 1/8 1/8 1/8 1/8"),
+    ("12/8", "1/8 1/8 1/8 1/8 1/8 1/8 1/8 1/8 1/8 1/8 1/8 1/8"),
+    ("5/8", "1/8 1/8 1/8 1/8 1/8"), ("5/8", "1/4 1/8 1/8 1/8"),
+    ("7/8", "1/8 1/8 1/8 1/8 1/8 1/8 1/8"), ("7/8", "1/8 1/8 1/4 1/8 1/8 1/8"),
+]
+# music21's beatSequence has one beat per unit in these meters, so their grouping is read from the
+# beams of a bar of unit notes instead. The others are read from beatSequence itself.
+ASYMMETRIC = {"5/8", "7/8"}  # not 11/8: music21 beams all eleven together, MusicTheory does 2+2+2+2+3
+
+
+def beams():
+    def build(m, spec):
+        s = stream.Stream()
+        s.insert(0, meter.TimeSignature(m))
+        for tok in spec.split():
+            n = note.Rest() if tok.startswith("r") else note.Note("C4")
+            n.quarterLength = Fraction(tok.lstrip("r")) * 4
+            s.append(n)
+        bars = s.makeMeasures()
+        bars.makeBeams(inPlace=True)
+        return list(bars.recurse().notesAndRests)
+
+    def groups_of(notes):
+        out, cur = [], []
+        for i, n in enumerate(notes):
+            t = n.beams.beamsList[0].type if (not n.isRest and n.beams.beamsList) else None
+            if t == "start":
+                cur = [i]
+            elif t in ("continue", "stop") and cur:
+                cur.append(i)
+                if t == "stop":
+                    out.append(cur)
+                    cur = []
+        return out
+
+    def show(groups):
+        return " ".join("-".join(map(str, g)) for g in groups)
+
+    rows = [[f"case{i}", m, spec, show(groups_of(build(m, spec)))] for i, (m, spec) in enumerate(BEAMING, 1)]
+    write("beams.csv", ["case", "meter", "input", "groups"], rows)
+
+    rows = []
+    for m in ["2/4", "3/4", "4/4", "2/2", "3/8", "6/8", "9/8", "12/8", "6/4", "5/8", "7/8", "5/4"]:
+        n, d = (int(x) for x in m.split("/"))
+        if m in ASYMMETRIC:
+            lengths = [len(g) for g in groups_of(build(m, " ".join([f"1/{d}"] * n)))]
+        else:
+            lengths = [round(Fraction(b.duration.quarterLength) / Fraction(4, d)) for b in meter.TimeSignature(m).beatSequence]
+        rows.append([m, " ".join(map(str, lengths))])
+    write("beatgroups.csv", ["meter", "groups"], rows)
+
+
 if __name__ == "__main__":
     print("music21", music21.__version__)
     OUT.mkdir(parents=True, exist_ok=True)
@@ -254,3 +316,4 @@ if __name__ == "__main__":
     pcsets()
     measures()
     tempo()
+    beams()
