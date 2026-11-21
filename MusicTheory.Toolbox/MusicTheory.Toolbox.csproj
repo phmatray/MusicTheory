@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MusicTheory\MusicTheory.csproj" />
+    <ProjectReference Include="..\MusicTheory.Guitar.Blazor\MusicTheory.Guitar.Blazor.csproj" />
   </ItemGroup>
 
   <!-- The app follows the site's look: tokens and self-hosted fonts are linked, not copied. -->

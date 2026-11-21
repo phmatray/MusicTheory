@@ -8,6 +8,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped<ToolboxSession>();
+builder.Services.AddScoped<MusicTheory.Guitar.Blazor.ChordAudio>();
 
 var host = builder.Build();
 // Read once: only used when the link carries no (valid) lang.

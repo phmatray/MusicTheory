@@ -1,0 +1,126 @@
+@using MusicTheory.Toolbox.Drills
+@using MusicTheory.Training
+@inject NavigationManager Nav
+@{
+    var lang = State.Lang;
+    var l = Link;
+}
+<PageTitle>@Strings.T(lang, "intervals.title") - @Strings.T(lang, "shell.title")</PageTitle>
+
+<h1>@Strings.T(lang, "intervals.title")</h1>
+<p>@Strings.T(lang, "intervals.blurb")</p>
+
+<div class="tb-controls">
+    <label>
+        @Strings.T(lang, "intervals.difficulty")
+        <select class="tb-difficulty" value="@l.Difficulty.ToString().ToLowerInvariant()" @onchange="OnDifficulty">
+            @foreach (var d in new[] { "beginner", "intermediate", "advanced" })
+            {
+                <option value="@d">@Strings.T(lang, "intervals.d." + d)</option>
+            }
+        </select>
+    </label>
+    <label>
+        @Strings.T(lang, "intervals.count")
+        <input class="tb-count" type="number" min="1" max="@DrillLink.MaxCount" value="@l.Count" @onchange="OnCount" />
+    </label>
+    <button type="button" class="tb-btn tb-generate" @onclick="Generate">@Strings.T(lang, l.Seed is null ? "intervals.generate" : "intervals.new")</button>
+</div>
+
+@if (_session is null)
+{
+    <p class="tb-notice" role="status">@Strings.T(lang, "intervals.new.blurb")</p>
+}
+else
+{
+    @if (_session.Current is { } q)
+    {
+        <h2 class="tb-progress">@Strings.T(lang, "intervals.question", _session.Index + 1, _session.Questions.Count)</h2>
+        <DrillPlayer Sounds="q.Sounds" Lang="lang" @key="_session.Index" />
+        <div class="tb-answers" role="group" aria-label="@Strings.T(lang, "intervals.choices")">
+            @foreach (var choice in q.Choices)
+            {
+                <button type="button" class="tb-btn tb-answer" disabled="@(_last is not null)" @onclick="() => Answer(choice)">@IntervalNames.Label(choice, lang)</button>
+            }
+        </div>
+        @if (_last is { } r)
+        {
+            <p class="tb-result @(r.IsCorrect ? "tb-right" : "tb-wrong")" role="status">
+                @Strings.T(lang, r.IsCorrect ? "intervals.right" : "intervals.wrong", IntervalNames.Label(r.Expected, lang))
+            </p>
+            <button type="button" class="tb-btn tb-next" @onclick="Next">
+                @Strings.T(lang, _session.IsFinished ? "intervals.finish" : "intervals.next")
+            </button>
+        }
+    }
+    else
+    {
+        <p class="tb-score" role="status">@Strings.T(lang, "intervals.score", _session.Summary.Correct, _session.Summary.Total)</p>
+        <button type="button" class="tb-btn tb-restart" @onclick="Restart">@Strings.T(lang, "intervals.restart")</button>
+    }
+
+    <ShareButton Url="@ShareUrl" Lang="lang" />
+
+    @if (l.TeacherKey)
+    {
+        <h2>@Strings.T(lang, "intervals.teacher")</h2>
+        <ol class="tb-key-list">
+            @foreach (var keyed in _session.Questions)
+            {
+                <li>@IntervalNames.Label(keyed.Answer, lang) (@Strings.T(lang, Kind(keyed)))</li>
+            }
+        </ol>
+    }
+}
+
+<Understand Lang="lang" TextKey="intervals.understand" />
+
+@code {
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+
+    private DrillLink Link => DrillLink.FromState(State);
+    private DrillSessionModel<Interval>? _session;
+    private AnswerResult<Interval>? _last;
+    private DrillLink? _built;
+
+    private string ShareUrl => Nav.Uri.Split('?')[0] + ToolboxUrl.Build((Link with { TeacherKey = false }).ToState(State.Lang));
+
+    // The session is rebuilt only when the link's exercise changes, not on a language switch.
+    protected override void OnParametersSet()
+    {
+        var l = Link;
+        if (_built == (l with { TeacherKey = false })) return;
+        _built = l with { TeacherKey = false };
+        Restart();
+    }
+
+    private void Restart()
+    {
+        _last = null;
+        var l = Link;
+        if (l.Seed is not { } seed) { _session = null; return; }
+        var options = IntervalDrillOptions.For(l.Difficulty);
+        var drill = new IntervalDrill(options, seed);
+        var questions = Enumerable.Range(0, l.Count).Select(_ => drill.Next()).ToArray();
+        _session = new DrillSessionModel<Interval>(questions, drill.Check);
+    }
+
+    private void Answer(Interval choice) => _last = _session!.Answer(choice);
+
+    private void Next() => _last = null;
+
+    private static string Kind(Question<Interval> q) =>
+        q.Sounds.Count == 1 ? "intervals.kind.together"
+        : q.Sounds[1][0].MidiNumber > q.Sounds[0][0].MidiNumber ? "intervals.kind.up" : "intervals.kind.down";
+
+    private void Go(DrillLink l) => Nav.NavigateTo(ToolboxUrl.Build(l.ToState(State.Lang)));
+
+    private void Generate() => Go(Link with { Seed = (ulong)Random.Shared.Next(1, 1_000_000_000) });
+
+    // Changing difficulty or count changes the exercise, so a seeded link gets a new seed.
+    private void OnDifficulty(ChangeEventArgs e) =>
+        Go(DrillLink.FromState(State with { Params = new Dictionary<string, string>(State.Params) { ["d"] = e.Value?.ToString() ?? "" } }));
+
+    private void OnCount(ChangeEventArgs e) =>
+        Go(DrillLink.FromState(State with { Params = new Dictionary<string, string>(State.Params) { ["n"] = e.Value?.ToString() ?? "" } }));
+}
