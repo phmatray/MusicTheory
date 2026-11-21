@@ -2,6 +2,17 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MusicTheory;
 
+/// <summary>How <see cref="Solfege.FixedDo"/> writes accidentals.</summary>
+public enum SolfegeStyle
+{
+    /// <summary>French words: <c>Ré dièse</c>.</summary>
+    Words,
+    /// <summary>ASCII symbols: <c>Ré#</c>.</summary>
+    Ascii,
+    /// <summary>Unicode symbols: <c>Ré♯</c>.</summary>
+    Unicode
+}
+
 /// <summary>
 /// Solfège note names: fixed do (<c>Do</c> is C) and movable do (the syllable names a scale degree of a key).
 /// Fixed do is read through <see cref="Note.Parse(string, NoteNotation)"/> with <see cref="NoteNotation.FixedDo"/>.
@@ -21,6 +32,26 @@ public static class Solfege
         ("double dièse", 2), ("double diese", 2), ("double bémol", -2), ("double bemol", -2),
         ("dièse", 1), ("diese", 1), ("bémol", -1), ("bemol", -1),
     };
+
+    /// <summary>The fixed-do name of <paramref name="note"/>, without octave: <c>Ré dièse</c>, <c>Si♭</c>.</summary>
+    /// <exception cref="ArgumentNullException"><paramref name="note"/> is null.</exception>
+    public static string FixedDo(Note note, SolfegeStyle style = SolfegeStyle.Words)
+    {
+        ArgumentNullException.ThrowIfNull(note);
+        string syllable = note.Name switch
+        {
+            NoteName.C => "Do", NoteName.D => "Ré", NoteName.E => "Mi", NoteName.F => "Fa",
+            NoteName.G => "Sol", NoteName.A => "La", _ => "Si",
+        };
+        int a = (int)note.Alteration;
+        string suffix = style switch
+        {
+            SolfegeStyle.Words => a switch { 2 => " double dièse", 1 => " dièse", -1 => " bémol", -2 => " double bémol", _ => "" },
+            SolfegeStyle.Ascii => a switch { 2 => "##", 1 => "#", -1 => "b", -2 => "bb", _ => "" },
+            _ => a switch { 2 => "𝄪", 1 => "♯", -1 => "♭", -2 => "𝄫", _ => "" },
+        };
+        return syllable + suffix;
+    }
 
     internal static bool TryParseFixedDoPitchClass(ReadOnlySpan<char> s, [NotNullWhen(true)] out Note? note, out int consumed)
     {

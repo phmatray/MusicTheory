@@ -15,6 +15,32 @@ public class SolfegeTests
         Note.Parse(text, NoteNotation.FixedDo).ShouldBe(Note.Parse(expected));
 
     [Theory]
+    [InlineData("D#4", SolfegeStyle.Words, "Ré dièse")]
+    [InlineData("Bbb", SolfegeStyle.Words, "Si double bémol")]
+    [InlineData("F#", SolfegeStyle.Unicode, "Fa♯")]
+    [InlineData("Eb", SolfegeStyle.Ascii, "Mib")]
+    [InlineData("C", SolfegeStyle.Words, "Do")]
+    [InlineData("G##", SolfegeStyle.Words, "Sol double dièse")]
+    public void FixedDo_FormatsNames(string note, SolfegeStyle style, string expected) =>
+        Solfege.FixedDo(Note.Parse(note), style).ShouldBe(expected);
+
+    [Fact]
+    public void FixedDo_RoundTripsEverySpelling()
+    {
+        foreach (var name in Enum.GetValues<NoteName>())
+            foreach (var alt in Enum.GetValues<Alteration>())
+                foreach (var style in Enum.GetValues<SolfegeStyle>())
+                {
+                    var n = new Note(name, alt);
+                    Note.Parse(Solfege.FixedDo(n, style), NoteNotation.FixedDo).ShouldBe(n);
+                }
+    }
+
+    [Fact]
+    public void FixedDo_RejectsNullNote() =>
+        Should.Throw<ArgumentNullException>(() => Solfege.FixedDo(null!));
+
+    [Theory]
     [InlineData("Ti")]
     [InlineData("Do dièse x")]
     [InlineData("")]
