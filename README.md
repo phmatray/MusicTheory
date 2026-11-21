@@ -70,6 +70,7 @@ KeySignature.Parse("Eb").AccidentalCount;                         // -3
 Note.Parse("A4").GetFrequency(442);                               // 442
 Note.FromFrequency(446.0);                                        // A4 +23.4¢
 TunedPitch.CentsBetween(440, 880);                                // 1200
+Temperament.JustIntonation.GetFrequency(Note.Parse("E4"), tonic: Note.Parse("C4"));  // 330 (pure 5/4 over a 264 C)
 
 HarmonicAnalyzer.Analyze(
     new[] { "Dm7", "G7", "Cmaj7" }.Select(ChordSymbol.Parse),
