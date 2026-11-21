@@ -1,0 +1,26 @@
+@page "/"
+@implements IDisposable
+@inject NavigationManager Nav
+@inject ToolboxSession Session
+
+@{ var state = Session.Current; var tool = ToolRegistry.Find(state.Tool); }
+@if (state.Tool.Length == 0)
+{
+    <Home State="state" />
+}
+else if (tool is null)
+{
+    <p>@Strings.T(state.Lang, "shell.unknown")</p>
+}
+else
+{
+    <DynamicComponent Type="tool.Component" Parameters="@(new Dictionary<string, object> { ["State"] = state })" />
+}
+
+@code {
+    protected override void OnInitialized() => Nav.LocationChanged += OnChanged;
+
+    private void OnChanged(object? sender, LocationChangedEventArgs e) => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Nav.LocationChanged -= OnChanged;
+}

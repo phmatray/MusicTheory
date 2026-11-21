@@ -1,0 +1,11 @@
+<details class="tb-understand">
+    <summary>@Strings.T(Lang, "understand.label")</summary>
+    <p>@Strings.T(Lang, TextKey)</p>
+</details>
+
+@code {
+    [Parameter, EditorRequired] public Lang Lang { get; set; }
+
+    /// <summary>The string key of the explanation (plain, under 120 words, only what the library computes).</summary>
+    [Parameter, EditorRequired] public string TextKey { get; set; } = "";
+}
