@@ -30,12 +30,13 @@ public static class Reharmonizer
     public static IReadOnlyList<ChordSymbol> TwoFiveTo(ChordSymbol target)
     {
         ArgumentNullException.ThrowIfNull(target);
-        var ii = target.ToChord().Quality switch
+        var quality = target.ToChord().Quality;
+        if (quality is ChordQuality.Diminished or ChordQuality.Augmented)
         {
-            ChordQuality.Major or ChordQuality.Suspended or ChordQuality.Power => ChordType.Minor7,
-            ChordQuality.Minor => ChordType.HalfDiminished7,
-            _ => throw new ArgumentException($"{target} is diminished or augmented and has no ii-V.", nameof(target)),
-        };
+            throw new ArgumentException($"{target} is diminished or augmented and has no ii-V.", nameof(target));
+        }
+
+        var ii = quality == ChordQuality.Minor ? ChordType.HalfDiminished7 : ChordType.Minor7;
 
         return
         [
