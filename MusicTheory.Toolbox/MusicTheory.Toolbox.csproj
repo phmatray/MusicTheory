@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MusicTheory\MusicTheory.csproj" />
+    <ProjectReference Include="..\MusicTheory.Guitar.Blazor\MusicTheory.Guitar.Blazor.csproj" />
     <ProjectReference Include="..\MusicTheory.Abc\MusicTheory.Abc.csproj" />
   </ItemGroup>
 
