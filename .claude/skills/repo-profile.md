@@ -90,5 +90,5 @@
 - `.claude/worktrees/` (verified ignored — `worktrees-ignored` ok at profile time)
 
 ## Environment gotchas
-- Publishing to NuGet happens when the release-please PR merges, and it is irreversible; the publish job still uses `NUGET_API_KEY`, not Trusted Publishing.
+- Publishing to NuGet happens when the release-please PR merges, and it is irreversible. It uses Trusted Publishing (OIDC, `NuGet/login`, secret `NUGET_USER` = nuget.org profile name); `workflow_dispatch` with `tag` republishes an existing release tag.
 - `MusicTheoryUtilities` and `MusicTheoryConstants` are internal and there is no `InternalsVisibleTo`: test them through the public API.
