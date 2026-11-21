@@ -1,0 +1,21 @@
+@* The progression answer: tap degrees in order, undo, check. DegreeSequenceModel holds the logic; this only draws it. *@
+<div class="tb-answers tb-degrees" role="group" aria-label="@Strings.T(Lang, "progressions.choices")">
+    @foreach (var d in Degrees)
+    {
+        <button type="button" class="tb-btn tb-degree" disabled="@(Disabled || Model.IsFull)" @onclick="() => Model.Add(d)">@TypeNames.Degree(d, Minor, Lang)</button>
+    }
+</div>
+<p class="tb-sequence" aria-live="polite">
+    @Strings.T(Lang, "progressions.yours"): @(Model.Value.Count == 0 ? "..." : string.Join(" - ", Model.Value.Select(d => TypeNames.Degree(d, Minor, Lang))))
+</p>
+<button type="button" class="tb-btn tb-undo" disabled="@(Disabled || Model.Value.Count == 0)" @onclick="Model.Undo">@Strings.T(Lang, "progressions.undo")</button>
+<button type="button" class="tb-btn tb-check" disabled="@(Disabled || !Model.IsFull)" @onclick="() => OnSubmit.InvokeAsync(Model.Value)">@Strings.T(Lang, "progressions.check")</button>
+
+@code {
+    [Parameter, EditorRequired] public DegreeSequenceModel Model { get; set; } = default!;
+    [Parameter, EditorRequired] public IReadOnlyList<int> Degrees { get; set; } = default!;
+    [Parameter] public bool Minor { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter, EditorRequired] public Lang Lang { get; set; }
+    [Parameter] public EventCallback<IReadOnlyList<int>> OnSubmit { get; set; }
+}

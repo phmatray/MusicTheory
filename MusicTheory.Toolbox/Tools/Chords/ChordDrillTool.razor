@@ -1,0 +1,6 @@
+@using MusicTheory.Toolbox.Drills
+<ChoiceDrill T="ChordType" Prefix="chords" State="State" Build="DrillSessions.Chords" Label="TypeNames.Label" />
+
+@code {
+    [Parameter, EditorRequired] public ToolState State { get; set; } = default!;
+}
