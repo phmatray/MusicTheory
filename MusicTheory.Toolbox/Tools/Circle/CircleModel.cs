@@ -1,12 +1,17 @@
 using MusicTheory.Toolbox.I18n;
+using MusicTheory.Toolbox.Rendering;
 
 namespace MusicTheory.Toolbox.Tools.Circle;
 
 /// <summary>One key of the ring, already spelled for a language.</summary>
-public sealed record CircleKey(string Id, string Title, string RelativeMinor, int Accidentals, string Signature, IReadOnlyList<string> ScaleNotes);
+public sealed record CircleKey(string Id, string Title, string RelativeMinor, int Accidentals, string Signature, IReadOnlyList<string> ScaleNotes, string ScaleAbc);
 
 /// <summary>The chosen key, and whether the requested one was unknown (so C is shown instead).</summary>
-public sealed record CircleView(CircleKey Key, bool Fallback);
+public sealed record CircleView(CircleKey Key, bool Fallback)
+{
+    /// <summary>The key's scale as ABC, tonic to octave, for the staff.</summary>
+    public string ScaleAbc => Key.ScaleAbc;
+}
 
 public static class CircleModel
 {
@@ -33,7 +38,8 @@ public static class CircleModel
     {
         var major = new KeySignature(tonic, KeyMode.Major);
         var n = major.AccidentalCount;
-        var notes = new Scale(tonic, ScaleType.Major).GetNotes().Take(7).Select(x => NoteNames.Format(x, lang)).ToList();
+        var scale = new Scale(tonic, ScaleType.Major);
+        var notes = scale.GetNotes().Take(7).Select(x => NoteNames.Format(x, lang)).ToList();
         var signature = n switch
         {
             0 => Strings.T(lang, "circle.sig.none"),
@@ -46,6 +52,6 @@ public static class CircleModel
             tonic.GetName(),
             Strings.T(lang, "circle.major", NoteNames.Format(tonic, lang)),
             Strings.T(lang, "circle.minor", NoteNames.Format(major.GetRelative().Tonic, lang)),
-            n, signature, notes);
+            n, signature, notes, StaffAbc.FromNotes(major, scale.GetNotes().ToList()));
     }
 }

@@ -19,6 +19,7 @@ public sealed class CircleStrings : IStringTable
         ["circle.signature"] = "Key signature",
         ["circle.relative"] = "Relative minor",
         ["circle.scale"] = "Scale",
+        ["circle.staff.alt"] = "{0} scale on a staff: {1}",
         ["circle.invalid"] = "Unknown key \"{0}\": showing C major.",
         ["circle.understand"] = "Going up a fifth adds one sharp (or removes one flat), and going down a fifth adds one flat. "
             + "Each major key shares its notes with a relative minor key, a minor third lower, so both have the same signature. "
@@ -40,6 +41,7 @@ public sealed class CircleStrings : IStringTable
         ["circle.signature"] = "Armure",
         ["circle.relative"] = "Relatif mineur",
         ["circle.scale"] = "Gamme",
+        ["circle.staff.alt"] = "Gamme de {0} sur une portée : {1}",
         ["circle.invalid"] = "Tonalité inconnue \"{0}\" : affichage de Do majeur.",
         ["circle.understand"] = "Monter d'une quinte ajoute un dièse (ou retire un bémol), et descendre d'une quinte ajoute un bémol. "
             + "Chaque tonalité majeure partage ses notes avec une tonalité relative mineure, une tierce mineure plus bas : les deux ont la même armure. "
