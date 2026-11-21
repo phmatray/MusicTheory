@@ -2,6 +2,19 @@
 
 Entries are written by release-please from the Conventional Commits merged into `dev`.
 
+## [2.1.0](https://github.com/phmatray/MusicTheory/compare/v2.0.0...v2.1.0) (2026-11-21)
+
+
+### Features
+
+* **analysis:** detect cadences in a chord sequence ([#130](https://github.com/phmatray/MusicTheory/issues/130)) ([#165](https://github.com/phmatray/MusicTheory/issues/165)) ([ba27fc5](https://github.com/phmatray/MusicTheory/commit/ba27fc52728ce952d2cd41ca557ce60cde7189e3))
+* **training:** seeded interval drill with difficulty levels ([#166](https://github.com/phmatray/MusicTheory/issues/166)) ([855e06c](https://github.com/phmatray/MusicTheory/commit/855e06cf5c3805b946851cd31301fb02d4d819cb))
+
+
+### Bug Fixes
+
+* **site:** circle of fifths labels, staff placement and site links in the top bar ([#163](https://github.com/phmatray/MusicTheory/issues/163)) ([77267f9](https://github.com/phmatray/MusicTheory/commit/77267f95079acf1e4a42d40c1e16f88dc726a341))
+
 ## [2.0.0](https://github.com/phmatray/MusicTheory/compare/v1.7.0...v2.0.0) (2026-11-21)
 
 
