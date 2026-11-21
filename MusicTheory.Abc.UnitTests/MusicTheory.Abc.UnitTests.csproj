@@ -25,6 +25,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Reference/**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../MusicTheory.Abc/MusicTheory.Abc.csproj" />
   </ItemGroup>
 
