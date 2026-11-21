@@ -1,7 +1,7 @@
 namespace MusicTheory.Guitar;
 
 /// <summary>
-/// A guitar tuning: the open-string notes, lowest string first.
+/// A fretted-instrument tuning: the open-string notes, lowest string first.
 /// </summary>
 /// <param name="Name">Display name, e.g. "Standard".</param>
 /// <param name="Strings">Open-string notes, low to high.</param>
@@ -35,6 +35,24 @@ public sealed record Tuning(string Name, IReadOnlyList<Note> Strings)
 
     /// <summary>Half step down: Eb2 Ab2 Db3 Gb3 Bb3 Eb4.</summary>
     public static Tuning HalfStepDown => Of("Half step down", "Eb2", "Ab2", "Db3", "Gb3", "Bb3", "Eb4");
+
+    /// <summary>Ukulele (re-entrant): G4 C4 E4 A4.</summary>
+    public static Tuning Ukulele => Of("Ukulele", "G4", "C4", "E4", "A4");
+
+    /// <summary>Ukulele with a low G: G3 C4 E4 A4.</summary>
+    public static Tuning UkuleleLowG => Of("Ukulele (low G)", "G3", "C4", "E4", "A4");
+
+    /// <summary>Four-string bass: E1 A1 D2 G2.</summary>
+    public static Tuning Bass => Of("Bass", "E1", "A1", "D2", "G2");
+
+    /// <summary>Mandolin, one entry per course: G3 D4 A4 E5.</summary>
+    public static Tuning Mandolin => Of("Mandolin", "G3", "D4", "A4", "E5");
+
+    /// <summary>Seven-string guitar: B1 E2 A2 D3 G3 B3 E4.</summary>
+    public static Tuning SevenString => Of("7-string", "B1", "E2", "A2", "D3", "G3", "B3", "E4");
+
+    /// <summary>True when some open string sounds lower than the string before it.</summary>
+    public bool IsReentrant => Strings.Zip(Strings.Skip(1)).Any(p => p.Second.MidiNumber < p.First.MidiNumber);
 
     private static Tuning Of(string name, params string[] notes) => new(name, notes.Select(Note.Parse).ToArray());
 
