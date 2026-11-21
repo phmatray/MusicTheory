@@ -24,6 +24,22 @@ public class TemperamentTests
         Ratio(Temperament.JustIntonation, "G4", C4).ShouldBe(1.5, 1e-9);
     }
 
+    [Theory]
+    [InlineData("Db4", 256.0 / 243, 16.0 / 15)]
+    [InlineData("Eb4", 32.0 / 27, 6.0 / 5)]
+    [InlineData("E4", 81.0 / 64, 5.0 / 4)]
+    [InlineData("F4", 4.0 / 3, 4.0 / 3)]
+    [InlineData("F#4", 729.0 / 512, 45.0 / 32)]
+    [InlineData("Ab4", 128.0 / 81, 8.0 / 5)]
+    [InlineData("A4", 27.0 / 16, 5.0 / 3)]
+    [InlineData("Bb4", 16.0 / 9, 9.0 / 5)]
+    [InlineData("B4", 243.0 / 128, 15.0 / 8)]
+    public void Pythagorean_AndJust_EveryDegree(string note, double pythagorean, double just)
+    {
+        Ratio(Temperament.Pythagorean, note, C4).ShouldBe(pythagorean, 1e-9);
+        Ratio(Temperament.JustIntonation, note, C4).ShouldBe(just, 1e-9);
+    }
+
     [Fact]
     public void Meantone_PureThirdAndNarrowFifth()
     {
