@@ -59,6 +59,12 @@ var inE = song.Select(c => ChordTransposer.Transpose(c, KeySignature.Parse("C"),
 Console.WriteLine(string.Join(" ", inE));   // E C#m A B7
 ```
 
+Chords move by the interval between the keys, so a borrowed Eb in C is Bb in G. The spelling of the target key is used only to avoid a double accidental.
+
+```csharp
+Console.WriteLine(ChordTransposer.Transpose("Eb", KeySignature.Parse("C"), KeySignature.Parse("G")));   // Bb
+```
+
 The output keeps the input's style: Unicode accidentals stay Unicode, jazz glyphs stay glyphs.
 
 ```csharp

@@ -28,6 +28,25 @@ public class ChordTransposerTests
     }
 
     [Theory]
+    [InlineData("Eb", 7, "G", "Bb")]
+    [InlineData("Eb/G", 7, "G", "Bb/D")]
+    [InlineData("C#", 5, "Bb", "F#")]
+    [InlineData("A", 1, "E", "A#")]
+    [InlineData("F/C#", 2, "D", "G/D#")]
+    public void Transpose_BySemitones_KeepsChromaticDirection(string chord, int semitones, string key, string expected) =>
+        ChordTransposer.Transpose(chord, semitones, K(key)).ShouldBe(expected);
+
+    [Theory]
+    [InlineData("Eb", "C", "G", "Bb")]
+    [InlineData("Eb/G", "C", "G", "Bb/D")]
+    [InlineData("C#7", "C", "G", "G#7")]
+    [InlineData("D7", "G", "Ab", "Eb7")]
+    [InlineData("Db", "C", "Db", "D")]
+    [InlineData("D", "C", "A#", "C")]
+    public void Transpose_BetweenKeys_FollowsTheInterval(string chord, string from, string to, string expected) =>
+        ChordTransposer.Transpose(chord, K(from), K(to)).ShouldBe(expected);
+
+    [Theory]
     [InlineData("A", 1, "Bb")]
     [InlineData("Bb", 2, "C")]
     [InlineData("Bb", 1, "B")]

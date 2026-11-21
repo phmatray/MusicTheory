@@ -59,6 +59,8 @@ public sealed record ChordProDocument(IReadOnlyList<ChordProLine> Lines)
     /// <param name="semitones">Semitones up (positive) or down (negative).</param>
     public ChordProDocument Transpose(int semitones)
     {
+        if (semitones == 0)
+            return this;
         var target = Key?.TransposeBySemitones(semitones);
         return Map(c => ChordTransposer.Transpose(c, semitones, target), target);
     }
