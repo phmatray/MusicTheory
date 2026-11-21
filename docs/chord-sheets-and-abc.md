@@ -56,7 +56,7 @@ A, C becomes D, and a G major sheet lands in A major, a whole tone higher.
 
 ```csharp
 var up = song.Transpose(2);
-Console.WriteLine(up.ToString().Split('\n')[1]);      // {key: A}
+Console.WriteLine(up.Key);                           // A
 Console.WriteLine(string.Join(" ", up.Chords));      // A D
 ```
 
@@ -65,7 +65,7 @@ G major to Bb major is three semitones up:
 
 ```csharp
 var inBb = song.Transpose(new KeySignature(Note.Parse("Bb"), KeyMode.Major));
-Console.WriteLine(inBb.ToString().Split('\n')[1]);    // {key: Bb}
+Console.WriteLine(inBb.Key);                         // Bb
 Console.WriteLine(string.Join(" ", inBb.Chords));    // Bb Eb
 ```
 
