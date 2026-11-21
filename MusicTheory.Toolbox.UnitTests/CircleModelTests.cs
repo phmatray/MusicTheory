@@ -61,6 +61,19 @@ public class CircleModelTests
     }
 
     [Fact]
+    public void Scale_abc_for_G_major_has_the_key_header_and_the_eight_scale_notes()
+    {
+        var abc = CircleModel.For("G", Lang.En).ScaleAbc;
+        abc.ShouldContain("K:G");
+        var notes = MusicTheory.Abc.AbcTune.Parse(abc).Measures.SelectMany(m => m.Events).Select(e => e.Pitches.Single()).ToArray();
+        notes.ShouldBe("G4 A4 B4 C5 D5 E5 F#5 G5".Split(' ').Select(Note.Parse).ToArray());
+    }
+
+    [Fact]
+    public void Every_key_has_a_parseable_scale_abc() =>
+        CircleModel.Keys(Lang.En).ToList().ForEach(k => MusicTheory.Abc.AbcTune.TryParse(k.ScaleAbc, out var _).ShouldBeTrue());
+
+    [Fact]
     public void No_key_is_C_without_a_notice() => CircleModel.For(null, Lang.En).Fallback.ShouldBeFalse();
 
     [Fact]
