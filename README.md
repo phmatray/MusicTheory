@@ -78,7 +78,7 @@ HarmonicAnalyzer.Analyze(
   315 scales and 70 key signatures with [music21](https://web.mit.edu/music21/); the tests replay every row.
 - **100% coverage.** The three packages are covered at 100% of lines and branches; CI fails below that
   (`tools/coverage/check.py`).
-- **Mutation testing.** Stryker.NET runs on every pull request, with break thresholds in each test
+- **Mutation testing.** Stryker.NET runs on demand (Actions, *Mutation testing*), with break thresholds in each test
   project's `stryker-config.json`.
 - **Docs that run.** Every C# block of `docs/` is compiled, run and has its printed output compared by
   `MusicTheory.DocTests`.

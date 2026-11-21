@@ -2,10 +2,8 @@ name: Mutation testing
 
 # Stryker.NET mutates the libraries and fails when the test suite stops killing enough of the mutants.
 # Thresholds live in each test project's stryker-config.json. The HTML reports are uploaded.
+# Manual only: a full run takes long enough that it does not belong on every push.
 on:
-  pull_request:
-  push:
-    branches: [ dev ]
   workflow_dispatch:
 
 jobs:
