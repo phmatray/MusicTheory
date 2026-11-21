@@ -81,7 +81,7 @@ public sealed record ChordProDocument(IReadOnlyList<ChordProLine> Lines)
         new(Lines.Select(line => line switch
         {
             LyricLine l => MapLyric(l, chord),
-            DirectiveLine { Name: "key" } d when newKey is not null => d with { Raw = $"{{key: {newKey}}}" + Tail(d.Raw) },
+            DirectiveLine { Name: "key" } d when newKey is not null => d with { Raw = $"{{key: {newKey}}}" + Tail(d.Raw), Value = newKey.ToString() },
             _ => line,
         }).ToList());
 
