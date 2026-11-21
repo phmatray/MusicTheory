@@ -22,3 +22,10 @@ MidiImport import = MidiReader.Read(File.OpenRead("tune.mid"));
 
 The reader merges all tracks into one voice, snaps onsets and durations to a grid (1/64 of a whole note by
 default) and throws `NotSupportedException` for SMPTE division or notes that overlap with different durations.
+
+## Tested against music21
+
+`MusicTheory.Midi.UnitTests/Reference/` holds `.mid` files written by music21 (`tools/reference/generate.py`)
+and `midi.csv`, what music21 itself parses back from them: meter, key, and every note, chord (`C4+E4+G4`),
+rest and tie. `MidiReferenceTests` requires the reader to agree on all of it. A file cannot hold a trailing
+rest, so the fixtures never end on one.

@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Reference/**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
