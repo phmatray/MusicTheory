@@ -51,27 +51,37 @@ public sealed record GuitarVoicing(
     /// MIDI note numbers to play, low string to high, muted strings skipped: open C (<c>x32010</c>) is
     /// <c>[48, 52, 55, 60, 64]</c>. Tuning- and capo-aware, so the same call feeds a piano view or a synth.
     /// </summary>
+    /// <exception cref="ArgumentException">The tuning's string count differs from the voicing's.</exception>
     public IReadOnlyList<int> ToMidi(Tuning? tuning = null, int capo = 0)
     {
-        var strings = (tuning ?? Tuning.Standard).Strings;
+        var strings = StringsOf(tuning ?? Tuning.Standard);
         return Frets.Select((f, s) => f is int fret ? strings[s].MidiNumber + capo + fret : (int?)null).OfType<int>().ToList();
     }
 
     /// <summary>The sounding note per string (null when muted), spelled after the chord where possible.</summary>
+    /// <exception cref="ArgumentException">The tuning's string count differs from the voicing's.</exception>
     public IReadOnlyList<Note?> Sound(Tuning tuning, int capo = 0)
     {
+        var strings = StringsOf(tuning);
         var chordTones = Chord.ToChord().GetNotes().Append(Chord.Bass).OfType<Note>().ToList();
         bool flats = Chord.Root.Alteration < 0;
         return Frets.Select((f, s) =>
         {
             if (f is not int fret)
                 return null;
-            int midi = tuning.Strings[s].MidiNumber + capo + fret;
+            int midi = strings[s].MidiNumber + capo + fret;
             var played = Note.FromMidiNumber(midi, flats);
             var tone = chordTones.FirstOrDefault(t => t.PitchClass == played.PitchClass);
             return tone is null ? played : played.Respell(tone.Name)!;
         }).ToList();
     }
+
+    private IReadOnlyList<Note> StringsOf(Tuning tuning) =>
+        Frets.Count == tuning.Strings.Count
+            ? tuning.Strings
+            : throw new ArgumentException(
+                $"The voicing has {Frets.Count} strings but the tuning '{tuning.Name}' has {tuning.Strings.Count}.",
+                nameof(tuning));
 }
 
 /// <summary>Options for <see cref="IGuitarVoicingProvider.GetVoicings"/>.</summary>
