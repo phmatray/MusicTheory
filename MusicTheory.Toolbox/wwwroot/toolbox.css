@@ -1,0 +1,7 @@
+body { margin: 0; background: var(--sc-canvas); color: var(--sc-ink); font-family: var(--sc-font-text); font-size: 1.125rem; line-height: 1.5; }
+code { font-family: var(--sc-font-mono); background: var(--mt-code-bg); padding: 0 .25em; }
+h1 { font-family: var(--sc-font-display); font-weight: 500; }
+a { color: var(--sc-accent); }
+.tb-header { display: flex; gap: 1.5rem; align-items: baseline; padding: 1rem 1.5rem; border-bottom: 1px solid var(--mt-rule); }
+.tb-title { font-family: var(--sc-font-display); font-size: 1.25rem; text-decoration: none; color: var(--sc-ink); }
+.tb-main { max-width: 60rem; margin: 0 auto; padding: 1.5rem; }

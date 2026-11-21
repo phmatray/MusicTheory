@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <!-- Not a package: the publish job runs `dotnet pack` over the whole solution. -->
+    <IsPackable>false</IsPackable>
+    <!-- No AOT, no trimming tuning: no wasm-tools workload needed on CI. -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MusicTheory\MusicTheory.csproj" />
+  </ItemGroup>
+
+  <!-- The app follows the site's look: tokens and self-hosted fonts are linked, not copied. -->
+  <ItemGroup>
+    <Content Include="..\site\tokens.css" Link="wwwroot\tokens.css" />
+    <Content Include="..\site\fonts\**" Link="wwwroot\fonts\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>
