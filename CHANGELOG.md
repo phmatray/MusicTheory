@@ -2,6 +2,17 @@
 
 Entries are written by release-please from the Conventional Commits merged into `dev`.
 
+## [2.0.0](https://github.com/phmatray/MusicTheory/compare/v1.7.0...v2.0.0) (2026-11-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* MusicTheory 2.0 on .NET 11 ([#157](https://github.com/phmatray/MusicTheory/issues/157))
+
+### Features
+
+* MusicTheory 2.0 on .NET 11 ([#157](https://github.com/phmatray/MusicTheory/issues/157)) ([c4775fb](https://github.com/phmatray/MusicTheory/commit/c4775fb7c4699df1fb5152096d7cdf56207b9482))
+
 ## [1.7.0](https://github.com/phmatray/MusicTheory/compare/v1.6.0...v1.7.0) (2026-10-17)
 
 
