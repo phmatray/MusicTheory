@@ -23,5 +23,12 @@ a { color: var(--sc-accent); }
 .tb-pc-on { background: var(--sc-accent); }
 .tb-results span { opacity: .75; }
 .tb-form { display: flex; gap: .5rem; align-items: end; flex-wrap: wrap; }
+.tb-controls { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; }
+.tb-controls label { display: flex; flex-direction: column; font-size: .9rem; }
+.tb-btn { font: inherit; padding: .4rem .9rem; border: 1px solid var(--sc-accent); background: var(--sc-canvas); color: var(--sc-ink); border-radius: .25rem; cursor: pointer; }
+.tb-btn:disabled { opacity: .5; cursor: default; }
+.tb-answers { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }
+.tb-right { font-weight: 600; }
+.tb-key-list { padding-left: 1.5rem; }
 .tb-form { display: grid; gap: .5rem; max-width: 36rem; }
 .tb-form button { justify-self: start; }

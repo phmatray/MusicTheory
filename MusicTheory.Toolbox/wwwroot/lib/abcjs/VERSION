@@ -1,0 +1,3 @@
+abcjs 6.7.2 (npm, MIT), dist/abcjs-basic-min.js, published 2026-10-16.
+Not modified. Only used to draw staves: no audio synth, so the soundfont URLs inside are never requested.
+Update: npm pack abcjs@<version>, copy dist/abcjs-basic-min.js and LICENSE.md here, edit this file.

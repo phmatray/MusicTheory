@@ -1,0 +1,25 @@
+@using MusicTheory.Guitar.Blazor
+@inject ChordAudio Audio
+
+<button type="button" class="tb-btn tb-play" @onclick="PlayAsync">@Strings.T(Lang, _played ? "intervals.replay" : "intervals.play")</button>
+
+@code {
+    /// <summary>Spacing of the two notes of a melodic interval, in ms (ChordAudio's strum is the gap).</summary>
+    private const int MelodicGapMs = 700;
+
+    [Parameter, EditorRequired] public IReadOnlyList<IReadOnlyList<Note>> Sounds { get; set; } = default!;
+    [Parameter, EditorRequired] public Lang Lang { get; set; }
+
+    private bool _played;
+
+    // Behind a click: browsers refuse audio before a user gesture.
+    private async Task PlayAsync()
+    {
+        var steps = DrillAudio.ToSchedule(Sounds);
+        _played = true;
+        if (steps.Count == 1)
+            await Audio.PlayAsync(steps[0], strumMs: 0);
+        else
+            await Audio.PlayAsync(steps.SelectMany(s => s).ToArray(), strumMs: MelodicGapMs);
+    }
+}
