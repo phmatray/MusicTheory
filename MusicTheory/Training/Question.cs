@@ -33,4 +33,8 @@ internal static class DrillRoots
     internal static readonly IReadOnlyList<Note> Twelve =
         new[] { "C4", "Db4", "D4", "Eb4", "E4", "F4", "F#4", "G4", "Ab4", "A4", "Bb4", "B4" }
             .Select(Note.Parse).ToArray();
+
+    internal static readonly IReadOnlyList<Note> MinorTonics =
+        new[] { "C4", "C#4", "D4", "Eb4", "E4", "F4", "F#4", "G4", "G#4", "A4", "Bb4", "B4" }
+            .Select(Note.Parse).ToArray();
 }
